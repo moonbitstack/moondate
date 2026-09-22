@@ -1,0 +1,10 @@
+// The proleptic Gregorian calendar and the clock on it.
+//
+// Dates and days are converted through the civil-from-days algorithm
+// (http://howardhinnant.github.io/date_algorithms.html#civil_from_days), which is
+// exact over the whole range an Int holds and needs no table.
+//
+// The text forms are RFC 3339 (https://www.rfc-editor.org/rfc/rfc3339), the four
+// shapes TOML 1.0.0 names (https://toml.io/en/v1.0.0#offset-date-time), HTTP's
+// IMF-fixdate (RFC 9110 §5.6.7) and ASN.1's UTCTime and GeneralizedTime
+// (ITU-T X.680 §47).
