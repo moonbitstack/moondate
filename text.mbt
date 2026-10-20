@@ -44,7 +44,7 @@ pub fn parse(src : StringView) -> Moment raise Refused {
 
 ///|
 /// The ten characters `YYYY-MM-DD` at `from`.
-fn date_of(s : String, from : Int) -> Date raise Refused {
+fn date_of(s : String, from : Int32) -> Date raise Refused {
   if at(s, from + 4) != '-' || at(s, from + 7) != '-' {
     raise Malformed("a date is YYYY-MM-DD")
   }
@@ -56,7 +56,7 @@ fn date_of(s : String, from : Int) -> Date raise Refused {
 ///
 /// RFC 3339 requires the seconds; TOML's local time allows them to be left off, and
 /// so does ISO 8601, so they are optional here.
-fn time_of(s : String, from : Int, end : Int) -> Time raise Refused {
+fn time_of(s : String, from : Int32, end : Int32) -> Time raise Refused {
   if end - from < 5 || at(s, from + 2) != ':' {
     raise Malformed("a time is HH:MM[:SS[.fff]]")
   }
@@ -97,7 +97,7 @@ fn time_of(s : String, from : Int, end : Int) -> Time raise Refused {
 
 ///|
 /// `Z`, `+HH:MM` or `-HH:MM` at `from`.
-fn zone_of(s : String, from : Int) -> Zone raise Refused {
+fn zone_of(s : String, from : Int32) -> Zone raise Refused {
   let c = at(s, from)
   if c == 'Z' || c == 'z' {
     if s.length() != from + 1 {
@@ -123,7 +123,7 @@ fn zone_of(s : String, from : Int) -> Zone raise Refused {
 ///|
 /// The character at `i`, or a space past the end so a caller's comparison fails
 /// rather than reading out of bounds.
-fn at(s : String, i : Int) -> Char {
+fn at(s : String, i : Int32) -> Char {
   if i >= 0 && i < s.length() {
     s[i].unsafe_to_char()
   } else {
@@ -133,7 +133,7 @@ fn at(s : String, i : Int) -> Char {
 
 ///|
 /// One digit at `i`.
-fn digit(s : String, i : Int) -> Int raise Refused {
+fn digit(s : String, i : Int32) -> Int32 raise Refused {
   let c = at(s, i)
   if c < '0' || c > '9' {
     raise Malformed("expected a digit at \{i}")
@@ -143,7 +143,7 @@ fn digit(s : String, i : Int) -> Int raise Refused {
 
 ///|
 /// `n` digits starting at `from`, as the number they spell.
-fn digits(s : String, from : Int, n : Int) -> Int raise Refused {
+fn digits(s : String, from : Int32, n : Int32) -> Int32 raise Refused {
   let mut out = 0
   for i = 0; i < n; i = i + 1 {
     out = out * 10 + digit(s, from + i)
@@ -226,7 +226,7 @@ fn text_of_zone(z : Zone) -> String {
 
 ///|
 /// `n` written with at least `width` digits.
-fn pad(n : Int, width : Int) -> String {
+fn pad(n : Int32, width : Int32) -> String {
   let s = n.to_string()
   if s.length() >= width {
     return s
@@ -352,7 +352,7 @@ fn asctime(s : String) -> Moment raise Refused {
 
 ///|
 /// A three-letter month name as its number.
-fn month_of(name : String) -> Int raise Refused {
+fn month_of(name : String) -> Int32 raise Refused {
   for i = 0; i < 12; i = i + 1 {
     if months[i] == name {
       return i + 1
@@ -362,7 +362,7 @@ fn month_of(name : String) -> Int raise Refused {
 }
 
 ///|
-fn find(s : String, c : Char) -> Int {
+fn find(s : String, c : Char) -> Int32 {
   for i = 0; i < s.length(); i = i + 1 {
     if s[i].to_int() == c.to_int() {
       return i

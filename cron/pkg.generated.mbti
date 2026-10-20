@@ -11,8 +11,8 @@ pub fn parse(StringView) -> Cron raise Refused
 
 // Errors
 pub(all) suberror Refused {
-  Fields(got~ : Int)
-  Range(field~ : String, got~ : Int, low~ : Int, high~ : Int)
+  Fields(got~ : Int32)
+  Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
 } derive(Eq, @debug.Debug)
 pub fn Refused::equal(Self, Self) -> Bool
@@ -26,10 +26,10 @@ pub impl Show for Refused
 pub(all) struct Cron {
   seconds : Int64
   minutes : Int64
-  hours : Int
-  days : Int
-  months : Int
-  weekdays : Int
+  hours : Int32
+  days : Int32
+  months : Int32
+  weekdays : Int32
   star_day : Bool
   star_week : Bool
 } derive(Eq, @debug.Debug)

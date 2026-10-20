@@ -37,13 +37,13 @@ pub let end_of_day : Time = {
 ///
 /// The proleptic Gregorian ordinal, which is what makes two dates subtractable
 /// without going through an epoch.
-pub fn Date::ordinal(self : Date) -> Int {
+pub fn Date::ordinal(self : Date) -> Int32 {
   self.days() + 719163
 }
 
 ///|
 /// The date with that ordinal (Python's `date.fromordinal`).
-pub fn Date::of_ordinal(n : Int) -> Date {
+pub fn Date::of_ordinal(n : Int32) -> Date {
   Date::of_days(n - 719163)
 }
 
@@ -54,7 +54,7 @@ pub fn Date::of_ordinal(n : Int) -> Date {
 /// The year is not always the calendar year. A week belongs to the year that holds
 /// its Thursday, so the first of January can fall in the last week of the year
 /// before — which is exactly the case a hand-rolled week number gets wrong.
-pub fn Date::isocalendar(self : Date) -> (Int, Int, Int) {
+pub fn Date::isocalendar(self : Date) -> (Int32, Int32, Int32) {
   let weekday = self.isoweekday()
   // The Thursday of this week decides which year the week counts against.
   let thursday = self.plus_days(4 - weekday)
@@ -70,7 +70,7 @@ pub fn Date::isocalendar(self : Date) -> (Int, Int, Int) {
 /// [`Date::weekday`] counts from Sunday as 0, which is what cron and C's `tm_wday`
 /// use; ISO counts from Monday as 1. Both are here because both are asked for, and
 /// picking one silently is how an off-by-one gets into a schedule.
-pub fn Date::isoweekday(self : Date) -> Int {
+pub fn Date::isoweekday(self : Date) -> Int32 {
   let d = self.weekday()
   if d == 0 {
     7
@@ -82,9 +82,9 @@ pub fn Date::isoweekday(self : Date) -> Int {
 ///|
 /// The date named by an ISO week date (Python's `date.fromisocalendar`).
 pub fn Date::of_isocalendar(
-  year : Int,
-  week : Int,
-  weekday : Int,
+  year : Int32,
+  week : Int32,
+  weekday : Int32,
 ) -> Date raise Refused {
   if week < 1 || week > 53 {
     raise Range(field="week", got=week, low=1, high=53)
@@ -114,9 +114,9 @@ pub fn Moment::combine(date : Date, time : Time, zone? : Zone) -> Moment {
 /// The same date with some parts replaced (Python's `date.replace`).
 pub fn Date::replace(
   self : Date,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
 ) -> Date raise Refused {
   Date::new(
     match year {
@@ -138,10 +138,10 @@ pub fn Date::replace(
 /// The same time with some parts replaced (Python's `time.replace`).
 pub fn Time::replace(
   self : Time,
-  hour? : Int,
-  minute? : Int,
-  second? : Int,
-  nano? : Int,
+  hour? : Int32,
+  minute? : Int32,
+  second? : Int32,
+  nano? : Int32,
 ) -> Time raise Refused {
   Time::new(
     match hour {
@@ -171,8 +171,8 @@ pub fn Time::replace(
 /// wants "now" passes what its own clock said.
 pub fn Moment::of_epoch(
   seconds : Int64,
-  nano? : Int = 0,
-  zone? : Zone = Utc,
+  nano~ : Int32 = 0,
+  zone~ : Zone = Utc,
 ) -> Moment {
   let offset = match zone {
     Utc => 0L
@@ -237,7 +237,7 @@ pub fn Span::total_seconds(self : Span) -> Double {
 ///|
 /// The whole days in a span, and the seconds and nanoseconds left over — the three
 /// fields Python's `timedelta` normalises to.
-pub fn Span::parts(self : Span) -> (Int, Int, Int) {
+pub fn Span::parts(self : Span) -> (Int32, Int32, Int32) {
   let mut days = self.nanos / day.nanos
   let mut rest = self.nanos % day.nanos
   if rest < 0L {
@@ -353,7 +353,7 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
   let mut minute = 0
   let mut sec = 0
   let mut nano = 0
-  let mut offset : Int? = None
+  let mut offset : Int32? = None
   let mut pm : Bool? = None
   let mut saw_date = false
   let mut saw_time = false
@@ -510,7 +510,7 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
 ///
 /// Fewer than `n` is allowed when what follows is not a digit, because `%m` reads
 /// `1-2-3` the way a person writes it.
-fn take(s : String, j : Int, n : Int) -> (Int, Int) raise Refused {
+fn take(s : String, j : Int32, n : Int32) -> (Int32, Int32) raise Refused {
   let mut v = 0
   let mut k = j
   while k < s.length() && k - j < n && is_digit(s[k].to_int()) {
@@ -524,13 +524,13 @@ fn take(s : String, j : Int, n : Int) -> (Int, Int) raise Refused {
 }
 
 ///|
-fn is_digit(c : Int) -> Bool {
+fn is_digit(c : Int32) -> Bool {
   c >= 0x30 && c <= 0x39
 }
 
 ///|
 /// Past a run of letters, for a name this parser does not need to keep.
-fn skip_name(s : String, j : Int) -> Int {
+fn skip_name(s : String, j : Int32) -> Int32 {
   let mut k = j
   while k < s.length() {
     let c = s[k].to_int()
@@ -545,7 +545,7 @@ fn skip_name(s : String, j : Int) -> Int {
 
 ///|
 /// A month name at `j`, long form or short, as its number.
-fn read_month(s : String, j : Int) -> (Int, Int) raise Refused {
+fn read_month(s : String, j : Int32) -> (Int32, Int32) raise Refused {
   let end = skip_name(s, j)
   if end == j {
     raise Malformed("expected a month name at \{j}")
@@ -569,7 +569,7 @@ fn read_month(s : String, j : Int) -> (Int, Int) raise Refused {
 
 ///|
 /// An offset at `j`, as `+HHMM`, `+HH:MM` or `Z`.
-fn read_offset(s : String, j : Int) -> (Int, Int) raise Refused {
+fn read_offset(s : String, j : Int32) -> (Int32, Int32) raise Refused {
   if j < s.length() && (s[j].to_int() == 0x5a || s[j].to_int() == 0x7a) {
     return (0, j + 1)
   }
@@ -602,10 +602,10 @@ let long_months : Array[String] = [
 
 ///|
 /// The years Python's calendar spans (`MINYEAR` and `MAXYEAR`).
-pub let min_year : Int = 1
+pub let min_year : Int32 = 1
 
 ///|
-pub let max_year : Int = 9999
+pub let max_year : Int32 = 9999
 
 ///|
 /// The smallest difference two moments can have (Python's `resolution`).
@@ -671,13 +671,13 @@ pub fn Moment::astimezone(self : Moment, zone : Zone) -> Moment? {
 /// The same moment with some parts replaced (Python's `datetime.replace`).
 pub fn Moment::replace(
   self : Moment,
-  year? : Int,
-  month? : Int,
-  day? : Int,
-  hour? : Int,
-  minute? : Int,
-  second? : Int,
-  nano? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
+  hour? : Int32,
+  minute? : Int32,
+  second? : Int32,
+  nano? : Int32,
   zone? : Zone,
 ) -> Moment raise Refused {
   let d = match self.date() {
@@ -696,19 +696,19 @@ pub fn Moment::replace(
 
 ///|
 /// The day of the week of the moment's date, Sunday being 0.
-pub fn Moment::weekday(self : Moment) -> Int? {
+pub fn Moment::weekday(self : Moment) -> Int32? {
   self.date().map(d => d.weekday())
 }
 
 ///|
 /// The ISO week date of the moment's date.
-pub fn Moment::isocalendar(self : Moment) -> (Int, Int, Int)? {
+pub fn Moment::isocalendar(self : Moment) -> (Int32, Int32, Int32)? {
   self.date().map(d => d.isocalendar())
 }
 
 ///|
 /// Days since 0001-01-01 of the moment's date (Python's `toordinal`).
-pub fn Moment::ordinal(self : Moment) -> Int? {
+pub fn Moment::ordinal(self : Moment) -> Int32? {
   self.date().map(d => d.ordinal())
 }
 
@@ -718,7 +718,7 @@ pub fn Moment::ordinal(self : Moment) -> Int? {
 ///
 /// `sep` is the character between the date and the time, `T` by default; Python
 /// allows any, and a space is what a log line wants.
-pub fn Moment::isoformat(self : Moment, sep? : Char = 'T') -> String {
+pub fn Moment::isoformat(self : Moment, sep~ : Char = 'T') -> String {
   let text = self.to_string()
   if sep == 'T' {
     return text
@@ -781,7 +781,7 @@ pub fn Moment::ctime(self : Moment) -> String {
 /// needs a zone database this package does not carry.
 pub fn Moment::timetuple(
   self : Moment,
-) -> (Int, Int, Int, Int, Int, Int, Int, Int, Int) {
+) -> (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32) {
   let d = match self.date() {
     Some(d) => d
     None => { year: 1900, month: 1, day: 1, }
@@ -810,13 +810,13 @@ pub fn Moment::timestamp(self : Moment) -> Double? {
 ///|
 /// A span made of the parts Python's `timedelta` constructor takes.
 pub fn Span::new(
-  days? : Int64 = 0,
-  hours? : Int64 = 0,
-  minutes? : Int64 = 0,
-  seconds? : Int64 = 0,
-  millis? : Int64 = 0,
-  micros? : Int64 = 0,
-  nanos? : Int64 = 0,
+  days~ : Int64 = 0,
+  hours~ : Int64 = 0,
+  minutes~ : Int64 = 0,
+  seconds~ : Int64 = 0,
+  millis~ : Int64 = 0,
+  micros~ : Int64 = 0,
+  nanos~ : Int64 = 0,
 ) -> Span {
   {
     nanos: days * day.nanos +

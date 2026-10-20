@@ -16,19 +16,19 @@ pub let hour : Span
 
 pub fn http(StringView) -> Moment raise Refused
 
-pub fn leap(Int) -> Bool
+pub fn leap(Int32) -> Bool
 
-pub fn length(Int, Int) -> Int
+pub fn length(Int32, Int32) -> Int32
 
 pub let max_date : Date
 
-pub let max_year : Int
+pub let max_year : Int32
 
 pub let midnight : Time
 
 pub let min_date : Date
 
-pub let min_year : Int
+pub let min_year : Int32
 
 pub let minute : Span
 
@@ -46,7 +46,7 @@ pub fn strptime(StringView, StringView) -> Moment raise Refused
 
 // Errors
 pub(all) suberror Refused {
-  Range(field~ : String, got~ : Int, low~ : Int, high~ : Int)
+  Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
   Truncated(String)
 } derive(Eq, @debug.Debug)
@@ -59,34 +59,34 @@ pub impl Show for Refused
 
 // Types and methods
 pub(all) struct Date {
-  year : Int
-  month : Int
-  day : Int
+  year : Int32
+  month : Int32
+  day : Int32
 } derive(Compare, Eq, @debug.Debug)
-pub fn Date::compare(Self, Self) -> Int
-pub fn Date::days(Self) -> Int
+pub fn Date::compare(Self, Self) -> Int32
+pub fn Date::days(Self) -> Int32
 pub fn Date::diff(Self, Self) -> Span
 pub fn Date::equal(Self, Self) -> Bool
-pub fn Date::isocalendar(Self) -> (Int, Int, Int)
-pub fn Date::isoweekday(Self) -> Int
-pub fn Date::new(Int, Int, Int) -> Self raise Refused
+pub fn Date::isocalendar(Self) -> (Int32, Int32, Int32)
+pub fn Date::isoweekday(Self) -> Int32
+pub fn Date::new(Int32, Int32, Int32) -> Self raise Refused
 pub fn Date::not_equal(Self, Self) -> Bool
-pub fn Date::of_days(Int) -> Self
-pub fn Date::of_isocalendar(Int, Int, Int) -> Self raise Refused
-pub fn Date::of_ordinal(Int) -> Self
+pub fn Date::of_days(Int32) -> Self
+pub fn Date::of_isocalendar(Int32, Int32, Int32) -> Self raise Refused
+pub fn Date::of_ordinal(Int32) -> Self
 pub fn Date::op_ge(Self, Self) -> Bool
 pub fn Date::op_gt(Self, Self) -> Bool
 pub fn Date::op_le(Self, Self) -> Bool
 pub fn Date::op_lt(Self, Self) -> Bool
-pub fn Date::ordinal(Self) -> Int
+pub fn Date::ordinal(Self) -> Int32
 pub fn Date::output(Self, &Logger) -> Unit
-pub fn Date::plus_days(Self, Int) -> Self
-pub fn Date::plus_months(Self, Int) -> Self
-pub fn Date::replace(Self, year? : Int, month? : Int, day? : Int) -> Self raise Refused
+pub fn Date::plus_days(Self, Int32) -> Self
+pub fn Date::plus_months(Self, Int32) -> Self
+pub fn Date::replace(Self, year? : Int32, month? : Int32, day? : Int32) -> Self raise Refused
 pub fn Date::to_repr(Self) -> @debug.Repr
 pub fn Date::to_string(Self) -> String
-pub fn Date::weekday(Self) -> Int
-pub fn Date::yearday(Self) -> Int
+pub fn Date::weekday(Self) -> Int32
+pub fn Date::yearday(Self) -> Int32
 pub impl Show for Date
 
 pub(all) enum Moment {
@@ -104,22 +104,22 @@ pub fn Moment::diff(Self, Self) -> Span?
 pub fn Moment::epoch(Self) -> Int64?
 pub fn Moment::equal(Self, Self) -> Bool
 pub fn Moment::http_text(Self) -> String raise Refused
-pub fn Moment::isocalendar(Self) -> (Int, Int, Int)?
+pub fn Moment::isocalendar(Self) -> (Int32, Int32, Int32)?
 pub fn Moment::isoformat(Self, sep? : Char) -> String
 pub fn Moment::not_equal(Self, Self) -> Bool
-pub fn Moment::of_epoch(Int64, nano? : Int, zone? : Zone) -> Self
-pub fn Moment::ordinal(Self) -> Int?
+pub fn Moment::of_epoch(Int64, nano? : Int32, zone? : Zone) -> Self
+pub fn Moment::ordinal(Self) -> Int32?
 pub fn Moment::output(Self, &Logger) -> Unit
 pub fn Moment::plus(Self, Span) -> Self
-pub fn Moment::replace(Self, year? : Int, month? : Int, day? : Int, hour? : Int, minute? : Int, second? : Int, nano? : Int, zone? : Zone) -> Self raise Refused
+pub fn Moment::replace(Self, year? : Int32, month? : Int32, day? : Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, zone? : Zone) -> Self raise Refused
 pub fn Moment::strftime(Self, StringView) -> String
 pub fn Moment::time(Self) -> Time
 pub fn Moment::timestamp(Self) -> Double?
-pub fn Moment::timetuple(Self) -> (Int, Int, Int, Int, Int, Int, Int, Int, Int)
+pub fn Moment::timetuple(Self) -> (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32)
 pub fn Moment::to_repr(Self) -> @debug.Repr
 pub fn Moment::to_string(Self) -> String
 pub fn Moment::utcoffset(Self) -> Span?
-pub fn Moment::weekday(Self) -> Int?
+pub fn Moment::weekday(Self) -> Int32?
 pub fn Moment::zone(Self) -> Zone?
 pub impl Show for Moment
 
@@ -128,7 +128,7 @@ pub(all) struct Span {
 } derive(Compare, Eq, @debug.Debug)
 pub fn Span::abs(Self) -> Self
 pub fn Span::add(Self, Self) -> Self
-pub fn Span::compare(Self, Self) -> Int
+pub fn Span::compare(Self, Self) -> Int32
 pub fn Span::equal(Self, Self) -> Bool
 pub fn Span::neg(Self) -> Self
 pub fn Span::new(days? : Int64, hours? : Int64, minutes? : Int64, seconds? : Int64, millis? : Int64, micros? : Int64, nanos? : Int64) -> Self
@@ -138,36 +138,36 @@ pub fn Span::op_ge(Self, Self) -> Bool
 pub fn Span::op_gt(Self, Self) -> Bool
 pub fn Span::op_le(Self, Self) -> Bool
 pub fn Span::op_lt(Self, Self) -> Bool
-pub fn Span::parts(Self) -> (Int, Int, Int)
+pub fn Span::parts(Self) -> (Int32, Int32, Int32)
 pub fn Span::seconds(Self) -> Int64
 pub fn Span::sub(Self, Self) -> Self
 pub fn Span::to_repr(Self) -> @debug.Repr
 pub fn Span::total_seconds(Self) -> Double
 
 pub(all) struct Time {
-  hour : Int
-  minute : Int
-  second : Int
-  nano : Int
+  hour : Int32
+  minute : Int32
+  second : Int32
+  nano : Int32
 } derive(Compare, Eq, @debug.Debug)
-pub fn Time::compare(Self, Self) -> Int
+pub fn Time::compare(Self, Self) -> Int32
 pub fn Time::equal(Self, Self) -> Bool
 pub fn Time::nanos(Self) -> Int64
-pub fn Time::new(Int, Int, second? : Int, nano? : Int) -> Self raise Refused
+pub fn Time::new(Int32, Int32, second? : Int32, nano? : Int32) -> Self raise Refused
 pub fn Time::not_equal(Self, Self) -> Bool
 pub fn Time::op_ge(Self, Self) -> Bool
 pub fn Time::op_gt(Self, Self) -> Bool
 pub fn Time::op_le(Self, Self) -> Bool
 pub fn Time::op_lt(Self, Self) -> Bool
 pub fn Time::output(Self, &Logger) -> Unit
-pub fn Time::replace(Self, hour? : Int, minute? : Int, second? : Int, nano? : Int) -> Self raise Refused
+pub fn Time::replace(Self, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32) -> Self raise Refused
 pub fn Time::to_repr(Self) -> @debug.Repr
 pub fn Time::to_string(Self) -> String
 pub impl Show for Time
 
 pub(all) enum Zone {
   Utc
-  Offset(Int)
+  Offset(Int32)
 } derive(Eq, @debug.Debug)
 pub fn Zone::equal(Self, Self) -> Bool
 pub fn Zone::not_equal(Self, Self) -> Bool

@@ -4,8 +4,8 @@
 ///|
 /// Why an expression was refused.
 pub(all) suberror Refused {
-  Fields(got~ : Int)
-  Range(field~ : String, got~ : Int, low~ : Int, high~ : Int)
+  Fields(got~ : Int32)
+  Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
 } derive(Eq, Debug)
 
@@ -37,10 +37,10 @@ pub extend Refused with Eq::{not_equal, equal}
 pub(all) struct Cron {
   seconds : Int64
   minutes : Int64
-  hours : Int
-  days : Int
-  months : Int
-  weekdays : Int
+  hours : Int32
+  days : Int32
+  months : Int32
+  weekdays : Int32
   star_day : Bool
   star_week : Bool
 } derive(Eq, Debug)
@@ -181,7 +181,12 @@ fn floor(m : @moondate.Moment) -> @moondate.Moment {
 
 ///|
 /// A field as a bit set over `low..=high`.
-fn field(s : String, low : Int, high : Int, name : String) -> Int raise Refused {
+fn field(
+  s : String,
+  low : Int32,
+  high : Int32,
+  name : String,
+) -> Int32 raise Refused {
   let mut out = 0
   for part in split_on(s, ',') {
     let (from, to, step) = span(part, low, high, name)
@@ -196,8 +201,8 @@ fn field(s : String, low : Int, high : Int, name : String) -> Int raise Refused 
 /// The same over a range that needs sixty-four bits.
 fn field64(
   s : String,
-  low : Int,
-  high : Int,
+  low : Int32,
+  high : Int32,
   name : String,
 ) -> Int64 raise Refused {
   let mut out = 0L
@@ -214,10 +219,10 @@ fn field64(
 /// One comma-separated piece as `(from, to, step)`.
 fn span(
   s : String,
-  low : Int,
-  high : Int,
+  low : Int32,
+  high : Int32,
   name : String,
-) -> (Int, Int, Int) raise Refused {
+) -> (Int32, Int32, Int32) raise Refused {
   let slash = find(s, '/')
   let head = if slash < 0 { s } else { s[0:slash].to_owned() }
   let step = if slash < 0 {
@@ -249,7 +254,12 @@ fn span(
 
 ///|
 /// One value, checked against the field's range.
-fn value(s : String, low : Int, high : Int, name : String) -> Int raise Refused {
+fn value(
+  s : String,
+  low : Int32,
+  high : Int32,
+  name : String,
+) -> Int32 raise Refused {
   let v = number(s, name)
   if v < low || v > high {
     raise Range(field=name, got=v, low~, high~)
@@ -259,14 +269,14 @@ fn value(s : String, low : Int, high : Int, name : String) -> Int raise Refused 
 
 ///|
 /// The month field, which also takes the three-letter names.
-fn month(s : String) -> Int raise Refused {
+fn month(s : String) -> Int32 raise Refused {
   field(names(s, month_names, 1), 1, 12, "month")
 }
 
 ///|
 /// The day-of-week field, which also takes the three-letter names, and where both
 /// 0 and 7 are Sunday (crontab(5)).
-fn week(s : String) -> Int raise Refused {
+fn week(s : String) -> Int32 raise Refused {
   let bits = field(names(s, day_names, 0), 0, 7, "day of week")
   if has(bits, 7) {
     (bits | 1) & 0x7f
@@ -279,7 +289,7 @@ fn week(s : String) -> Int raise Refused {
 /// Three-letter names replaced by their numbers, so the rest of the parser sees
 /// only digits. `base` is the number the first name stands for: months count from
 /// one, days of the week from zero.
-fn names(s : String, table : Array[String], base : Int) -> String {
+fn names(s : String, table : Array[String], base : Int32) -> String {
   let out = StringBuilder()
   let upper = s.to_upper()
   let mut i = 0
@@ -355,12 +365,12 @@ fn split_on(s : String, c : Char) -> Array[String] {
 }
 
 ///|
-fn find(s : String, c : Char) -> Int {
+fn find(s : String, c : Char) -> Int32 {
   find_from(s, c, 0)
 }
 
 ///|
-fn find_from(s : String, c : Char, from : Int) -> Int {
+fn find_from(s : String, c : Char, from : Int32) -> Int32 {
   for i = from; i < s.length(); i = i + 1 {
     if s[i].to_int() == c.to_int() {
       return i
@@ -370,7 +380,7 @@ fn find_from(s : String, c : Char, from : Int) -> Int {
 }
 
 ///|
-fn number(s : String, name : String) -> Int raise Refused {
+fn number(s : String, name : String) -> Int32 raise Refused {
   if s.length() == 0 {
     raise Malformed(name + " has an empty value")
   }
@@ -400,18 +410,18 @@ fn trim(s : String) -> String {
 
 ///|
 /// A bit set holding only `v`.
-fn bit64(v : Int) -> Int64 {
+fn bit64(v : Int32) -> Int64 {
   1L << v
 }
 
 ///|
 /// Whether `v` is absent from a sixty-four bit set.
-fn not64(set : Int64, v : Int) -> Bool {
+fn not64(set : Int64, v : Int32) -> Bool {
   ((set >> v) & 1L) == 0L
 }
 
 ///|
 /// Whether `v` is in a thirty-two bit set.
-fn has(set : Int, v : Int) -> Bool {
+fn has(set : Int32, v : Int32) -> Bool {
   ((set >> v) & 1) == 1
 }

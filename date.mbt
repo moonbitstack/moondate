@@ -7,7 +7,7 @@
 /// A calendar that accepted the thirty-first of February would be no use as a
 /// check, so every constructor here validates and says what was wrong.
 pub(all) suberror Refused {
-  Range(field~ : String, got~ : Int, low~ : Int, high~ : Int)
+  Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
   Truncated(String)
 } derive(Eq, Debug)
@@ -38,9 +38,9 @@ pub extend Refused with Eq::{not_equal, equal}
 /// what every interchange format in reach assumes and what makes arithmetic over
 /// the whole range uniform.
 pub(all) struct Date {
-  year : Int
-  month : Int
-  day : Int
+  year : Int32
+  month : Int32
+  day : Int32
 } derive(Eq, Compare, Debug)
 
 ///|
@@ -59,10 +59,10 @@ pub extend Date with Compare::{compare, op_lt, op_le, op_ge, op_gt}
 /// timestamp that records one is a real timestamp that a reader should not throw
 /// away.
 pub(all) struct Time {
-  hour : Int
-  minute : Int
-  second : Int
-  nano : Int
+  hour : Int32
+  minute : Int32
+  second : Int32
+  nano : Int32
 } derive(Eq, Compare, Debug)
 
 ///|
@@ -82,7 +82,7 @@ pub extend Time with Compare::{compare, op_lt, op_le, op_ge, op_gt}
 /// unknown, and `Z` to one that is genuinely UTC.
 pub(all) enum Zone {
   Utc
-  Offset(Int)
+  Offset(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -176,13 +176,13 @@ pub fn Span::seconds(self : Span) -> Int64 {
 ///
 /// Every fourth year, except every hundredth, except every four-hundredth — the
 /// rule that makes the calendar year 365.2425 days long.
-pub fn leap(year : Int) -> Bool {
+pub fn leap(year : Int32) -> Bool {
   (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
 }
 
 ///|
 /// How many days `month` has in `year`.
-pub fn length(year : Int, month : Int) -> Int {
+pub fn length(year : Int32, month : Int32) -> Int32 {
   match month {
     1 | 3 | 5 | 7 | 8 | 10 | 12 => 31
     4 | 6 | 9 | 11 => 30
@@ -193,7 +193,11 @@ pub fn length(year : Int, month : Int) -> Int {
 
 ///|
 /// A date, checked against the calendar.
-pub fn Date::new(year : Int, month : Int, day : Int) -> Date raise Refused {
+pub fn Date::new(
+  year : Int32,
+  month : Int32,
+  day : Int32,
+) -> Date raise Refused {
   if month < 1 || month > 12 {
     raise Range(field="month", got=month, low=1, high=12)
   }
@@ -209,7 +213,7 @@ pub fn Date::new(year : Int, month : Int, day : Int) -> Date raise Refused {
 ///
 /// Howard Hinnant's `days_from_civil`: shift the year to start in March so the leap
 /// day falls at the end, then the month lengths follow a pattern with no table.
-pub fn Date::days(self : Date) -> Int {
+pub fn Date::days(self : Date) -> Int32 {
   let y = if self.month <= 2 { self.year - 1 } else { self.year }
   let era = (if y >= 0 { y } else { y - 399 }) / 400
   let yoe = y - era * 400
@@ -221,7 +225,7 @@ pub fn Date::days(self : Date) -> Int {
 
 ///|
 /// The date `n` days after 1970-01-01, the inverse of [`Date::days`].
-pub fn Date::of_days(n : Int) -> Date {
+pub fn Date::of_days(n : Int32) -> Date {
   let z = n + 719468
   let era = (if z >= 0 { z } else { z - 146096 }) / 146097
   let doe = z - era * 146097
@@ -238,7 +242,7 @@ pub fn Date::of_days(n : Int) -> Date {
 /// The day of the week, Sunday being 0.
 ///
 /// 1970-01-01 was a Thursday, which is where the 4 comes from.
-pub fn Date::weekday(self : Date) -> Int {
+pub fn Date::weekday(self : Date) -> Int32 {
   let d = (self.days() + 4) % 7
   if d < 0 {
     d + 7
@@ -249,13 +253,13 @@ pub fn Date::weekday(self : Date) -> Int {
 
 ///|
 /// The day of the year, the first of January being 1.
-pub fn Date::yearday(self : Date) -> Int {
+pub fn Date::yearday(self : Date) -> Int32 {
   self.days() - { year: self.year, month: 1, day: 1, }.days() + 1
 }
 
 ///|
 /// The date `n` days later, or earlier when `n` is negative.
-pub fn Date::plus_days(self : Date, n : Int) -> Date {
+pub fn Date::plus_days(self : Date, n : Int32) -> Date {
   Date::of_days(self.days() + n)
 }
 
@@ -265,7 +269,7 @@ pub fn Date::plus_days(self : Date, n : Int) -> Date {
 /// The thirty-first of January plus one month is the twenty-eighth or
 /// twenty-ninth of February, because there is no thirty-first. Every calendar
 /// library makes this choice and they all make the same one.
-pub fn Date::plus_months(self : Date, n : Int) -> Date {
+pub fn Date::plus_months(self : Date, n : Int32) -> Date {
   let total = self.year * 12 + (self.month - 1) + n
   let year = if total >= 0 { total / 12 } else { (total - 11) / 12 }
   let month = total - year * 12 + 1
@@ -278,10 +282,10 @@ pub fn Date::plus_months(self : Date, n : Int) -> Date {
 ///|
 /// A time, checked against the clock.
 pub fn Time::new(
-  hour : Int,
-  minute : Int,
-  second? : Int = 0,
-  nano? : Int = 0,
+  hour : Int32,
+  minute : Int32,
+  second~ : Int32 = 0,
+  nano~ : Int32 = 0,
 ) -> Time raise Refused {
   if hour < 0 || hour > 23 {
     raise Range(field="hour", got=hour, low=0, high=23)
