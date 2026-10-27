@@ -278,8 +278,15 @@
       crystals: { crystal: 16 },
       sleet: { snow: 14, burst: { hail: 12, spread: [1300, 2200], gap: [2400, 6200] } },
       wind: { snow: 16, crystal: 10, blow: true },
+      // Autumn, once the wind gets up. Two of the three windy loads carry the
+      // drawn leaves — one shakes a few maples loose, the other takes a limb's
+      // worth of maple and ginkgo away together — and the plain gust keeps the
+      // coloured leaf it always had, so a maple load reads as its own afternoon
+      // rather than as the usual one with stickers on it.
       leaves: { leaf: 11 },
       gust: { leaf: 11, gust: [5000, 10000] },
+      maples: { maple: 20, gust: [7000, 14000] },
+      windfall: { maple: 9, ginkgo: 10, gust: [3500, 8000] },
       // Not weather: plain spring with one thing in the sky. Here so the rare
       // states can be asked for by name instead of waited for.
       balloons: { petal: 12 },
@@ -290,6 +297,10 @@
     const SHAPE = {
       petal: { w: [10, 15], drift: [26, 58], dur: [13, 21], o: [0.55, 0.7] },
       leaf: { w: [16, 22], drift: [44, 72], dur: [10, 16], o: [0.6, 0.8] },
+      // A drawn leaf wants a little more weight than a coloured corner does:
+      // the silhouette is thin at the tips, so it reads smaller than it is.
+      maple: { w: [17, 25], drift: [42, 84], dur: [9, 15], o: [0.82, 0.96] },
+      ginkgo: { w: [16, 23], drift: [38, 76], dur: [10, 16], o: [0.82, 0.96] },
       drop: { w: [1.4, 2], h: [18, 30], drift: [18, 40], dur: [0.7, 1.5], o: [0.45, 0.8] },
       snow: { w: [3, 7], drift: [16, 42], dur: [15, 26], o: [0.6, 0.9] },
       crystal: { w: [12, 24], drift: [20, 60], dur: [16, 30], o: [0.6, 0.9] },
@@ -308,6 +319,16 @@
     const CRYSTAL_B =
       '<path fill="currentColor" d="M510.44352 122.88a71.68 71.68 0 0 1 20.48 140.3904v66.16064l59.67872-59.67872a20.48 20.48 0 0 1 27.66848-1.19808l1.30048 1.19808a20.48 20.48 0 0 1 1.19808 27.65824l-1.19808 1.31072-86.8864 86.8864a20.69504 20.69504 0 0 1-1.75104 1.55648v14.04928a112.5376 112.5376 0 0 1 65.19808 37.66272l12.17536-7.03488c0.11264-0.768 0.27648-1.536 0.48128-2.29376l31.7952-118.69184a20.48 20.48 0 0 1 39.56736 10.5984l-21.84192 81.5104 57.2928-33.0752a71.68 71.68 0 1 1 20.48 35.4816l-57.2928 33.0752 81.53088 21.85216a20.48 20.48 0 0 1 14.85824 23.35744l-0.37888 1.73056a20.48 20.48 0 0 1-23.35744 14.85824l-1.73056-0.37888-118.6816-31.80544a20.69504 20.69504 0 0 1-2.23232-0.72704l-12.16512 7.0144c4.17792 11.776 6.4512 24.45312 6.4512 37.65248 0 13.2096-2.27328 25.87648-6.4512 37.65248l12.16512 7.0144c0.7168-0.27648 1.46432-0.52224 2.22208-0.72704l118.69184-31.80544a20.48 20.48 0 1 1 10.60864 39.56736l-81.52064 21.84192 57.2928 33.0752a71.68 71.68 0 1 1-20.48 35.4816l-57.2928-33.08544 21.83168 81.53088a20.48 20.48 0 0 1-12.8 24.55552l-1.67936 0.53248a20.48 20.48 0 0 1-24.55552-12.8l-0.53248-1.6896-31.7952-118.6816a20.69504 20.69504 0 0 1-0.48128-2.304l-12.1856-7.03488a112.5376 112.5376 0 0 1-65.19808 37.66272v14.04928c0.6144 0.48128 1.19808 1.00352 1.76128 1.55648l86.8864 86.8864a20.48 20.48 0 1 1-28.96896 28.96896l-59.66848-59.67872v66.16064a71.68 71.68 0 1 1-40.96 0v-66.16064l-59.6992 59.67872a20.48 20.48 0 0 1-27.648 1.19808l-1.31072-1.19808a20.48 20.48 0 0 1-1.19808-27.65824l1.19808-1.31072 86.8864-86.8864c0.5632-0.55296 1.14688-1.0752 1.75104-1.55648v-14.05952a112.5376 112.5376 0 0 1-65.19808-37.65248l-12.1856 7.03488c-0.1024 0.768-0.26624 1.536-0.47104 2.29376l-31.80544 118.69184a20.48 20.48 0 0 1-39.55712-10.5984l21.84192-81.5104-57.30304 33.0752a71.68 71.68 0 1 1-20.48-35.4816l57.30304-33.0752-81.53088-21.85216a20.48 20.48 0 0 1-14.85824-23.35744l0.37888-1.73056a20.48 20.48 0 0 1 23.35744-14.85824l1.73056 0.37888 118.6816 31.80544c0.768 0.2048 1.51552 0.45056 2.23232 0.72704l12.15488-7.0144A112.45568 112.45568 0 0 1 397.80352 512c0-13.2096 2.27328-25.87648 6.4512-37.65248l-12.16512-7.0144c-0.7168 0.27648-1.46432 0.52224-2.22208 0.72704l-118.69184 31.80544a20.48 20.48 0 1 1-10.60864-39.56736l81.52064-21.84192-57.2928-33.0752a71.68 71.68 0 1 1 20.48-35.4816l57.2928 33.08544-21.83168-81.53088a20.48 20.48 0 0 1 12.8-24.55552l1.67936-0.53248a20.48 20.48 0 0 1 24.55552 12.8l0.52224 1.6896 31.80544 118.6816c0.2048 0.768 0.36864 1.536 0.48128 2.304l12.1856 7.03488a112.5376 112.5376 0 0 1 65.18784-37.65248v-14.05952a20.69504 20.69504 0 0 1-1.7408-1.55648l-86.89664-86.8864a20.48 20.48 0 1 1 28.96896-28.96896l59.66848 59.67872V263.2704a71.68 71.68 0 0 1 20.48-140.3904z"/>';
 
+    // ---- autumn leaves --------------------------------------------------------
+    // Two leaves, drawn once and referenced by every one that comes down: a
+    // maple still carrying its stem, and a ginkgo, which is a fan and not a
+    // maple at all. Each is stored as a bare path and cropped to its own box,
+    // because the source art is a square canvas with the leaf in the middle and
+    // a square canvas at 18px would leave the leaf the size of a crumb.
+    const LEAF_MAPLE = 'M957.62963 322.37037c-4.133926 56.357926-103.158519 169.054815-103.158519 169.054815a150.148741 150.148741 0 0 1 74.277926 24.158815c-20.612741 60.378074-152.689778 120.775111-152.689778 120.775111l103.177482 108.676741s-172.752593 98.778074-342.71763 31.004444c-4.399407 68.645926-16.270222 159.156148-47.122963 229.451852-13.368889 30.473481-97.545481 22.376296-50.157037-17.066667 34.683259-28.880593 53.57037-128.948148 56.471704-215.608888-172.562963 74.524444-351.080296-27.648-351.080296-27.648l103.177481-108.676741s-132.077037-60.397037-152.708741-120.775111a150.262519 150.262519 0 0 1 74.296889-24.158815S70.314667 378.804148 66.199704 322.37037a255.222519 255.222519 0 0 1 127.943111 20.119704 99.043556 99.043556 0 0 1 12.363852-68.437333c57.780148 8.059259 148.574815 96.616296 160.957629 116.736s-61.895111-140.894815-37.129481-217.372445a365.074963 365.074963 0 0 1 107.292444 28.178963s0-149.124741 74.296889-201.462518c74.258963 52.337778 74.258963 201.462519 74.258963 201.462518a365.302519 365.302519 0 0 1 107.311408-28.178963c24.76563 76.47763-49.531259 237.511111-37.129482 217.372445s103.177481-108.676741 160.95763-116.736a99.214222 99.214222 0 0 1 12.363852 68.437333A255.184593 255.184593 0 0 1 957.62963 322.37037z';
+    const LEAF_BRASS = 'M740.4 474.9c-1.8-3.2-2.5-6.7-4.4-9.8-1.5-2.5-2.5-5.5-5.7-6.5-0.1-0.1-0.2-0.1-0.3-0.1-1-2.2-3.1-3.4-5.1-4.3-2.5-1-3.1-3.5-4.9-5-3.1-2.4 0.6-4.1 0.7-6.2 0-0.2 0.1-0.3 0.1-0.5 0.9-3.8 3.6-7.9-1.8-10.7-0.3-0.1-0.4-0.6-0.5-0.9-0.7-1.9-2.3-2.8-4.1-3.3-0.6-0.5-1.6-0.8-1.7-1.6-0.3-2.9-1.8-5.5-2.2-8.4-0.9-6.7-3.3-8.5-9.3-7.8-0.3 0-0.5 0.1-0.8 0.1-2-0.4-4.2-0.5-6-1.6-1.2-1-3.2-0.4-4-2-0.8-1.7-2.3-2.7-3.8-3.9-1.1-3.5-2.2-7.2-0.8-10.8 1.3-3.5 1-7.1 1.2-10.7 0.1-2.1-1-3.6-2.5-5-2.1-2-4.6-3.3-7.3-4.6-3.8-1.9-6.8-4.9-9.5-8.2-1.4-1.7-3.3-3.6-5.2-3.8-2.9-0.2-5-1.6-6.9-3.2-3.1-2.7-6.9-4.7-8.8-8.6-0.8-1.7-1.8-3.3-3.1-4.6-2.2-2.2-4.6-4.2-7.7-4.8-2.9-0.5-6-0.5-9-0.7 0 0.1-0.1 0.2-0.1 0.2 0.1-0.1 0.1-0.2 0.2-0.2-1.2-0.9-3.3 0.9-3.9-1.7-0.9-4.1-2.1-8.2-3.1-12.3-0.3-1.3-0.9-2.3-1.8-3.2-4.6-4.2-9.2-8.6-13.9-12.7-4.2-3.6-8.8-6.3-14.7-6.4-4.4-0.1-8.3-2.2-12.2-3.9-0.4-0.8-1-1.5-1.9-1.8-0.5-0.7-1.2-1.3-1.6-2.1-2.1-4.7-5.5-8.2-9.9-10.8-3.5-2.1-8.8-1.4-11 1.7 0 0.1-0.1 0.3-0.1 0.4-2.6 3.2-5.2 6.4-7.8 9.7-1.2 1.9-2.2 3.8-2.9 5.9 0 0.1 0.1 0.1 0.2 0.2l-0.2-0.2c-0.6 1.1-1.2 2.2-1.8 3.4-1.5 2.1-2.9 4.2-4.4 6.2-0.4 0.5-0.9 1-0.8 1.7-0.2 0.3-0.4 0.7-0.6 1-1.3 2.4-2.5 4.8-3.8 7.2-0.8 1-1.3 2.2-1.6 3.4-1 2.2-2 4.5-2.4 6.9-1.7 4.5-3.1 9.1-4.4 13.7-0.4 0.4-0.5 1-0.4 1.6l-0.9 1.8c-0.4 2-0.9 3.9-1.3 5.9-0.5 0.6-0.8 1.4-0.8 2.2-0.3 0.4-0.6 0.8-0.8 1.2 0 0.6-0.2 1.1-0.5 1.6-0.7 0.4-1 1-1.1 1.7 0 0.2 0 0.5 0.1 0.7 0 0.1 0.1 0.1 0.1 0.2-0.4 0.8-0.9 1.6-1.3 2.4-1.4 0.8-2.3 3.4-4.4 1.7v-0.3c-0.2-1-0.6-1.9-1.6-2.5l-0.3-0.3c0-0.1 0.1-0.2 0.1-0.4 0-0.9-0.3-1.8-0.5-2.7-0.4-0.8-0.9-1.6-1.1-2.4-0.1-0.7-0.2-1.4-0.2-2.1 0.4-1.9-0.7-3.5-0.9-5.3-0.6-4-1.3-8.1-1.9-12.1-0.1-0.1-0.2-0.3-0.3-0.5 0.1 0.2 0.2 0.3 0.3 0.5-0.6-5.2-1.6-10.3-3.3-15.2-1.5-5.4-4.5-10.3-6.2-15.6-1.8-3.6-3-7.6-5.1-11-3.2-5.2-5.9-11.4-13.6-12.1-3.9-0.4-7.5-0.1-10.9 1.8-4.4 2.5-8.4 5.8-13.9 5.9-1.9 0-3.7 1.2-4.3 3.4-0.3 0.3-0.5 0.6-0.4 1.1-0.5 1.9-1.3 3.5-3.5 3.9-0.4-0.1-0.7-0.3-1.1-0.4l-0.5-0.5c-1.2-1.3-2-3-4-3.5-2.2-1.3-4.6-1.5-7.1-1-4.3 0.9-8.5 2.2-12.6 3.9-2.6 1.1-5.7 1.4-7.7 3.8-5.2 3.3-10.8 5.4-17 5.5-1.7 0-3.1 0.8-4.3 1.8-4.5 2.3-9 4.4-12.3 8.4-0.8 0.6-1.6 1.1-2.5 1.7-1.5 0.2-2.2 1.4-3 2.5-0.4 0.8-0.9 1.5-1.3 2.3-1.7 4.5-1.6 9.7-4.9 13.6-1.3 2.6-3.3 4-6.3 3.7-1.1-0.1-2.3 0.1-3.4-0.2-6.1-1.8-11.5 1-17.1 2.6-0.7 0.4-1.4 0.8-2.2 1.2-1.5 0.3-2.2 1.4-3 2.5-1.8 1.6-3.8 2.9-5.3 4.7-1.5 1.9-2.8 4.1-3.3 6.5-1.3 6.1 0 11.8 2.2 17.5 0 0.5 0.1 0.9 0.6 1.2 0.1 0.3 0.1 0.6 0.2 0.9v0.5c0.9 1.2 1.5 2.5 1.4 4 0.2 0.4 0.3 0.7 0.5 1.1 0.2 0.6 0 1.3 0.8 1.5 0.8 2.5 0.3 4.8-0.6 7.1-0.7-0.4-1.5-0.2-2.3-0.4l-0.9-0.3c-0.1-0.1-0.1-0.2-0.2-0.3-0.3-0.4-0.5-0.8-0.9-1.1-0.6-0.6-1.2-1.1-1.9-1.6-0.4-0.3-0.8-0.5-1.3-0.4-2.1-0.6-3.3-2.4-5-3.6-0.4-0.7-0.9-1.2-1.7-1.5-4.2-2.4-8.2-3.6-12.9-0.4-4.1 2.7-8.1 5.9-13.2 7-2.8 0.3-4.9 1.6-6.6 3.9-2.7 3.7-2.8 8.1-3.6 12.3 0.1 0 0.1 0.1 0.2 0.1h-0.1l-0.1-0.1c-1.4 3.5-0.5 6.9 0.7 10.2 1.1 4.6 0.9 8.9-2.2 12.8-4.7 4.6-4.1 10.1-2.6 15.7-0.2 2 1.1 4.3-1.2 5.9l-5.1 3c-0.3 0.2-0.6 0.4-0.9 0.7-1.3 0.2-1.9 1.4-2.8 2.3-0.1 0.2-0.2 0.4-0.3 0.5-1 0.6-1.7 1.5-2 2.7-0.9 3.6-1.2 7.2-0.5 11 0.7 4.3 1.6 8.7-1.1 12.7-1.5 3-3.1 6-4.5 9-0.2 0.4 0 1-0.2 1.6-0.5 2.4 1.4 4.4 1.4 6.5 0 2.9 1.3 4.6 3.5 5.9 4.6 2.7 9.3 5.3 13.2 9 0.2 0.2 0.6 0.3 1 0.4 1.6 1 3.4 1.7 5.3 1.9 3.9 1.3 7.9 2.2 11.9 2.9l7.2 2.1h0.6c0.2 0.2 0.5 0.3 0.7 0.5 0.8 0.5 1.6 0.6 2.5 0.5 1.6 0 3.1 0.2 4.6 0.4 2.7 0.6 5.3 1.3 8 1.7 0.6 0.1 1.3 0.2 1.9 0.3 1.1 0.2 2.1 0.3 3.2 0.4 0.2 0.2 0.3 0.5 0.6 0.6 6.9 2 14 2.2 21.1 3 3.5 0.4 7.1 1.2 10.7 0.4l0.2-0.1 0.2 0.1c2.6-0.2 5.3-0.3 7.9-0.5 5.7 0.7 11.3 0.6 17 0.4 1.3 0.5 2.6 0 3.8 0.2 7.7-1.1 15.3 0.7 23 0.9 1.9 1.2 4 0.2 6 0.7 1.1 0.1 2.2-0.1 3.3 0.2 0.3 0.1 0.5 0.1 0.8 0.1 1.6 0.1 3.3-0.1 4.9 0.2 0.7 0 1.4 0 2-0.5 0.1-0.1 0.1-0.2 0.1-0.3 1.9 0.3 3.9 0.5 5.8 0.8 1.7 0.3 3.4 0.9 5.1 1.4 2 0.6 4 1.3 6.2 0.9h0.1c0.1 0.2 0.2 0.4 0.5 0.5 3.9 1.2 7.6 2.9 11.7 3.5 1.3 1 2.7 1.6 4.3 2 0.4 0.5 1 0.8 1.7 0.9 1.3 1.3 3.4 1.2 4.5 2.9 0.3 0.4 0.7 0.4 1.1 0.4 0.4 0.8 1.2 1.1 2 1 0.3 1.9 2.3 2 3.3 3.2 1.5 1.2 3.3 2 4.4 3.7 0.3 0.4 0.6 0.7 1.1 0.9 0.1 0.1 0.2 0.1 0.3 0.2v0.2c0.1 0.7 0.4 1.3 0.8 1.8 0.5 0.6 0.5 1.5 1.3 1.8 0.6 0.6 0.6 1.4 0.6 2.1 0.8 1.3 0.6 3 1.7 4.2 0.6 1.8 1.3 3.6 2.5 5.2 0.2 1 0.6 1.8 1.3 2.5 0.1 0.2 0.3 0.4 0.4 0.6 1.5 3.3 3.2 6.5 4.2 10 0.8 2.5 0.8 5.2 1.9 7.6 2.7 12.6 5.8 25 10.1 37.2-0.1 0.2 0 0.3 0.1 0.4 1.1 4.3 2.7 8.4 4.5 12.5 1.1 3.7 2.6 7.3 4 10.9 0.5 2 1 4 1.9 5.8 0.2 1.4 0.7 2.8 1.3 4.1 0.7 2.1 1.3 4.2 2 6.2 0.3 1 0.6 2.1 0.9 3.1 2.7 12.9 6.4 25.5 9.6 38.3 0.1 0.3 0.1 0.7 0.2 1-0.3 3.5 1.2 6.6 1.8 9.9-1.1-0.2-2-1.9-3.1-0.5-0.8 1.1 0 2.1 1 2.8 1 1.3 2.1 2.6 2.8 4 1.1 2.1 2.6 2.2 4.4 1.1 0.6-0.3 1.4-0.3 1.8-1 1.9-1.2 1.8-3 1.8-4.9 0.5-1 0.3-2.1 0.3-3.2 0.5-1.1 0.4-2.1 0.2-3.2-0.1-1-0.1-1.9-0.3-2.9-1.9-8-5-15.5-7.3-23.3 0.1-0.2 0-0.3-0.1-0.4-1.8-5.4-3.5-10.8-5.3-16.2-2.4-8.4-4.8-16.8-7.7-25 0-1.3-0.6-2.5-1.2-3.6-1.9-6.6-3.8-13.3-5.8-19.9-1.2-5.7-2.7-11.3-4.3-16.8 0.1-0.2 0-0.3-0.1-0.4-0.2-1.1-0.3-2.3-0.6-3.4-0.9-4.7-1.9-9.3-2.8-14-1.2-6.4 0.1-12.4 3-18.2 0.7-0.6 1-1.4 0.9-2.3v-0.9c-0.1 0-0.1-0.1-0.2-0.1l0.2 0.1c1-0.5 1-1.6 1.3-2.5 1.5-3.9 2.8-8 4.7-11.8 0.6-0.5 1.2-0.9 1.7-1.4l1.1-1.1c1.7-0.8 3.5-1.5 4.8-2.9 1 0 1.2-0.9 1.9-1.3 1.1 0.1 1.6-0.9 2.6-1.2 1.9-1.8 4.5-2.8 6.7-4.2 0.6-0.2 1.1-0.4 1.7-0.5 0.2 0.2 0.5 0.3 0.8 0.4 1.4 0.1 2.7 0.1 3.8-0.9l0.2-0.1 0.2 0.1c0.7-0.5 1.6 0.1 2.3-0.6 0.2-0.1 0.3-0.2 0.5-0.2h1.1c0.6 0 0.8-0.8 1.5-0.6 0.2-0.1 0.4-0.2 0.5-0.4 0.1 0 0.2 0 0.2 0.1 0.5 0.1 1 0.1 1.4-0.3 0.4-0.2 0.7-0.4 1.1-0.6 2.4-0.4 4.9-0.8 7.3-1.2 5.4-0.9 10.6-2.5 15.8-4 0.3 0 0.7-0.1 1-0.3 2.8-0.5 5.5-1.1 8.3-1.6 1.8-0.1 3.5-0.5 5.2-1.1 13.7-0.7 27.4-3 41.1-3.3 1.4 0.8 3.1-0.2 4.5 0.6 3.9-0.4 7.8-0.1 11.6-1.2l11.7-0.9c0.3 0 0.6-0.1 1-0.1 1.5-0.8 3.1 0 4.6-0.5 4.6-1.4 9.2-2.7 14.1-3.2 0.9-0.1 1.8-0.2 2.4-0.9l0.2-0.1h0.2c0.8-0.7 2 0.2 2.7-0.7 0.3-0.1 0.6-0.1 0.9-0.2 0.7-0.5 1.6 0 2.3-0.6 3.3-1.2 6.9-1.3 10.1-2.8 4.2-0.8 8.4-1.2 12.4-2.6l14.7-3c2.7-0.5 5.2-1.5 7.8-2.3 2.5-0.4 4.4-1.3 6.1-3.6 1.7-2.4 3.4-5.1 5.7-6.7 3.3-2.4 5-5.3 5.9-9 0.8-4.2 1-8.7-1.3-12.6z';
+    const LEAF_GINKGO = 'M576.8 672.4s-28.8-16.8-35-39.7c-6.2-22.9 84.2-66.8 84.2-66.8-19.2 5.8-79.6 11.5-97.7-16.4-21.3-33 58.9-74.6 77.7-87.6 0 0-42.7 25.9-60.4 5.9-17.7-20 23.5-38.4 23.5-38.4-53.7-0.2 12.9-92.4 18.4-99.9-5.5 5.8-57.9 54.6-83 63.9-27.2 10.1-30.8-33-30.8-33s-30.6 65.8-58.3 49.2c-39.3-23.5 27.2-115.1 27.2-115.1-6.2 5.7-32.2 36.5-49.7 26.4-28.4-16.4 8.7-58.9 8.7-58.9-8.3 7.5-21 13.3-31.4 6.3-12.5-8.5-11.7-83-11.7-83s-17.3 69.4-32.9 77.3c-9.5 4.8-23.5-4.6-28.8-13.1 0 0 24.9 49.6-6.9 59.1-19.6 5.9-38.2-32.7-41.4-36.7 0 0 40.7 103.7-3.5 117.8-31.2 10-43.8-60.8-43.8-60.8s-14.7 41-38.5 25.2c-21.9-14.6-59.9-73.4-63.9-80.5 3.5 8.8 43.9 112.8-8.1 101 0 0 35.2 27.1 12.9 42.5-22.4 15.5-57.1-19.2-57.1-19.2 14.9 16.9 81.9 75.2 52.6 102.4-24.7 23.1-83.2 1-99.1-5.9 0 0 76.3 62.8 64.3 83.7-12 20.8-44.3 30.7-44.3 30.7s94.8-17.1 105.7 12C136.6 650 79.1 679.6 79.1 679.6s56.8-7.4 95.8-7.6c53.7-0.3 82.9-7.2 100.9-17.9 12.6-9.8 21.8-38.3 22.4-84.7 0.6-49.9-16.1-91.7-16.1-91.7 16.9 34.9 30 50.2 33.6 78.6 7.4 58.9-15.4 97.6-15.4 97.6-1.8 5.8-3.8 11.4-6.2 17-8 18.7-20.7 38.1-32.2 55.8-13.1 20-32.2 37.6-49.8 55.4-3.1 3.2 6.6 10.5 9.6 11.5 6.5 2.2 11.9 0.2 17.2-1.3 5.3-1.5 12.4-2 14.8-7 2-4.3-0.9-11.6 0.8-16.5 4.7-13.1 14.5-24.2 21.2-36.1 12.7-22.4 24.1-45.9 30.9-71.4 15 14.4 47.8 31.7 103.3 38 38.7 4.4 94.2 30.5 94.2 30.5s-51.4-43.3-33.2-69.1c18.4-26.2 105.9 11.7 105.9 11.7z';
+
     function sprite() {
       if (document.getElementById("snow-a")) return;
       const box = document.createElement("div");
@@ -317,6 +338,12 @@
         '<svg xmlns="http://www.w3.org/2000/svg">' +
         '<symbol id="snow-a" viewBox="0 0 1024 1024">' + CRYSTAL_A + "</symbol>" +
         '<symbol id="snow-b" viewBox="0 0 1024 1024">' + CRYSTAL_B + "</symbol>" +
+        '<symbol id="leaf-maple" viewBox="60 -8 903 1040">' +
+        '<path fill="currentColor" d="' + LEAF_MAPLE + '"/></symbol>' +
+        '<symbol id="leaf-brass" viewBox="247 271 506 466">' +
+        '<path fill="currentColor" d="' + LEAF_BRASS + '"/></symbol>' +
+        '<symbol id="leaf-ginkgo" viewBox="-8 177 642 625">' +
+        '<path fill="currentColor" d="' + LEAF_GINKGO + '"/></symbol>' +
         "</svg>";
       document.body.appendChild(box);
     }
@@ -329,6 +356,18 @@
         el.setAttribute("class", "flake crystal");
         const use = document.createElementNS(SVG, "use");
         use.setAttribute("href", index % 2 ? "#snow-b" : "#snow-a");
+        el.appendChild(use);
+      } else if (type === "maple" || type === "ginkgo") {
+        // A drawn leaf, not a coloured blob: the shape is the whole point, so
+        // the flight is the same flutter the plain leaves use and only the
+        // silhouette changes. The maple comes in two tones; the brass one is
+        // the older leaf, so roughly half of them are the paler colour.
+        sprite();
+        const brass = type === "maple" && Math.random() < 0.45;
+        el = document.createElementNS(SVG, "svg");
+        el.setAttribute("class", "flake " + (brass ? "brass" : type));
+        const use = document.createElementNS(SVG, "use");
+        use.setAttribute("href", brass ? "#leaf-brass" : type === "ginkgo" ? "#leaf-ginkgo" : "#leaf-maple");
         el.appendChild(use);
       } else {
         el = document.createElement("span");
@@ -372,7 +411,7 @@
 
     function build(recipe) {
       layer.textContent = "";
-      ["petal", "leaf", "drop", "snow", "crystal", "hail"].forEach(function (type) {
+      ["petal", "leaf", "maple", "ginkgo", "drop", "snow", "crystal", "hail"].forEach(function (type) {
         const n = recipe[type] || 0;
         for (let i = 0; i < n; i++) {
           layer.appendChild(make(type, i, n, shapeFor(type, recipe)));
@@ -491,13 +530,17 @@
     function gusts(recipe) {
       if (calm) return;
 
+      // A load that carries drawn leaves throws drawn leaves: whatever is
+      // falling is what the wind can pick up off the ground.
+      const drawn = (recipe.maple || 0) + (recipe.ginkgo || 0) > 0;
+
       // The leaves in the air are animated on `transform`, so a shove rides on
       // the separate `translate` property: the fall carries on undisturbed and
       // the whole path is simply carried sideways, which is what wind does. The
       // offset is remembered and clamped, so a run of gusts cannot walk a leaf
       // out of the picture.
       const push = (dir, reach) => {
-        const leaves = layer.querySelectorAll(".flake.leaf");
+        const leaves = layer.querySelectorAll(".flake.leaf, .flake.maple, .flake.brass, .flake.ginkgo");
         for (let i = 0; i < leaves.length; i++) {
           const el = leaves[i];
           const next = Math.max(
@@ -511,16 +554,34 @@
 
       const wave = (dir, count) => {
         for (let i = 0; i < count; i++) {
-          const el = document.createElement("span");
-          el.className = "gustleaf";
-          const w = Math.round(rand(12, 18));
+          // On a maple load the handful the wind picks up is drawn as well. A
+          // gust that throws coloured corners past a maple tree is somebody
+          // else's weather, and the eye catches it at once.
+          let kind = null;
+          if (drawn && Math.random() < 0.72) {
+            const gink = recipe.ginkgo && (!recipe.maple || Math.random() < 0.55);
+            kind = gink ? "ginkgo" : Math.random() < 0.45 ? "brass" : "maple";
+          }
+          const w = Math.round(kind ? rand(15, 23) : rand(12, 18));
+          let el;
+          if (kind) {
+            sprite();
+            el = document.createElementNS(SVG, "svg");
+            el.setAttribute("class", "gustleaf " + kind);
+            const use = document.createElementNS(SVG, "use");
+            use.setAttribute("href", "#leaf-" + kind);
+            el.appendChild(use);
+          } else {
+            el = document.createElement("span");
+            el.className = "gustleaf";
+          }
           // The height it enters and leaves at comes from the keyframes, so the
           // flight is corner to corner; only the reach and the timing differ,
           // which is what keeps a wave from flying in a rank.
           el.style.cssText = [
             dir > 0 ? "left:-6%" : "left:104%",
             "width:" + w + "px",
-            "height:" + (w * 0.62).toFixed(0) + "px",
+            "height:" + Math.round(w * (kind === "ginkgo" ? 0.98 : kind ? 1.14 : 0.62)) + "px",
             "--fly:" + (dir * rand(55, 82)).toFixed(0) + "vw",
             "animation-duration:" + rand(1.5, 2.4).toFixed(1) + "s",
             "animation-delay:" + (i * rand(0.05, 0.14)).toFixed(2) + "s",
@@ -720,15 +781,41 @@
       }
 
       if (what === "runaway") {
+        // It begins as a kite like the others: up in the sky, line running out
+        // of the frame towards somebody standing off it. Then the line is not
+        // there any more, and the sail is taken — up and away, over the top
+        // rail, towards whichever of the two corners the gust is pointing at.
+        // Downwards would be the other way a kite goes, but the frame below the
+        // sky is the headline, and a kite tumbling through a headline reads as
+        // a bug rather than as weather.
+        const narrow = window.innerWidth < 720;
+        const leftward = Math.random() < 0.5;
+        const dur = want ? 8.5 : rand(14, 20);
+        const delay = want ? 0 : rand(2, 10);
         const el = document.createElement("span");
         el.className = "kite runaway";
         el.style.cssText = [
-          "--w:" + Math.round(rand(52, 76)) + "px",
-          "--dur:" + (want ? 7 : rand(15, 21)).toFixed(1) + "s",
-          "--delay:" + (want ? 0 : rand(2, 14)).toFixed(1) + "s",
+          "--sx:" + (narrow ? rand(46, 62) : rand(40, 60)).toFixed(1) + "%",
+          "--sy:" + (narrow ? rand(1, 4) : rand(2, 11)).toFixed(1) + "%",
+          "--w:" + Math.round(rand(narrow ? 46 : 54, narrow ? 60 : 78)) + "px",
+          "--lean:" + (leftward ? 1 : -1) * Math.round(rand(16, 28)) + "deg",
+          "--dur:" + dur.toFixed(1) + "s",
+          "--delay:" + delay.toFixed(1) + "s",
+          // The corner it is carried to, and how far round it has turned by the
+          // time it gets there.
+          "--ex:" + (leftward ? -30 : 114) + "%",
+          "--ey:-38%",
+          "--spin:" + (leftward ? -1 : 1) * Math.round(rand(60, 120)) + "deg",
+          // The line parts a quarter of the way in, and the tumbling starts
+          // there rather than on the first frame: until then it is a kite
+          // hanging on its bridle like any other.
+          "--snap:" + (delay + dur * 0.24).toFixed(2) + "s",
         ].join(";");
-        el.innerHTML = kiteMarkup(true);
+        el.innerHTML = kiteMarkup(true) + '<span class="kite-line"></span>';
         box.appendChild(el);
+        el.addEventListener("animationend", (e) => {
+          if (e.target === el) el.remove();
+        });
       }
     }
 
@@ -755,7 +842,15 @@
         if (r < 0.45) return "crystals";
         return "snow";
       }
-      if (season === "autumn") return r < 0.3 ? "gust" : "leaves";
+      if (season === "autumn") {
+        // Wind is what brings the maples down, so the two loads that carry
+        // them are both windy ones: one shakes a few loose, the other strips
+        // the branch and takes maple and ginkgo away together.
+        if (r < 0.3) return "gust";
+        if (r < 0.42) return "maples";
+        if (r < 0.5) return "windfall";
+        return "leaves";
+      }
       return "petals";
     }
 

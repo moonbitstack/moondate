@@ -167,6 +167,13 @@ img, svg {
   --tok-key: #b34e0c; --tok-str: #8a6a1e; --tok-num: #a0440a; --tok-com: #a98f70;
   --hero-a: color-mix(in oklab, var(--main) 46%, var(--bg));
   --hero-b: color-mix(in oklab, var(--a2) 20%, var(--bg));
+  // The drawn leaves only ever come down in autumn, so they live here rather
+  // than in the shared block. The maple's own yellow is too pale to hold an
+  // edge on cream paper, so it is deepened; the ginkgo is a shade warmer than
+  // its source orange for the same reason.
+  --leaf-maple: #dfbd4e;
+  --leaf-brass: #b8801a;
+  --leaf-ginkgo: #ef9a24;
 }
 
 [data-season="winter"] {
@@ -217,6 +224,9 @@ img, svg {
   --tok-key: #f4ae52; --tok-str: #e0a86a; --tok-num: #f0c07a;
   --hero-a: color-mix(in oklab, #d4621a 24%, #0d1016);
   --hero-b: color-mix(in oklab, #f4ae52 10%, #0d1016);
+  --leaf-maple: #f0d47c;
+  --leaf-brass: #d49f34;
+  --leaf-ginkgo: #ffb457;
 }
 [data-season="winter"][data-theme="dark"] {
   --accent: #c3c9d4; --accent-2: #8b98ad; --link: #c3c9d4;
@@ -1202,6 +1212,31 @@ img, svg {
   &:nth-child(4n) { background: color-mix(in oklab, var(--leaf-a, var(--main)) 62%, var(--leaf-b, var(--a2))); }
 }
 
+// Autumn, when the wind gets up: these two are drawn rather than coloured, so
+// the maple keeps its lobes and the stem still on it, and the ginkgo keeps its
+// fan. One symbol each, painted with `currentColor`, which is how a single path
+// serves every tone — the paler maple, the brass one and the ginkgo all differ
+// only in `color`.
+.maple,
+.brass,
+.ginkgo {
+  width: var(--w, 18px);
+  --fall-o: 0.9;
+  animation-name: flutter;
+}
+
+.maple,
+.brass {
+  height: calc(var(--w, 18px) * 1.15);
+}
+
+.maple { color: var(--leaf-maple, #dfbd4e); }
+.brass { color: var(--leaf-brass, #b8801a); }
+.ginkgo {
+  height: calc(var(--w, 18px) * 0.97);
+  color: var(--leaf-ginkgo, #ef9a24);
+}
+
 // Rain: a drop — a hairline with a bright head, slanted so it reads as falling
 // water rather than as something dropping.
 .drop {
@@ -1278,6 +1313,15 @@ img, svg {
   background: color-mix(in oklab, var(--main) 80%, var(--a2));
   animation: gust cubic-bezier(0.36, 0.06, 0.52, 0.95) forwards;
   opacity: 0;
+}
+
+// A drawn leaf already has its shape, so it wants none of the coloured-paper
+// treatment above: no fill of its own, no rounded corners.
+.gustleaf.maple,
+.gustleaf.brass,
+.gustleaf.ginkgo {
+  background: none;
+  border-radius: 0;
 }
 
 // A leaf taken by the wind travels corner to corner: it comes in over the top
@@ -1378,26 +1422,59 @@ img, svg {
   to { transform: rotate(5deg) translateY(7px); }
 }
 
-// A string parts, and the kite is held by nothing: it tumbles across the sky
-// and out of the frame the way a sheet of paper does, spinning as it goes.
+// A string parts, and the kite is held by nothing. It is already up there when
+// this begins — the flight is not an entrance — so the first quarter of the
+// animation is the wait: a sail pulling on a line that is still there. Then the
+// line goes, and the kite is carried out of the frame at a corner rather than
+// across the middle of the page, because a kite on the loose does not travel in
+// a straight line through the sky, it leaves it.
 .kite.runaway {
   opacity: 0;
-  animation: runaway var(--dur, 17s) cubic-bezier(0.35, 0.05, 0.65, 0.95) var(--delay, 0s) forwards;
+  animation: runaway var(--dur, 17s) linear var(--delay, 0s) forwards;
 
   svg {
-    animation: tumble 3.6s linear infinite;
+    // Tumbling does not begin with the kite: until the line goes it hangs the
+    // way a kite hangs, and only then starts turning over.
+    animation: tumble 3.4s linear var(--snap, 4s) infinite;
+  }
+
+  .kite-line {
+    animation: part var(--dur, 17s) linear var(--delay, 0s) forwards;
   }
 }
 
 @keyframes runaway {
-  from { top: -24%; left: -16%; rotate: -12deg; opacity: 0; }
-  6% { opacity: 1; }
-  84% { opacity: 1; }
-  to { top: 104%; left: 106%; rotate: 43deg; opacity: 0; }
+  from {
+    left: var(--sx, 46%);
+    top: var(--sy, 4%);
+    rotate: 0deg;
+    opacity: 0;
+  }
+  4% { opacity: 1; }
+  24% {
+    left: var(--sx, 46%);
+    top: var(--sy, 4%);
+    rotate: -4deg;
+    // The wait is over. From here the wind has it, so the timing is the one
+    // thing that has to change: the same distance covered, accelerating.
+    animation-timing-function: cubic-bezier(0.3, 0.02, 0.86, 0.72);
+  }
+  to {
+    left: var(--ex, 114%);
+    top: var(--ey, -38%);
+    rotate: var(--spin, 60deg);
+    opacity: 1;
+  }
 }
 
 @keyframes tumble {
   to { transform: rotate(360deg); }
+}
+
+// The line goes in one frame, not over a second: a string parts.
+@keyframes part {
+  0%, 21% { opacity: 1; }
+  27%, 100% { opacity: 0; }
 }
 
 // ---- storm ----------------------------------------------------------------
