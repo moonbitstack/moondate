@@ -7,3 +7,8 @@ target/
 package-lock.json
 pnpm-lock.yaml
 yarn-lock.yaml
+
+# Docs build artifacts: CSS is compiled from site.less, and the demo module is
+# compiled from the demo package to JavaScript. Both are rebuilt in CI.
+docs/assets/site.css
+docs/assets/moondate.js

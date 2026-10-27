@@ -96,7 +96,7 @@ test "the ISO week date puts the turn of the year in the right week" {
 }
 
 ///|
-test "the ordinal is Python's, counting 0001-01-01 as one" {
+test "the ordinal counts 0001-01-01 as one" {
   assert_eq(Date::new(1, 1, 1).ordinal(), 1)
   assert_eq(Date::new(1970, 1, 1).ordinal(), 719163)
   assert_eq(Date::new(2026, 9, 22).ordinal(), 739881)
@@ -116,12 +116,12 @@ test "a time the clock does not show is refused, but a leap second is not" {
 }
 
 ///|
-test "a span is nanoseconds, and its parts are Python's three fields" {
+test "a span is nanoseconds, and its parts are days, seconds and nanos" {
   assert_eq(Span::of(day, 1L).nanos, 86_400_000_000_000L)
   assert_eq(Span::new(days=1L, hours=2L, minutes=3L).parts(), (1, 7380, 0))
   assert_eq(Span::new(seconds=90L).total_seconds(), 90.0)
   assert_eq(Span::new(millis=1500L).total_seconds(), 1.5)
-  // A negative span normalises the way Python's does: whole days down, the rest
+  // A negative span normalises with whole days down and the rest
   // positive.
   assert_eq(Span::new(seconds=-1L).parts(), (-1, 86399, 0))
   assert_eq(Span::new(seconds=-1L).neg().parts(), (0, 1, 0))

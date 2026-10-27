@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-season="winter" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playground — moondate</title>
+<meta name="description" content="Run moondate in the browser: parse a date and format it, or ask a cron expression for its next firings. Compiled from the library itself to JavaScript.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..650;1,9..144,400..600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+<script type="module" src="assets/playground.js"></script>
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html">
+      <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>
+      <span>moondate</span>
+    </a>
+    <nav class="mainnav" aria-label="Primary">
+      <a href="guide.html">Guide</a>
+      <a href="api.html">API</a>
+      <a href="showcase.html" aria-current="page">Playground</a>
+    </nav>
+    <div class="tools">
+      <nav class="seasons" aria-label="Seasons">
+        <a class="dot spring" href="index.html" title="Spring — home"></a>
+        <a class="dot summer" href="guide.html" title="Summer — guide"></a>
+        <a class="dot autumn" href="api.html" title="Autumn — API reference"></a>
+        <a class="dot winter" href="showcase.html" aria-current="true" title="Winter — playground"></a>
+      </nav>
+      <a class="icon-btn" href="https://github.com/moonbitstack/moondate" target="_blank" rel="noopener" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+      </a>
+      <button class="icon-btn theme-toggle" aria-label="Toggle light and dark theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2M12 19.4v2M2.6 12h2M19.4 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="season-tag"><span class="dot"></span> Playground · Winter</span>
+      <h1>Run it here.</h1>
+      <p class="lede">The library compiled to JavaScript and running in this page. Change an input and the answer updates — parsed and formatted, or the next firings of a schedule. Nothing is pre-computed; it is the same code the guide prints from.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="play-grid">
+
+        <div class="panel reveal">
+          <div class="panel-head"><span class="idx">01</span><h2>Parse &amp; format</h2></div>
+          <div class="panel-body">
+            <div class="field">
+              <label for="p-date">date &amp; time</label>
+              <input id="p-date" value="2026-09-22T14:30:00+08:00" spellcheck="false" autocomplete="off" inputmode="text">
+            </div>
+            <div class="field">
+              <label for="p-fmt">strftime format</label>
+              <input id="p-fmt" value="%A, %d %B %Y" spellcheck="false" autocomplete="off" inputmode="text">
+            </div>
+            <div class="console-foot">
+              <button class="chip" data-set-p="2026-09-22T14:30:00+08:00">offset instant</button>
+              <button class="chip" data-set-p="2026-09-22T14:30:00">wall clock</button>
+              <button class="chip" data-set-p="2026-02-29">a date</button>
+              <button class="chip" data-set-p="14:30:00">a time</button>
+              <button class="chip" data-fmt-p="%G-W%V-%u">ISO week</button>
+              <button class="chip" data-fmt-p="%a %d %b %Y %H:%M %z">log line</button>
+            </div>
+            <div class="readout" id="p-out" aria-live="polite">shape    Zoned
+canon    2026-09-22T14:30:00+08:00
+format   Tuesday, 22 September 2026</div>
+            <p class="muted" style="font-size:13px;margin:0">The shape line is read from the text: an offset makes an instant, a date and time without one is a wall clock.</p>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="panel-head"><span class="idx">02</span><h2>Next firings</h2></div>
+          <div class="panel-body">
+            <div class="field">
+              <label for="c-expr">cron expression</label>
+              <input id="c-expr" value="0 9 * * MON-FRI" spellcheck="false" autocomplete="off" inputmode="text">
+            </div>
+            <div class="field">
+              <label for="c-from">from</label>
+              <input id="c-from" value="2026-09-22T14:30:00Z" spellcheck="false" autocomplete="off" inputmode="text">
+            </div>
+            <div class="field">
+              <label for="c-count">how many</label>
+              <input id="c-count" type="number" min="1" max="12" value="6">
+            </div>
+            <div class="console-foot">
+              <button class="chip" data-cron-c="0 9 * * MON-FRI">weekday 9am</button>
+              <button class="chip" data-cron-c="*/15 9-17 * * MON-FRI">quarter hours</button>
+              <button class="chip" data-cron-c="0 0 29 2 *">leap day</button>
+              <button class="chip" data-cron-c="30 * * * * *">every half minute</button>
+              <button class="chip" data-cron-c="0 0 30 2 *">never</button>
+            </div>
+            <div class="cron-list" id="c-list" aria-live="polite"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Under the hood</span>
+        <h2>How <span class="mono">next</span> finds the answer.</h2>
+        <p><span class="mono">next</span> starts one second after the given moment, floors to a whole second, then walks forward one second at a time until the six bit sets all agree. The search is bounded at four years — past any leap-year cycle a real schedule turns on — so an expression naming a day that does not exist returns <span class="mono">None</span> instead of looping.</p>
+      </div>
+      <div class="play-grid">
+        <div class="reveal">
+          <div class="computed">┌───────────── second   (0-59, six-field form only)
+│ ┌───────────── minute   (0-59)
+│ │ ┌───────────── hour     (0-23)
+│ │ │ ┌───────────── day of month (1-31)
+│ │ │ │ ┌───────────── month    (1-12 or JAN-DEC)
+│ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT)
+* * * * * *</div>
+          <p class="muted" style="font-size:13px;margin-top:12px">Both 0 and 7 are Sunday. <span class="mono">?</span> reads as <span class="mono">*</span>, which is what Quartz writes in the day field it is not using.</p>
+        </div>
+        <div class="reveal">
+          <div class="code">
+            <div class="bar"><span class="name">five fields, no seconds</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>0 9 * * MON-FRI     every weekday at 09:00
+*/15 9-17 * * MON-FRI   quarter hours, 09:00-17:45
+0 0 1 * *           the first of the month
+0 0 29 2 *          the leap day, when it exists</code></pre>
+          </div>
+          <div class="note"><strong>Day fields are or-ed.</strong> When both day-of-month and day-of-week are restricted, a moment matches if <em>either</em> does. With one of them <span class="mono">*</span> they are and-ed, so <span class="mono">0 0 13 * *</span> is only the thirteenth.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="index.html">
+        <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>
+        <span>moondate</span>
+      </a>
+      <p class="tag">Dates, times, instants, spans and cron for MoonBit. Apache-2.0.</p>
+      <div class="links">
+        <a href="https://github.com/moonbitstack/moondate" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+          GitHub
+        </a>
+        <a href="https://mooncakes.io/docs/moonbitstack/moondate" target="_blank" rel="noopener">mooncakes</a>
+        <a href="index.html">Home</a>
+        <a href="guide.html">Guide</a>
+        <a href="api.html">API</a>
+      </div>
+    </div>
+    <div class="legal"><span>Apache-2.0</span><span>Built with MoonBit</span></div>
+  </div>
+</footer>
+</body>
+</html>

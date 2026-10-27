@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" data-season="autumn" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API reference — moondate</title>
+<meta name="description" content="Every public type, function and constant in moondate, generated from the package interface and the source documentation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..650;1,9..144,400..600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html">
+      <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>
+      <span>moondate</span>
+    </a>
+    <nav class="mainnav" aria-label="Primary">
+      <a href="guide.html">Guide</a>
+      <a href="api.html" aria-current="page">API</a>
+      <a href="showcase.html">Playground</a>
+    </nav>
+    <div class="tools">
+      <nav class="seasons" aria-label="Seasons">
+        <a class="dot spring" href="index.html" title="Spring — home"></a><a class="dot summer" href="guide.html" title="Summer — guide"></a><a class="dot autumn" href="api.html" aria-current="true" title="Autumn — API reference"></a><a class="dot winter" href="showcase.html" title="Winter — playground"></a>
+      </nav>
+      <a class="icon-btn" href="https://github.com/moonbitstack/moondate" target="_blank" rel="noopener" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+      </a>
+      <button class="icon-btn theme-toggle" aria-label="Toggle light and dark theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2M12 19.4v2M2.6 12h2M19.4 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main">
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="season-tag"><span class="dot"></span> API · Autumn</span>
+      <h1>The reference.</h1>
+      <p class="lede">Every public type, function and constant, grouped by package. Generated from <span class="mono">pkg.generated.mbti</span> and the source's own documentation comments.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap api-layout">
+      <nav class="api-nav" aria-label="API contents">
+<div class="group">
+<div class="pkg">@moondate</div>
+<a href="#type-moondate-Date">Date</a>
+<a href="#type-moondate-Moment">Moment</a>
+<a href="#type-moondate-Span">Span</a>
+<a href="#type-moondate-Time">Time</a>
+<a href="#type-moondate-Zone">Zone</a>
+<a href="#err-moondate-Refused">Refused</a>
+<a href="#fn-moondate">Functions</a>
+<a href="#const-moondate">Constants</a>
+</div>
+<div class="group">
+<div class="pkg">@cron</div>
+<a href="#type-cron-Cron">Cron</a>
+<a href="#err-cron-Refused">Refused</a>
+<a href="#fn-cron">Functions</a>
+</div>
+</nav>
+      <div class="api-body">
+<section class="api-pkg" id="pkg-moondate">
+<header>
+<h2><span class="mono">@moondate</span></h2>
+<div class="imp">import { "moonbitstack/moondate" }</div>
+</header>
+<div class="api-cat"><h3>Types</h3></div>
+<section class="api-type" id="type-moondate-Date">
+<div class="type-head"><h3>Date</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Date</span></div>
+<div class="doc"><p>A day on the proleptic Gregorian calendar.</p>
+<p>Proleptic means the Gregorian rules are applied before 1582 as well, which is what every interchange format in reach assumes and what makes arithmetic over the whole range uniform.</p></div>
+<ul class="members"><li><b>year</b> : <span class="pt">Int32</span></li><li><b>month</b> : <span class="pt">Int32</span></li><li><b>day</b> : <span class="pt">Int32</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-Date-new">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::new</span>(Int32, Int32, Int32) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A date, checked against the calendar.</p></div>
+<div class="params"><span class="p"><b>year</b> <span class="pt">Int32</span></span><span class="p"><b>month</b> <span class="pt">Int32</span></span><span class="p"><b>day</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-days">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::days</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>Days since 1970-01-01, negative before it.</p>
+<p>Howard Hinnant's <code>days_from_civil</code>: shift the year to start in March so the leap day falls at the end, then the month lengths follow a pattern with no table.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-diff">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::diff</span>(Self, Self) -&gt; Span</div>
+<div class="doc"><p>One date less another, as a span of whole days.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">Date</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-isocalendar">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::isocalendar</span>(Self) -&gt; (Int32, Int32, Int32)</div>
+<div class="doc"><p>The ISO 8601 week date: the year the week belongs to, the week number, and the day of the week with Monday as 1.</p>
+<p>The year is not always the calendar year. A week belongs to the year that holds its Thursday, so the first of January can fall in the last week of the year before — which is exactly the case a hand-rolled week number gets wrong.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-isoweekday">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::isoweekday</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The day of the week with Monday as 1 and Sunday as 7.</p>
+<p>[<code>Date::weekday</code>] counts from Sunday as 0, which is what cron and C's <code>tm_wday</code> use; ISO counts from Monday as 1. Both are here because both are asked for, and picking one silently is how an off-by-one gets into a schedule.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-of_days">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::of_days</span>(Int32) -&gt; Self</div>
+<div class="doc"><p>The date <code>n</code> days after 1970-01-01, the inverse of [<code>Date::days</code>].</p></div>
+<div class="params"><span class="p"><b>n</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-of_isocalendar">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::of_isocalendar</span>(Int32, Int32, Int32) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The date named by an ISO week date.</p></div>
+<div class="params"><span class="p"><b>year</b> <span class="pt">Int32</span></span><span class="p"><b>week</b> <span class="pt">Int32</span></span><span class="p"><b>weekday</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-of_ordinal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::of_ordinal</span>(Int32) -&gt; Self</div>
+<div class="doc"><p>The date with that ordinal.</p></div>
+<div class="params"><span class="p"><b>n</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-ordinal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::ordinal</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>Days since 0001-01-01, that day being 1.</p>
+<p>The proleptic Gregorian ordinal, which is what makes two dates subtractable without going through an epoch.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-plus_days">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::plus_days</span>(Self, Int32) -&gt; Self</div>
+<div class="doc"><p>The date <code>n</code> days later, or earlier when <code>n</code> is negative.</p></div>
+<div class="params"><span class="p"><b>n</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-plus_months">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::plus_months</span>(Self, Int32) -&gt; Self</div>
+<div class="doc"><p>The date <code>n</code> months later, clamped to the end of the month it lands in.</p>
+<p>The thirty-first of January plus one month is the twenty-eighth or twenty-ninth of February, because there is no thirty-first. Every calendar library makes this choice and they all make the same one.</p></div>
+<div class="params"><span class="p"><b>n</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-replace">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::replace</span>(Self, year? : Int32, month? : Int32, day? : Int32) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The same date with some parts replaced.</p></div>
+<div class="params"><span class="p"><b>year?</b> <span class="pt">Int32</span></span><span class="p"><b>month?</b> <span class="pt">Int32</span></span><span class="p"><b>day?</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Date-weekday">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::weekday</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The day of the week, Sunday being 0.</p>
+<p>1970-01-01 was a Thursday, which is where the 4 comes from.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-yearday">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::yearday</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The day of the year, the first of January being 1.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Date-compare">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::compare</span>(Self, Self) -&gt; Int32</div>
+<div class="doc"><p>Three-way ordering from <code>Compare</code>: less, equal or greater.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-op_ge">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::op_ge</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &gt;= other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-op_gt">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::op_gt</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &gt; other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-op_le">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::op_le</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &lt;= other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-op_lt">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::op_lt</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &lt; other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-moondate-Moment">
+<div class="type-head"><h3>Moment</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Moment</span></div>
+<div class="doc"><p>A point in time, in one of the four shapes a format names.</p>
+<p>TOML 1.0.0 has exactly these four and gives them these meanings; RFC 3339 defines only <code>Zoned</code>. The distinction is not decoration: <code>Plain</code> is a wall clock, which is what an alarm or an opening time is, and turning it into an instant needs a zone nobody has supplied.</p></div>
+<ul class="members"><li>Zoned(date~ : Date, time~ : Time, zone~ : Zone)</li><li>Plain(date~ : Date, time~ : Time)</li><li>Day(date~ : Date)</li><li>Clock(time~ : Time)</li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-Moment-asn1_text">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::asn1_text</span>(Self) -&gt; String <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A moment as an ASN.1 GeneralizedTime, which is the form DER uses from 2050 on and the one that needs no windowing rule to read back.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-astimezone">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::astimezone</span>(Self, Zone) -&gt; Self?</div>
+<div class="doc"><p>The same instant read in another zone.</p>
+<p><code>None</code> for the three shapes that are not instants: moving a wall clock to another zone would be inventing the zone it was written in.</p></div>
+<div class="params"><span class="p"><b>zone</b> <span class="pt">Zone</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-combine">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::combine</span>(Date, Time, zone? : Zone) -&gt; Self</div>
+<div class="doc"><p>A date and a time as one wall-clock moment.</p>
+<p><code>zone</code> makes it an instant instead; leaving it off keeps it a wall clock, which is what an opening time or an alarm is.</p></div>
+<div class="params"><span class="p"><b>date</b> <span class="pt">Date</span></span><span class="p"><b>time</b> <span class="pt">Time</span></span><span class="p"><b>zone?</b> <span class="pt">Zone</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-ctime">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::ctime</span>(Self) -&gt; String</div>
+<div class="doc"><p>The moment in C's <code>ctime</code> form: <code>Sun Nov  6 08:49:37 1994</code>.</p>
+<p>The day is space-padded rather than zero-padded, which is the one thing that distinguishes this form from every other.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-date">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::date</span>(Self) -&gt; Date?</div>
+<div class="doc"><p>The date out of a moment.</p>
+<p><code>None</code> for a bare time, which has no date to give.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-diff">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::diff</span>(Self, Self) -&gt; Span?</div>
+<div class="doc"><p>One moment less another, for the two shapes that can be subtracted.</p>
+<p><code>None</code> when they are not comparable: an instant and a wall clock differ by an amount that depends on a zone nobody supplied, and a bare time and a bare date are not the same kind of thing.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">Moment</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-epoch">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::epoch</span>(Self) -&gt; Int64?</div>
+<div class="doc"><p>Seconds since 1970-01-01T00:00:00Z, for a moment that names one.</p>
+<p><code>None</code> for the three shapes that do not: a wall clock, a bare date and a bare time are not instants until someone supplies the zone they are read in.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-http_text">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::http_text</span>(Self) -&gt; String <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A moment as an HTTP date (RFC 9110 §5.6.7): <code>Sun, 06 Nov 1994 08:49:37 GMT</code>.</p>
+<p>This is the one form a <code>Date</code> header may take. The two obsolete forms are read by [<code>http</code>] and never written, which is what §5.6.7 asks for.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-isocalendar">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isocalendar</span>(Self) -&gt; (Int32, Int32, Int32)?</div>
+<div class="doc"><p>The ISO week date of the moment's date.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-isoformat">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char) -&gt; String</div>
+<div class="doc"><p>The moment as ISO 8601 text, which is what [<code>Show</code>] writes.</p>
+<p><code>sep</code> is the character between the date and the time, <code>T</code> by default; any character works, and a space is what a log line wants.</p></div>
+<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-of_epoch">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::of_epoch</span>(Int64, nano? : Int32, zone? : Zone) -&gt; Self</div>
+<div class="doc"><p>The moment <code>seconds</code> after 1970-01-01T00:00:00Z, the inverse of [<code>Moment::timestamp</code>].</p>
+<p>Reading the clock is not this package's job — it has no I/O — so a caller that wants "now" passes what its own clock said.</p></div>
+<div class="params"><span class="p"><b>seconds</b> <span class="pt">Int64</span></span><span class="p"><b>nano~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>zone~</b> <span class="pt">Zone</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-ordinal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::ordinal</span>(Self) -&gt; Int32?</div>
+<div class="doc"><p>Days since 0001-01-01 of the moment's date.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-plus">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::plus</span>(Self, Span) -&gt; Self</div>
+<div class="doc"><p>The moment <code>span</code> later.</p>
+<p>A bare date moves by whole days and a bare time wraps within the day, because that is all each of them can mean.</p></div>
+<div class="params"><span class="p"><b>span</b> <span class="pt">Span</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-replace">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::replace</span>(Self, year? : Int32, month? : Int32, day? : Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, zone? : Zone) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The same moment with some parts replaced.</p></div>
+<div class="params"><span class="p"><b>year?</b> <span class="pt">Int32</span></span><span class="p"><b>month?</b> <span class="pt">Int32</span></span><span class="p"><b>day?</b> <span class="pt">Int32</span></span><span class="p"><b>hour?</b> <span class="pt">Int32</span></span><span class="p"><b>minute?</b> <span class="pt">Int32</span></span><span class="p"><b>second?</b> <span class="pt">Int32</span></span><span class="p"><b>nano?</b> <span class="pt">Int32</span></span><span class="p"><b>zone?</b> <span class="pt">Zone</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-strftime">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::strftime</span>(Self, StringView) -&gt; String</div>
+<div class="doc"><p>A moment written by a format string of <code>%</code> directives.</p>
+<p>The directives are the ones C89 defines, less the two that need a locale (<code>%c</code>, <code>%x</code>, <code>%X</code> are the C locale's) and the one that needs a zone database (<code>%Z</code> writes <code>UTC</code> or the offset, never a name like <code>CEST</code>, because a name cannot be recovered from an offset).</p>
+<table><thead><tr><th style="text-align:center"></th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:center"><code>%Y</code> <code>%y</code> <code>%m</code> <code>%d</code></td><td style="text-align:left">year, two-digit year, month, day</td></tr><tr><td style="text-align:center"><code>%H</code> <code>%I</code> <code>%M</code> <code>%S</code> <code>%f</code></td><td style="text-align:left">hour, twelve-hour, minute, second, microseconds</td></tr><tr><td style="text-align:center"><code>%p</code> <code>%j</code> <code>%a</code> <code>%A</code> <code>%b</code> <code>%B</code></td><td style="text-align:left">AM/PM, day of year, day and month names</td></tr><tr><td style="text-align:center"><code>%z</code> <code>%Z</code></td><td style="text-align:left">offset as <code>+HHMM</code>, and <code>UTC</code></td></tr><tr><td style="text-align:center"><code>%G</code> <code>%V</code> <code>%u</code> <code>%w</code></td><td style="text-align:left">ISO year, ISO week, ISO weekday, weekday from Sunday</td></tr><tr><td style="text-align:center"><code>%%</code></td><td style="text-align:left">a per cent sign</td></tr></tbody></table></div>
+<div class="params"><span class="p"><b>format</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Moment-time">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::time</span>(Self) -&gt; Time</div>
+<div class="doc"><p>The time out of a moment.</p>
+<p>Midnight for a bare date, which is the time it names.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-timestamp">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::timestamp</span>(Self) -&gt; Double?</div>
+<div class="doc"><p>Seconds since the epoch as a <code>Double</code>, fraction included.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-timetuple">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::timetuple</span>(Self) -&gt; (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32)</div>
+<div class="doc"><p>The nine fields C's <code>struct tm</code> holds, in its order: year, month, day, hour, minute, second, weekday from Monday as 0, day of the year, and whether daylight saving applies — always <code>-1</code> here, because that needs a zone database this package does not carry.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-utcoffset">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::utcoffset</span>(Self) -&gt; Span?</div>
+<div class="doc"><p>How far the moment's clock is from UTC.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-weekday">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::weekday</span>(Self) -&gt; Int32?</div>
+<div class="doc"><p>The day of the week of the moment's date, Sunday being 0.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-zone">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::zone</span>(Self) -&gt; Zone?</div>
+<div class="doc"><p>The zone a moment carries, or <code>None</code> when it carries none.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Moment-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-moondate-Span">
+<div class="type-head"><h3>Span</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Span</span></div>
+<div class="doc"><p>A length of time, to the nanosecond, with no calendar attached.</p>
+<p>A span is not a number of months: a month is not a fixed length, so adding one is a calendar operation (<code>Date::plus_months</code>) rather than arithmetic.</p></div>
+<ul class="members"><li><b>nanos</b> : <span class="pt">Int64</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-Span-new">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::new</span>(days? : Int64, hours? : Int64, minutes? : Int64, seconds? : Int64, millis? : Int64, micros? : Int64, nanos? : Int64) -&gt; Self</div>
+<div class="doc"><p>A span made of the usual parts: days, hours, minutes, seconds and fractions.</p></div>
+<div class="params"><span class="p"><b>days~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>hours~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>minutes~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>seconds~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>millis~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>micros~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>nanos~</b> <span class="pt">Int64</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Span-abs">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::abs</span>(Self) -&gt; Self</div>
+<div class="doc"><p>The span with its sign dropped.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-add">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::add</span>(Self, Self) -&gt; Self</div>
+<div class="doc"><p>Two spans added.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">Span</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Span-neg">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::neg</span>(Self) -&gt; Self</div>
+<div class="doc"><p>The span negated.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-of">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::of</span>(Self, Int64) -&gt; Self</div>
+<div class="doc"><p>A span of <code>n</code> of these.</p></div>
+<div class="params"><span class="p"><b>unit</b> <span class="pt">Span</span></span><span class="p"><b>n</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Span-parts">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::parts</span>(Self) -&gt; (Int32, Int32, Int32)</div>
+<div class="doc"><p>The whole days in a span, and the seconds and nanoseconds left over — the three fields a duration is usually stored in.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-seconds">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::seconds</span>(Self) -&gt; Int64</div>
+<div class="doc"><p>The span as whole seconds, rounded towards zero.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-sub">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::sub</span>(Self, Self) -&gt; Self</div>
+<div class="doc"><p>One span less another.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">Span</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Span-total_seconds">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::total_seconds</span>(Self) -&gt; Double</div>
+<div class="doc"><p>The span as seconds, fraction included.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Span-compare">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::compare</span>(Self, Self) -&gt; Int32</div>
+<div class="doc"><p>Three-way ordering from <code>Compare</code>: less, equal or greater.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-op_ge">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::op_ge</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &gt;= other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-op_gt">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::op_gt</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &gt; other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-op_le">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::op_le</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &lt;= other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-op_lt">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::op_lt</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &lt; other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Span-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Span::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-moondate-Time">
+<div class="type-head"><h3>Time</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Time</span></div>
+<div class="doc"><p>A time on a twenty-four hour clock, to the nanosecond.</p>
+<p>A second of 60 is allowed: RFC 3339 §5.6 permits it for a leap second, and a timestamp that records one is a real timestamp that a reader should not throw away.</p></div>
+<ul class="members"><li><b>hour</b> : <span class="pt">Int32</span></li><li><b>minute</b> : <span class="pt">Int32</span></li><li><b>second</b> : <span class="pt">Int32</span></li><li><b>nano</b> : <span class="pt">Int32</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-Time-new">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::new</span>(Int32, Int32, second? : Int32, nano? : Int32) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A time, checked against the clock.</p></div>
+<div class="params"><span class="p"><b>hour</b> <span class="pt">Int32</span></span><span class="p"><b>minute</b> <span class="pt">Int32</span></span><span class="p"><b>second~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>nano~</b> <span class="pt">Int32</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Time-nanos">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::nanos</span>(Self) -&gt; Int64</div>
+<div class="doc"><p>Nanoseconds since midnight.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-replace">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::replace</span>(Self, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The same time with some parts replaced.</p></div>
+<div class="params"><span class="p"><b>hour?</b> <span class="pt">Int32</span></span><span class="p"><b>minute?</b> <span class="pt">Int32</span></span><span class="p"><b>second?</b> <span class="pt">Int32</span></span><span class="p"><b>nano?</b> <span class="pt">Int32</span></span></div>
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Time-compare">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::compare</span>(Self, Self) -&gt; Int32</div>
+<div class="doc"><p>Three-way ordering from <code>Compare</code>: less, equal or greater.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-op_ge">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::op_ge</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &gt;= other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-op_gt">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::op_gt</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &gt; other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-op_le">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::op_le</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &lt;= other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-op_lt">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::op_lt</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p><code>self &lt; other</code>, from <code>Compare</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Time-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Time::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-moondate-Zone">
+<div class="type-head"><h3>Zone</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Zone</span></div>
+<div class="doc"><p>How far the clock is from UTC, in minutes east of it.</p>
+<p><code>Utc</code> and <code>Offset(0)</code> are both midnight-at-Greenwich, but they are not the same thing to write down: RFC 3339 §4.3 gives <code>-00:00</code> to a timestamp whose offset is unknown, and <code>Z</code> to one that is genuinely UTC.</p></div>
+<ul class="members"><li>Utc</li><li>Offset(Int32)</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Zone-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Zone-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Zone-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<div class="api-cat"><h3>Errors</h3></div>
+<section class="api-type" id="err-moondate-Refused">
+<div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
+<div class="doc"><p>Why an expression was refused.</p></div>
+<ul class="members"><li>Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)</li><li>Malformed(String)</li><li>Truncated(String)</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Refused-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Refused-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Refused-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Refused-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Refused-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<div class="api-cat" id="fn-moondate"><h3>Functions</h3></div>
+<article class="api-item" id="fn-moondate-asn1">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">asn1</span>(StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>An ASN.1 UTCTime or GeneralizedTime (ITU-T X.680 §47), as DER writes them.</p>
+<p>This is how a certificate spells its validity. DER requires the <code>Z</code> and whole seconds; UTCTime's two-digit year is read as RFC 5280 §4.1.2.5.1 says — 49 and under are 2000s, 50 and over are 1900s, which is not the same rule HTTP uses.</p></div>
+<div class="params"><span class="p"><b>src</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-moondate-http">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">http</span>(StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>An HTTP date read (RFC 9110 §5.6.7).</p>
+<p>The preferred IMF-fixdate, and the two obsolete forms a recipient must still accept: RFC 850's <code>Sunday, 06-Nov-94 08:49:37 GMT</code> and asctime's <code>Sun Nov  6 08:49:37 1994</code>. A two-digit year is read as RFC 6265 §5.1.1 says: 69 and under are 2000s, 70 and over are 1900s.</p></div>
+<div class="params"><span class="p"><b>src</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-moondate-leap">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">leap</span>(Int32) -&gt; Bool</div>
+<div class="doc"><p>Whether <code>year</code> has a twenty-ninth of February.</p>
+<p>Every fourth year, except every hundredth, except every four-hundredth — the rule that makes the calendar year 365.2425 days long.</p></div>
+<div class="params"><span class="p"><b>year</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="fn-moondate-length">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">length</span>(Int32, Int32) -&gt; Int32</div>
+<div class="doc"><p>How many days <code>month</code> has in <code>year</code>.</p></div>
+<div class="params"><span class="p"><b>year</b> <span class="pt">Int32</span></span><span class="p"><b>month</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="fn-moondate-of_isoformat">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">of_isoformat</span>(StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A moment read from ISO 8601 text, which is what [<code>parse</code>] does.</p></div>
+<div class="params"><span class="p"><b>src</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-moondate-parse">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse</span>(StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>An expression, in the five-field form crontab(5) defines or the six-field form that puts seconds in front.</p>
+<pre><code class="language-text">┌───────────── second (0-59, six-field form only)
+│ ┌───────────── minute (0-59)
+│ │ ┌───────────── hour (0-23)
+│ │ │ ┌───────────── day of month (1-31)
+│ │ │ │ ┌───────────── month (1-12 or JAN-DEC)
+│ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT, both 0 and 7 being Sunday)
+* * * * * *</code></pre>
+<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is what Quartz writes in whichever of the two day fields it is not using.</p>
+<p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
+<div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-moondate-strptime">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">strptime</span>(StringView, StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A moment read by a format string of <code>%</code> directives.</p>
+<p>The directives are the ones [<code>Moment::strftime</code>] writes. Literal characters in the format must match the text exactly, except that whitespace in the format matches any run of whitespace, which is what C's <code>strptime</code> does and what makes a format survive a double space.</p>
+<p>The result is <code>Zoned</code> when the text carried an offset, <code>Plain</code> when it carried a date and a time, <code>Day</code> when only a date, and <code>Clock</code> when only a time — the same four shapes [<code>parse</code>] answers with.</p></div>
+<div class="params"><span class="p"><b>src</b> <span class="pt">StringView</span></span><span class="p"><b>format</b> <span class="pt">StringView</span></span></div>
+</article>
+<div class="api-cat" id="const-moondate"><h3>Constants</h3></div>
+<article class="api-item" id="const-moondate-day">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">day</span> : Span</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-end_of_day">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">end_of_day</span> : Time</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-hour">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">hour</span> : Span</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-max_date">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">max_date</span> : Date</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-max_year">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">max_year</span> : Int32</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-midnight">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">midnight</span> : Time</div>
+<div class="doc"><p>Midnight, and the last representable moment of a day.</p></div>
+
+</article>
+<article class="api-item" id="const-moondate-min_date">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">min_date</span> : Date</div>
+<div class="doc"><p>The earliest and latest dates this calendar writes with a four-digit year.</p>
+<p>They are 1-01-01 and 9999-12-31, which is as far as a four-digit year writes; the arithmetic here works outside that range, so these are a convention for writing rather than a limit on computing.</p></div>
+
+</article>
+<article class="api-item" id="const-moondate-min_year">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">min_year</span> : Int32</div>
+<div class="doc"><p>The years this calendar spans.</p></div>
+
+</article>
+<article class="api-item" id="const-moondate-minute">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">minute</span> : Span</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-nanosecond">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">nanosecond</span> : Span</div>
+<div class="doc"><p>Nanoseconds in a second, a minute, an hour and a day.</p></div>
+
+</article>
+<article class="api-item" id="const-moondate-resolution">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">resolution</span> : Span</div>
+<div class="doc"><p>The smallest difference two moments can have.</p>
+<p>A nanosecond rather than a microsecond: the clock here is finer, which is what a protocol timestamp and a benchmark both want.</p></div>
+
+</article>
+<article class="api-item" id="const-moondate-second">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">second</span> : Span</div>
+
+
+</article>
+</section>
+<section class="api-pkg" id="pkg-cron">
+<header>
+<h2><span class="mono">@cron</span></h2>
+<div class="imp">import { "moonbitstack/moondate/cron" }</div>
+</header>
+<div class="api-cat"><h3>Types</h3></div>
+<section class="api-type" id="type-cron-Cron">
+<div class="type-head"><h3>Cron</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Cron</span></div>
+<div class="doc"><p>A parsed expression: which values of each field it fires on.</p>
+<p>Each field is a bit set, so asking whether a moment matches is six bit tests rather than a search. <code>star_day</code> and <code>star_week</code> are kept because the two fields interact — see [<code>Cron::matches</code>].</p></div>
+<ul class="members"><li><b>seconds</b> : <span class="pt">Int64</span></li><li><b>minutes</b> : <span class="pt">Int64</span></li><li><b>hours</b> : <span class="pt">Int32</span></li><li><b>days</b> : <span class="pt">Int32</span></li><li><b>months</b> : <span class="pt">Int32</span></li><li><b>weekdays</b> : <span class="pt">Int32</span></li><li><b>star_day</b> : <span class="pt">Bool</span></li><li><b>star_week</b> : <span class="pt">Bool</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-cron-Cron-matches">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Cron::matches</span>(Self, @moondate.Moment) -&gt; Bool</div>
+<div class="doc"><p>Whether <code>m</code> is a moment this expression fires on.</p>
+<p>The day-of-month and day-of-week fields are <strong>or</strong>-ed when both are restricted, which is Vixie cron's rule and surprises everyone once: <code>0 0 13 * 5</code> is the thirteenth *or* any Friday, not Friday the thirteenth. When one of them is <code>*</code> they are and-ed, which is why <code>0 0 13 * *</code> is only the thirteenth.</p></div>
+<div class="params"><span class="p"><b>m</b> <span class="pt">@moondate.Moment</span></span></div>
+</article>
+<article class="api-item" id="m-cron-Cron-next">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Cron::next</span>(Self, @moondate.Moment) -&gt; @moondate.Moment?</div>
+<div class="doc"><p>The first moment strictly after <code>m</code> that this expression fires on.</p>
+<p><code>None</code> when it never does. An expression can name a day that does not exist — <code>0 0 30 2 *</code> is the thirtieth of February — so the search is bounded at four years, which is past any leap-year cycle a real schedule turns on.</p></div>
+<div class="params"><span class="p"><b>m</b> <span class="pt">@moondate.Moment</span></span></div>
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-cron-Cron-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Cron::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-cron-Cron-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Cron::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-cron-Cron-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Cron::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<div class="api-cat"><h3>Errors</h3></div>
+<section class="api-type" id="err-cron-Refused">
+<div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
+<div class="doc"><p>Why an expression was refused.</p></div>
+<ul class="members"><li>Fields(got~ : Int32)</li><li>Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)</li><li>Malformed(String)</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-cron-Refused-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-cron-Refused-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-cron-Refused-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-cron-Refused-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-cron-Refused-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<div class="api-cat" id="fn-cron"><h3>Functions</h3></div>
+<article class="api-item" id="fn-cron-parse">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse</span>(StringView) -&gt; Cron <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>An expression, in the five-field form crontab(5) defines or the six-field form that puts seconds in front.</p>
+<pre><code class="language-text">┌───────────── second (0-59, six-field form only)
+│ ┌───────────── minute (0-59)
+│ │ ┌───────────── hour (0-23)
+│ │ │ ┌───────────── day of month (1-31)
+│ │ │ │ ┌───────────── month (1-12 or JAN-DEC)
+│ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT, both 0 and 7 being Sunday)
+* * * * * *</code></pre>
+<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is what Quartz writes in whichever of the two day fields it is not using.</p>
+<p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
+<div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
+</article>
+</section>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="index.html">
+        <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>
+        <span>moondate</span>
+      </a>
+      <p class="tag">Dates, times, instants, spans and cron for MoonBit. Apache-2.0.</p>
+      <div class="links">
+        <a href="https://github.com/moonbitstack/moondate" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg> GitHub</a>
+        <a href="https://mooncakes.io/docs/moonbitstack/moondate" target="_blank" rel="noopener">mooncakes</a>
+        <a href="index.html">Home</a>
+        <a href="guide.html">Guide</a>
+        <a href="showcase.html">Playground</a>
+      </div>
+    </div>
+    <div class="legal"><span>Apache-2.0</span><span>Built with MoonBit</span></div>
+  </div>
+</footer>
+</body>
+</html>

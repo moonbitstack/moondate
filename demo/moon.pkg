@@ -1,0 +1,8 @@
+pkgtype(kind: "foreign_library")
+
+supported_targets = "js"
+
+import {
+  "moonbitstack/moondate",
+  "moonbitstack/moondate/cron",
+}

@@ -1,20 +1,20 @@
 // Copyright 2026 Leo Cheng
 // SPDX-License-Identifier: Apache-2.0
 
-// What Python's `datetime` module offers beyond the calendar itself: the ordinal,
-// the ISO week date, combining and replacing parts, the epoch both ways, and the
-// directive-driven format and parse of `strftime` and `strptime`.
+// The rest of the surface beyond the calendar itself: the ordinal, the ISO week
+// date, combining and replacing parts, the epoch both ways, and the directive-
+// driven format and parse of `strftime` and `strptime`.
 //
-// The names are this family's rather than Python's where the two disagree —
-// `Date::ordinal` reads better than `toordinal` — but the meanings are the same,
-// so a person who knows the Python module knows this one.
+// The names are the words a reader already has — `ordinal`, `isocalendar`,
+// `astimezone` — and each one means what its name says rather than something only
+// this file knows.
 
 ///|
 /// The earliest and latest dates this calendar writes with a four-digit year.
 ///
-/// Python's `date.min` and `date.max` are 1-01-01 and 9999-12-31; the arithmetic
-/// here works outside that range, so these are a convention for writing rather than
-/// a limit on computing.
+/// They are 1-01-01 and 9999-12-31, which is as far as a four-digit year writes;
+/// the arithmetic here works outside that range, so these are a convention for
+/// writing rather than a limit on computing.
 pub let min_date : Date = { year: 1, month: 1, day: 1, }
 
 ///|
@@ -33,7 +33,7 @@ pub let end_of_day : Time = {
 }
 
 ///|
-/// Days since 0001-01-01, that day being 1 (Python's `date.toordinal`).
+/// Days since 0001-01-01, that day being 1.
 ///
 /// The proleptic Gregorian ordinal, which is what makes two dates subtractable
 /// without going through an epoch.
@@ -42,14 +42,14 @@ pub fn Date::ordinal(self : Date) -> Int32 {
 }
 
 ///|
-/// The date with that ordinal (Python's `date.fromordinal`).
+/// The date with that ordinal.
 pub fn Date::of_ordinal(n : Int32) -> Date {
   Date::of_days(n - 719163)
 }
 
 ///|
 /// The ISO 8601 week date: the year the week belongs to, the week number, and the
-/// day of the week with Monday as 1 (Python's `date.isocalendar`).
+/// day of the week with Monday as 1.
 ///
 /// The year is not always the calendar year. A week belongs to the year that holds
 /// its Thursday, so the first of January can fall in the last week of the year
@@ -65,7 +65,7 @@ pub fn Date::isocalendar(self : Date) -> (Int32, Int32, Int32) {
 }
 
 ///|
-/// The day of the week with Monday as 1 and Sunday as 7 (Python's `isoweekday`).
+/// The day of the week with Monday as 1 and Sunday as 7.
 ///
 /// [`Date::weekday`] counts from Sunday as 0, which is what cron and C's `tm_wday`
 /// use; ISO counts from Monday as 1. Both are here because both are asked for, and
@@ -80,7 +80,7 @@ pub fn Date::isoweekday(self : Date) -> Int32 {
 }
 
 ///|
-/// The date named by an ISO week date (Python's `date.fromisocalendar`).
+/// The date named by an ISO week date.
 pub fn Date::of_isocalendar(
   year : Int32,
   week : Int32,
@@ -99,7 +99,7 @@ pub fn Date::of_isocalendar(
 }
 
 ///|
-/// A date and a time as one wall-clock moment (Python's `datetime.combine`).
+/// A date and a time as one wall-clock moment.
 ///
 /// `zone` makes it an instant instead; leaving it off keeps it a wall clock, which
 /// is what an opening time or an alarm is.
@@ -111,7 +111,7 @@ pub fn Moment::combine(date : Date, time : Time, zone? : Zone) -> Moment {
 }
 
 ///|
-/// The same date with some parts replaced (Python's `date.replace`).
+/// The same date with some parts replaced.
 pub fn Date::replace(
   self : Date,
   year? : Int32,
@@ -135,7 +135,7 @@ pub fn Date::replace(
 }
 
 ///|
-/// The same time with some parts replaced (Python's `time.replace`).
+/// The same time with some parts replaced.
 pub fn Time::replace(
   self : Time,
   hour? : Int32,
@@ -164,8 +164,8 @@ pub fn Time::replace(
 }
 
 ///|
-/// The moment `seconds` after 1970-01-01T00:00:00Z (Python's
-/// `datetime.fromtimestamp`, with `tz` always supplied).
+/// The moment `seconds` after 1970-01-01T00:00:00Z, the inverse of
+/// [`Moment::timestamp`].
 ///
 /// Reading the clock is not this package's job — it has no I/O — so a caller that
 /// wants "now" passes what its own clock said.
@@ -198,7 +198,7 @@ pub fn Moment::of_epoch(
 }
 
 ///|
-/// One date less another, as a span of whole days (Python's `date - date`).
+/// One date less another, as a span of whole days.
 pub fn Date::diff(self : Date, other : Date) -> Span {
   Span::of(day, (self.days() - other.days()).to_int64())
 }
@@ -229,14 +229,14 @@ pub fn Moment::diff(self : Moment, other : Moment) -> Span? {
 }
 
 ///|
-/// The span as seconds, fraction included (Python's `timedelta.total_seconds`).
+/// The span as seconds, fraction included.
 pub fn Span::total_seconds(self : Span) -> Double {
   self.nanos.to_double() / 1.0e9
 }
 
 ///|
 /// The whole days in a span, and the seconds and nanoseconds left over — the three
-/// fields Python's `timedelta` normalises to.
+/// fields a duration is usually stored in.
 pub fn Span::parts(self : Span) -> (Int32, Int32, Int32) {
   let mut days = self.nanos / day.nanos
   let mut rest = self.nanos % day.nanos
@@ -254,9 +254,9 @@ pub fn Span::parts(self : Span) -> (Int32, Int32, Int32) {
 // -- strftime and strptime ----------------------------------------------------
 
 ///|
-/// A moment written by a format string of `%` directives (Python's `strftime`).
+/// A moment written by a format string of `%` directives.
 ///
-/// The directives are the ones C89 defines and Python implements, less the two
+/// The directives are the ones C89 defines, less the two
 /// that need a locale (`%c`, `%x`, `%X` are the C locale's) and the one that needs
 /// a zone database (`%Z` writes `UTC` or the offset, never a name like `CEST`,
 /// because a name cannot be recovered from an offset).
@@ -333,7 +333,7 @@ pub fn Moment::strftime(self : Moment, format : StringView) -> String {
 }
 
 ///|
-/// A moment read by a format string of `%` directives (Python's `strptime`).
+/// A moment read by a format string of `%` directives.
 ///
 /// The directives are the ones [`Moment::strftime`] writes. Literal characters in
 /// the format must match the text exactly, except that whitespace in the format
@@ -390,7 +390,7 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
       }
       'y' => {
         let (v, k) = take(s, j, 2)
-        // Python's rule: 69 and over are 1900s, under are 2000s.
+        // The two-digit window: 69 and over are 1900s, under are 2000s.
         year = if v >= 69 { 1900 + v } else { 2000 + v }
         j = k
         saw_date = true
@@ -598,24 +598,24 @@ let long_months : Array[String] = [
   "October", "November", "December",
 ]
 
-// -- the rest of Python's surface ---------------------------------------------
+// -- the rest of the surface ---------------------------------------------------
 
 ///|
-/// The years Python's calendar spans (`MINYEAR` and `MAXYEAR`).
+/// The years this calendar spans.
 pub let min_year : Int32 = 1
 
 ///|
 pub let max_year : Int32 = 9999
 
 ///|
-/// The smallest difference two moments can have (Python's `resolution`).
+/// The smallest difference two moments can have.
 ///
-/// A nanosecond rather than Python's microsecond: the clock here is finer, which is
+/// A nanosecond rather than a microsecond: the clock here is finer, which is
 /// what a protocol timestamp and a benchmark both want.
 pub let resolution : Span = nanosecond
 
 ///|
-/// The date out of a moment (Python's `datetime.date()`).
+/// The date out of a moment.
 ///
 /// `None` for a bare time, which has no date to give.
 pub fn Moment::date(self : Moment) -> Date? {
@@ -626,7 +626,7 @@ pub fn Moment::date(self : Moment) -> Date? {
 }
 
 ///|
-/// The time out of a moment (Python's `datetime.time()`).
+/// The time out of a moment.
 ///
 /// Midnight for a bare date, which is the time it names.
 pub fn Moment::time(self : Moment) -> Time {
@@ -637,7 +637,7 @@ pub fn Moment::time(self : Moment) -> Time {
 }
 
 ///|
-/// The zone a moment carries, or `None` when it carries none (Python's `tzinfo`).
+/// The zone a moment carries, or `None` when it carries none.
 pub fn Moment::zone(self : Moment) -> Zone? {
   match self {
     Zoned(zone~, ..) => Some(zone)
@@ -646,7 +646,7 @@ pub fn Moment::zone(self : Moment) -> Zone? {
 }
 
 ///|
-/// How far the moment's clock is from UTC (Python's `utcoffset`).
+/// How far the moment's clock is from UTC.
 pub fn Moment::utcoffset(self : Moment) -> Span? {
   match self.zone() {
     Some(Utc) => Some(Span::of(minute, 0L))
@@ -656,7 +656,7 @@ pub fn Moment::utcoffset(self : Moment) -> Span? {
 }
 
 ///|
-/// The same instant read in another zone (Python's `astimezone`).
+/// The same instant read in another zone.
 ///
 /// `None` for the three shapes that are not instants: moving a wall clock to
 /// another zone would be inventing the zone it was written in.
@@ -668,7 +668,7 @@ pub fn Moment::astimezone(self : Moment, zone : Zone) -> Moment? {
 }
 
 ///|
-/// The same moment with some parts replaced (Python's `datetime.replace`).
+/// The same moment with some parts replaced.
 pub fn Moment::replace(
   self : Moment,
   year? : Int32,
@@ -707,17 +707,16 @@ pub fn Moment::isocalendar(self : Moment) -> (Int32, Int32, Int32)? {
 }
 
 ///|
-/// Days since 0001-01-01 of the moment's date (Python's `toordinal`).
+/// Days since 0001-01-01 of the moment's date.
 pub fn Moment::ordinal(self : Moment) -> Int32? {
   self.date().map(d => d.ordinal())
 }
 
 ///|
-/// The moment as ISO 8601 text, which is what [`Show`] writes (Python's
-/// `isoformat`).
+/// The moment as ISO 8601 text, which is what [`Show`] writes.
 ///
-/// `sep` is the character between the date and the time, `T` by default; Python
-/// allows any, and a space is what a log line wants.
+/// `sep` is the character between the date and the time, `T` by default; any
+/// character works, and a space is what a log line wants.
 pub fn Moment::isoformat(self : Moment, sep~ : Char = 'T') -> String {
   let text = self.to_string()
   if sep == 'T' {
@@ -737,7 +736,7 @@ pub fn Moment::isoformat(self : Moment, sep~ : Char = 'T') -> String {
 }
 
 ///|
-/// A moment read from ISO 8601 text (Python's `fromisoformat`), which is what
+/// A moment read from ISO 8601 text, which is what
 /// [`parse`] does.
 pub fn of_isoformat(src : StringView) -> Moment raise Refused {
   parse(src)
@@ -775,7 +774,7 @@ pub fn Moment::ctime(self : Moment) -> String {
 }
 
 ///|
-/// The nine fields C's `struct tm` holds, in its order (Python's `timetuple`):
+/// The nine fields C's `struct tm` holds, in its order:
 /// year, month, day, hour, minute, second, weekday from Monday as 0, day of the
 /// year, and whether daylight saving applies — always `-1` here, because that
 /// needs a zone database this package does not carry.
@@ -801,14 +800,13 @@ pub fn Moment::timetuple(
 }
 
 ///|
-/// Seconds since the epoch as a `Double`, fraction included (Python's
-/// `datetime.timestamp`).
+/// Seconds since the epoch as a `Double`, fraction included.
 pub fn Moment::timestamp(self : Moment) -> Double? {
   self.epoch().map(s => s.to_double() + self.time().nano.to_double() / 1.0e9)
 }
 
 ///|
-/// A span made of the parts Python's `timedelta` constructor takes.
+/// A span made of the usual parts: days, hours, minutes, seconds and fractions.
 pub fn Span::new(
   days~ : Int64 = 0,
   hours~ : Int64 = 0,

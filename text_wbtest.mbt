@@ -96,14 +96,14 @@ test "an ASN.1 time reads with the windowing rule certificates use" {
   // UTCTime's two digits: RFC 5280 §4.1.2.5.1 puts 49 and under in the 2000s.
   assert_eq(asn1("491231235959Z").to_string(), "2049-12-31T23:59:59Z")
   assert_eq(asn1("500101000000Z").to_string(), "1950-01-01T00:00:00Z")
-  // Which is not the rule HTTP uses, where the boundary is 68/69.
-  assert_eq(
-    http("Sunday, 06-Nov-68 08:49:37 GMT").to_string(),
-    "2068-11-06T08:49:37Z",
-  )
+  // Which is not the rule HTTP uses, where the boundary is 69/70.
   assert_eq(
     http("Sunday, 06-Nov-69 08:49:37 GMT").to_string(),
-    "1969-11-06T08:49:37Z",
+    "2069-11-06T08:49:37Z",
+  )
+  assert_eq(
+    http("Sunday, 06-Nov-70 08:49:37 GMT").to_string(),
+    "1970-11-06T08:49:37Z",
   )
   // GeneralizedTime spells the year out, which is why DER uses it from 2050 on.
   assert_eq(asn1("20260922143000Z").to_string(), "2026-09-22T14:30:00Z")
@@ -116,7 +116,7 @@ test "an ASN.1 time reads with the windowing rule certificates use" {
 }
 
 ///|
-test "strftime writes the directives Python writes" {
+test "strftime writes the C89 directives" {
   let m = Zoned(
     date=Date::new(2026, 9, 22),
     time=Time::new(14, 30, second=5, nano=123_456_000),
@@ -164,7 +164,7 @@ test "strptime gets the shape from what the text carried" {
   // A twelve-hour clock needs its AM/PM to mean anything.
   assert_eq(strptime("12:30:00 AM", "%I:%M:%S %p").to_string(), "00:30:00")
   assert_eq(strptime("12:30:00 PM", "%I:%M:%S %p").to_string(), "12:30:00")
-  // Two-digit years follow Python's rule: 69 and over are 1900s.
+  // Two-digit years follow the cookie rule: 69 and over are 1900s.
   assert_eq(strptime("69-01-01", "%y-%m-%d").to_string(), "1969-01-01")
   assert_eq(strptime("68-01-01", "%y-%m-%d").to_string(), "2068-01-01")
 }

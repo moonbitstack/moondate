@@ -309,7 +309,7 @@ pub fn http(src : StringView) -> Moment raise Refused {
     let year = digits(rest, 7, 2)
     return Zoned(
       date=Date::new(
-        if year <= 68 {
+        if year <= 69 {
           2000 + year
         } else {
           1900 + year

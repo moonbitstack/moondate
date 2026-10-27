@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" data-season="summer" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide — moondate</title>
+<meta name="description" content="A step-by-step guide to moondate: parse a timestamp, keep its shape, do calendar arithmetic, work with instants and spans, and ask a cron expression when it fires next.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..650;1,9..144,400..600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html">
+      <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>
+      <span>moondate</span>
+    </a>
+    <nav class="mainnav" aria-label="Primary">
+      <a href="guide.html" aria-current="page">Guide</a>
+      <a href="api.html">API</a>
+      <a href="showcase.html">Playground</a>
+    </nav>
+    <div class="tools">
+      <nav class="seasons" aria-label="Seasons">
+        <a class="dot spring" href="index.html" title="Spring — home"></a>
+        <a class="dot summer" href="guide.html" aria-current="true" title="Summer — guide"></a>
+        <a class="dot autumn" href="api.html" title="Autumn — API reference"></a>
+        <a class="dot winter" href="showcase.html" title="Winter — playground"></a>
+      </nav>
+      <a class="icon-btn" href="https://github.com/moonbitstack/moondate" target="_blank" rel="noopener" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+      </a>
+      <button class="icon-btn theme-toggle" aria-label="Toggle light and dark theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2M12 19.4v2M2.6 12h2M19.4 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="season-tag"><span class="dot"></span> Guide · Summer</span>
+      <h1>From a string to a schedule.</h1>
+      <p class="lede">Eight steps through the library. Parsing can fail, so every program below is declared <code class="mono">raise</code>; a real program catches <code class="mono">Refused</code> at the edge. The output under each block is what the program actually prints.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap guide-layout">
+      <aside class="toc">
+        <div class="toc-title">Contents</div>
+        <ol>
+          <li><a href="#install">Install and first look</a></li>
+          <li><a href="#shapes">The four shapes</a></li>
+          <li><a href="#writing">Reading and writing</a></li>
+          <li><a href="#calendar">Calendar arithmetic</a></li>
+          <li><a href="#instants">Instants and zones</a></li>
+          <li><a href="#durations">Durations</a></li>
+          <li><a href="#wire">HTTP and ASN.1</a></li>
+          <li><a href="#cron">Schedules with cron</a></li>
+        </ol>
+      </aside>
+
+      <div class="guide-body">
+
+        <article class="step" id="install">
+          <h2><span class="n">01</span> Install and first look</h2>
+          <p>Add the module, then hand a string to <span class="mono">@moondate.parse</span>. It reads whichever of the four shapes the text is written in and gives that shape back.</p>
+          <div class="code">
+            <div class="bar"><span class="name">first.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let stamp = @moondate.parse("2026-09-22T14:30:00+08:00")
+  println(stamp)
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22T14:30:00+08:00</div>
+          <p>A timestamp written in the text comes back written the same way. That is the whole promise of the parser: nothing is invented, and nothing that matters is lost.</p>
+          <div class="note"><strong>When parsing fails</strong> it raises <span class="mono">Refused</span>, whose message says which field and which range. A date the calendar does not have is refused rather than rolled over.</div>
+          <div class="code">
+            <div class="bar"><span class="name">refused.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main {
+  try {
+    let _ = @moondate.parse("2026-02-29")
+    println("accepted")
+  } catch {
+    e => println(e.to_string())
+  }
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>day is 29, outside 1..28</div>
+        </article>
+
+        <article class="step" id="shapes">
+          <h2><span class="n">02</span> The four shapes</h2>
+          <p>A moment is a <span class="mono">Zoned</span> instant, a <span class="mono">Plain</span> wall clock, a <span class="mono">Day</span>, or a <span class="mono">Clock</span>. The text says which: an offset makes it an instant, a date and time without one is a wall clock, a bare date is a day, and a bare time is a clock.</p>
+          <div class="code">
+            <div class="bar"><span class="name">shapes.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  println(@moondate.parse("2026-09-22T14:30:00Z"))   // an instant
+  println(@moondate.parse("2026-09-22T14:30:00"))    // a wall clock
+  println(@moondate.parse("2026-09-22"))             // a date
+  println(@moondate.parse("14:30:00"))               // a time
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22T14:30:00Z
+2026-09-22T14:30:00
+2026-09-22
+14:30:00</div>
+          <p>Only <span class="mono">Zoned</span> names an instant. The other three are deliberately incomplete: turning a wall clock into an instant needs a zone nobody has supplied, so the library will not guess one.</p>
+        </article>
+
+        <article class="step" id="writing">
+          <h2><span class="n">03</span> Reading and writing</h2>
+          <p><span class="mono">to_string</span> and <span class="mono">isoformat</span> write a moment back as RFC 3339. When you want another layout, <span class="mono">strftime</span> takes the <span class="mono">%</span> directives, and <span class="mono">strptime</span> reads them back.</p>
+          <div class="code">
+            <div class="bar"><span class="name">write.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+  println(m.strftime("%Y-%m-%d"))
+  println(m.strftime("%a %A %b %B"))
+  println(m.strftime("%H:%M:%S.%f %z"))
+  println(m.strftime("%G-W%V-%u"))
+  let back = @moondate.strptime("22/09/2026", "%d/%m/%Y")
+  println(back)
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22
+Tue Tuesday Sep September
+14:30:05.123456 +0800
+2026-W39-2
+2026-09-22</div>
+          <p>The directive set is the one C89 defines, less the two that need a locale and the one that needs a zone database. <span class="mono">%Z</span> writes <span class="mono">UTC</span> or nothing, never a name it could not recover from an offset.</p>
+        </article>
+
+        <article class="step" id="calendar">
+          <h2><span class="n">04</span> Calendar arithmetic</h2>
+          <p>A <span class="mono">Date</span> knows its weekday, its day of the year, its ISO week date, and how many days it is from the epoch. Adding days carries cleanly; adding months lands on a day the month actually has.</p>
+          <div class="code">
+            <div class="bar"><span class="name">calendar.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let d = @moondate.Date::new(2026, 9, 22)
+  println(d.weekday())          // Sunday is 0
+  println(d.yearday())
+  println(d.isocalendar())
+  println(d.plus_days(10))
+  println(d.plus_months(1))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2
+265
+(2026, 39, 2)
+2026-10-02
+2026-10-22</div>
+          <p>The last day of January plus one month has nowhere to land on a short February, so it clamps to the end of the month it reaches:</p>
+          <div class="code">
+            <div class="bar"><span class="name">clamp.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  println(@moondate.Date::new(2023, 1, 31).plus_months(1))
+  println(@moondate.Date::new(2024, 1, 31).plus_months(1))
+  println(@moondate.Date::new(1970, 1, 1).days())      // epoch
+  println(@moondate.Date::new(2026, 9, 22).ordinal())  // 0001-01-01 is 1
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2023-02-28
+2024-02-29
+0
+739881</div>
+        </article>
+
+        <article class="step" id="instants">
+          <h2><span class="n">05</span> Instants and zones</h2>
+          <p>An instant has seconds since 1970, and can be read in another zone without changing which moment it is. A wall clock answers <span class="mono">None</span> to both questions, because it is not an instant until someone says where it is.</p>
+          <div class="code">
+            <div class="bar"><span class="name">instants.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:00Z")
+  println(m.epoch())
+  match m.astimezone(@moondate.Offset(480)) {
+    Some(east) => println(east)
+    None => println("not an instant")
+  }
+  println(@moondate.Moment::of_epoch(1790087400L))
+  println(@moondate.parse("2026-09-22T14:30:00").epoch())
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>Some(1790087400)
+2026-09-22T22:30:00+08:00
+2026-09-22T14:30:00Z
+None</div>
+          <p>There is no <span class="mono">now()</span>: reading the clock is I/O, and this package has none. A caller that wants the current moment passes its own clock's reading to <span class="mono">Moment::of_epoch</span>.</p>
+        </article>
+
+        <article class="step" id="durations">
+          <h2><span class="n">06</span> Durations</h2>
+          <p>A <span class="mono">Span</span> is a length of time, to the nanosecond, with no calendar attached. Add one to a moment and it carries across midnight; add one to a bare time and it wraps within the day.</p>
+          <div class="code">
+            <div class="bar"><span class="name">spans.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let s = @moondate.Span::new(days=1L, hours=2L, minutes=3L)
+  println(s.parts())
+  println(@moondate.Span::new(millis=1500L).total_seconds())
+  let m = @moondate.parse("2026-09-22T23:30:00")
+  println(m.plus(@moondate.hour))
+  println(m.plus(@moondate.Span::new(hours=-24L)))
+  println(@moondate.parse("23:30:00").plus(@moondate.hour))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>(1, 7380, 0)
+1.5
+2026-09-23T00:30:00
+2026-09-21T23:30:00
+00:30:00</div>
+          <p>A span is not a number of months. A month is not a fixed length, so adding one is a calendar operation (<span class="mono">Date::plus_months</span>) rather than arithmetic.</p>
+        </article>
+
+        <article class="step" id="wire">
+          <h2><span class="n">07</span> HTTP and ASN.1</h2>
+          <p>The same instant has a different spelling on an HTTP header and inside a certificate. Both readers apply the two-digit-year window their own specification names — and those windows differ.</p>
+          <div class="code">
+            <div class="bar"><span class="name">wire.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.http("Sun, 06 Nov 1994 08:49:37 GMT")
+  println(m)
+  println(m.http_text())
+  println(@moondate.asn1("491231235959Z"))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>1994-11-06T08:49:37Z
+Sun, 06 Nov 1994 08:49:37 GMT
+2049-12-31T23:59:59Z</div>
+          <p>HTTP reads IMF-fixdate and the two obsolete forms a recipient must still accept, but writes only IMF-fixdate. ASN.1's <span class="mono">UTCTime</span> puts 49 and under in the 2000s; HTTP's rule puts 68 and under there instead.</p>
+        </article>
+
+        <article class="step" id="cron">
+          <h2><span class="n">08</span> Schedules with cron</h2>
+          <p><span class="mono">@cron.parse</span> takes five fields as crontab(5) defines them, or six with seconds in front. <span class="mono">next</span> answers with the first moment strictly after a given one, or <span class="mono">None</span> when the expression names no day that exists.</p>
+          <div class="code">
+            <div class="bar"><span class="name">schedule.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let now = @moondate.parse("2026-09-22T14:30:00Z")
+  println(@cron.parse("0 9 * * MON-FRI").next(now))
+  println(@cron.parse("@daily").next(now))
+  println(@cron.parse("0 0 30 2 *").next(now))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>Some(2026-09-23T09:00:00Z)
+Some(2026-09-23T00:00:00Z)
+None</div>
+          <p>When both day fields are restricted they are <em>or</em>-ed, which is Vixie cron's rule: the thirteenth <em>or</em> any Friday, not Friday the thirteenth.</p>
+          <div class="code">
+            <div class="bar"><span class="name">or-rule.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let both = @cron.parse("0 0 13 * 5")
+  println(both.matches(@moondate.parse("2026-09-25T00:00:00Z")))   // a Friday
+  println(both.matches(@moondate.parse("2026-10-13T00:00:00Z")))   // the thirteenth
+  let day_only = @cron.parse("0 0 13 * *")
+  println(day_only.matches(@moondate.parse("2026-09-25T00:00:00Z")))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>true
+true
+false</div>
+          <p>That is the whole library in a pass. The <a href="api.html">API reference</a> lists every type and method, and the <a href="showcase.html">playground</a> runs the same code in the browser.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="index.html">
+        <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>
+        <span>moondate</span>
+      </a>
+      <p class="tag">Dates, times, instants, spans and cron for MoonBit. Apache-2.0.</p>
+      <div class="links">
+        <a href="https://github.com/moonbitstack/moondate" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+          GitHub
+        </a>
+        <a href="https://mooncakes.io/docs/moonbitstack/moondate" target="_blank" rel="noopener">mooncakes</a>
+        <a href="index.html">Home</a>
+        <a href="api.html">API</a>
+        <a href="showcase.html">Playground</a>
+      </div>
+    </div>
+    <div class="legal"><span>Apache-2.0</span><span>Built with MoonBit</span></div>
+  </div>
+</footer>
+</body>
+</html>
