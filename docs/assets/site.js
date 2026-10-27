@@ -276,10 +276,15 @@
       downpour: { drop: 64, heavy: true, dim: true, strike: [2000, 7000] },
       snow: { snow: 22 },
       crystals: { crystal: 16 },
-      sleet: { snow: 14, burst: { hail: 12, gap: [2600, 6500] } },
+      sleet: { snow: 14, burst: { hail: 12, spread: [1300, 2200], gap: [2400, 6200] } },
       wind: { snow: 16, crystal: 10, blow: true },
       leaves: { leaf: 11 },
       gust: { leaf: 11, gust: [5000, 10000] },
+      // Not weather: plain spring with one thing in the sky. Here so the rare
+      // states can be asked for by name instead of waited for.
+      balloons: { petal: 12 },
+      kites: { petal: 12 },
+      runaway: { petal: 12 },
     };
 
     const SHAPE = {
@@ -288,7 +293,7 @@
       drop: { w: [1.4, 2], h: [18, 30], drift: [18, 40], dur: [0.7, 1.5], o: [0.45, 0.8] },
       snow: { w: [3, 7], drift: [16, 42], dur: [15, 26], o: [0.6, 0.9] },
       crystal: { w: [12, 24], drift: [20, 60], dur: [16, 30], o: [0.6, 0.9] },
-      hail: { w: [5, 8], drift: [6, 18], dur: [0.75, 1.2], o: [0.6, 0.9] },
+      hail: { w: [6, 10], drift: [6, 18], dur: [0.75, 1.2], o: [0.8, 0.95] },
     };
 
     const HEAVY = { w: [2, 2.6], h: [30, 54], drift: [10, 26], dur: [0.42, 0.75], o: [0.6, 0.9] };
@@ -541,24 +546,190 @@
       setTimeout(blow, rand(1200, 3000));
     }
 
-    // Hail does not fall as a curtain. It comes down in short, fast bursts with
-    // a random silence in between, so what you hear and see is a shower passing
-    // rather than sleet going on without end.
+    // Hail does not fall as a curtain. It comes down as a shower: a run of
+    // pellets over a second or two, each a beat behind the one before, and then
+    // it stops outright and starts again several seconds later. The pause is
+    // half the weather — a shower passing, not sleet that never ends.
     function hailfall(recipe) {
       if (calm) return;
       const spec = recipe.burst;
+      const n = spec.hail;
       const fall = () => {
-        const n = spec.hail;
+        const spread = pair(spec.spread);
+        // Every slot is used once per shower, shuffled, so the shower covers
+        // the width instead of clumping wherever the dice landed.
+        const slots = [];
+        for (let i = 0; i < n; i++) slots.push(i);
+        slots.sort(() => Math.random() - 0.5);
         for (let i = 0; i < n; i++) {
-          const el = make("hail", i, n, SHAPE.hail);
-          // Each pellet is a beat behind the one before it: that is the patter.
-          el.style.animationDelay = "-" + rand(0, 0.24).toFixed(2) + "s";
-          layer.appendChild(el);
-          setTimeout(() => el.remove(), 2000);
+          const at = (i / n) * spread + rand(0, spread / n);
+          setTimeout(() => {
+            const el = make("hail", slots[i], n, SHAPE.hail);
+            // From the top, not part-way down: the shower begins.
+            el.style.animationDelay = "0s";
+            layer.appendChild(el);
+            setTimeout(() => el.remove(), 1700);
+          }, at);
         }
-        setTimeout(fall, pair(spec.gap));
+        setTimeout(fall, spread + pair(spec.gap));
       };
       setTimeout(fall, rand(300, 1200));
+    }
+
+    // ---- sky ---------------------------------------------------------------
+    // Spring is the one season with something above the weather. It is rare, and
+    // it only happens on a dry load: nobody lets a balloon go in the rain, and
+    // nobody flies a kite in it either.
+    //
+    // One roll, not three. What turns up is somebody's balloons, a bunch of
+    // kites, or a kite that has parted from its string — two of those at once
+    // would make a busy sky instead of a small surprise.
+
+    const SKY_INK = ["#e2705b", "#4fab93", "#5b9ee2", "#e0ac38", "#a184d4", "#df86a6", "#78bd68"];
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    let skyId = 0;
+
+    // A kite is four panels stretched over a cross of spars, and what varies is
+    // the sail: one colour, a wash from corner to corner, or four panels that do
+    // not agree. A kite that has lost its string trails a length of parted line.
+    function kiteMarkup(broken) {
+      const mode = pick(["solid", "grad", "patch"]);
+      const id = "kg" + ++skyId;
+      const a = pick(SKY_INK);
+      let b = pick(SKY_INK);
+      while (b === a) b = pick(SKY_INK);
+      const tones = mode === "patch" ? SKY_INK.slice().sort(() => Math.random() - 0.5).slice(0, 4) : [a, b, b, a];
+      const fill = (i) => (mode === "grad" ? "url(#" + id + ")" : tones[i]);
+      const defs =
+        mode === "grad"
+          ? '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1">' +
+            '<stop offset="0" stop-color="' + a + '"/>' +
+            '<stop offset="1" stop-color="' + b + '"/>' +
+            "</linearGradient></defs>"
+          : "";
+      const panel = (i, d) => '<path d="' + d + '" fill="' + fill(i) + '"/>';
+      const bow = (x, y, r, c) =>
+        '<rect x="' + (x - 4.5) + '" y="' + (y - 2.5) + '" width="9" height="5" rx="1.2" ' +
+        'transform="rotate(' + r + " " + x + " " + y + ')" fill="' + c + '"/>';
+      return (
+        '<svg viewBox="0 0 100 172" aria-hidden="true">' +
+        defs +
+        panel(0, "M50 2 L96 50 L50 50 Z") +
+        panel(1, "M50 2 L4 50 L50 50 Z") +
+        panel(2, "M4 50 L50 50 L50 116 Z") +
+        panel(3, "M96 50 L50 50 L50 116 Z") +
+        '<path d="M50 2 L50 116 M4 50 L96 50" stroke="currentColor" stroke-opacity=".34" stroke-width="1.4"/>' +
+        '<path d="M50 2 L96 50 L50 116 L4 50 Z" fill="none" stroke="currentColor" stroke-opacity=".42" stroke-width="1.6"/>' +
+        '<path d="M50 116 C55 128 44 136 50 148 C56 158 45 163 50 170" fill="none" stroke="currentColor" stroke-opacity=".36" stroke-width="1.7"/>' +
+        bow(47, 126, -16, tones[1]) +
+        bow(53, 139, 14, tones[0]) +
+        bow(48, 152, -12, tones[3]) +
+        (broken
+          ? '<path d="M50 110 C62 118 41 126 55 133" fill="none" stroke="currentColor" ' +
+            'stroke-opacity=".42" stroke-width="1.1" stroke-dasharray="7 4"/>'
+          : "") +
+        "</svg>"
+      );
+    }
+
+    // A balloon is a round of colour with the light on one shoulder, a knot at
+    // the bottom and a length of string that goes nowhere in particular.
+    function balloonMarkup() {
+      const id = "bg" + ++skyId;
+      const a = pick(SKY_INK);
+      const body = "M40 4 C58 4 71 21 71 44 C71 68 56 82 40 82 C24 82 9 68 9 44 C9 21 22 4 40 4 Z";
+      return (
+        '<svg viewBox="0 0 80 152" aria-hidden="true">' +
+        '<defs><radialGradient id="' + id + '" cx=".34" cy=".26" r=".82">' +
+        '<stop offset="0" stop-color="#fff" stop-opacity=".55"/>' +
+        '<stop offset=".52" stop-color="#fff" stop-opacity=".06"/>' +
+        '<stop offset="1" stop-color="#000" stop-opacity=".14"/>' +
+        "</radialGradient></defs>" +
+        '<path d="' + body + '" fill="' + a + '"/>' +
+        '<path d="' + body + '" fill="url(#' + id + ')"/>' +
+        '<path d="' + body + '" fill="none" stroke="currentColor" stroke-opacity=".16" stroke-width="1.4"/>' +
+        '<path d="M34 82 L40 91 L46 82 Z" fill="' + a + '"/>' +
+        '<path d="M40 91 C47 103 33 113 40 125 C46 134 36 141 39 151" fill="none" ' +
+        'stroke="currentColor" stroke-opacity=".42" stroke-width="1.3"/>' +
+        "</svg>"
+      );
+    }
+
+    function sky(recipe) {
+      if (calm || season !== "spring" || recipe.drop) return;
+      const want =
+        forced === "balloons" || forced === "kites" || forced === "runaway" ? forced : null;
+      const r = Math.random();
+      const what =
+        want || (r < 0.01 ? "balloons" : r < 0.03 ? "kites" : r < 0.04 ? "runaway" : null);
+      if (!what) return;
+
+      const box = document.createElement("div");
+      box.className = "sky";
+      box.setAttribute("aria-hidden", "true");
+      layer.parentElement.appendChild(box);
+
+      if (what === "balloons") {
+        const n = 1 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < n; i++) {
+          const el = document.createElement("span");
+          el.className = "balloon";
+          el.style.cssText = [
+            "left:" + rand(4, 42).toFixed(1) + "%",
+            "--w:" + Math.round(window.innerWidth < 720 ? rand(38, 56) : rand(54, 82)) + "px",
+            "--dur:" + rand(42, 64).toFixed(0) + "s",
+            "--sway:" + rand(5, 8).toFixed(1) + "s",
+            // Let go at some point in the first fifty seconds, so the sky is
+            // empty when the page opens and fills a while later.
+            "--delay:" + (want ? rand(0, 1.5) : rand(0, 50)).toFixed(1) + "s",
+          ].join(";");
+          el.innerHTML = balloonMarkup();
+          box.appendChild(el);
+          el.addEventListener("animationend", (e) => {
+            if (e.target === el) el.remove();
+          });
+        }
+      }
+
+      if (what === "kites") {
+        // High in the frame and to one side, where the sky is: a bunch near the
+        // middle would sit on the headline and read as a diagram, not weather.
+        // A phone has no spare sky, so the bunch closes up into the top corner,
+        // smaller and usually two instead of three — a kite big enough to cover
+        // a headline is a poster, not weather.
+        const narrow = window.innerWidth < 720;
+        const n = narrow ? 1 + (Math.random() < 0.45 ? 1 : 0) : 1 + Math.floor(Math.random() * 3);
+        const lean = (Math.random() < 0.5 ? -1 : 1) * rand(16, 30);
+        const x0 = narrow ? rand(48, 62) : rand(44, 62);
+        const step = narrow ? rand(4, 7) : rand(8, 14);
+        const y0 = narrow ? rand(0, 1.5) : rand(1, 9);
+        for (let i = 0; i < n; i++) {
+          const el = document.createElement("span");
+          el.className = "kite";
+          el.style.cssText = [
+            "left:" + Math.min(narrow ? 74 : 82, x0 + i * step).toFixed(1) + "%",
+            "top:" + (y0 + i * rand(3, 7)).toFixed(1) + "%",
+            "--w:" + Math.round(rand(narrow ? 32 : 48, narrow ? 46 : 72)) + "px",
+            "--lean:" + lean.toFixed(0) + "deg",
+            "--bob:" + rand(7, 11).toFixed(1) + "s",
+            "--phase:-" + rand(0, 6).toFixed(1) + "s",
+          ].join(";");
+          el.innerHTML = kiteMarkup(false) + '<span class="kite-line"></span>';
+          box.appendChild(el);
+        }
+      }
+
+      if (what === "runaway") {
+        const el = document.createElement("span");
+        el.className = "kite runaway";
+        el.style.cssText = [
+          "--w:" + Math.round(rand(52, 76)) + "px",
+          "--dur:" + (want ? 7 : rand(15, 21)).toFixed(1) + "s",
+          "--delay:" + (want ? 0 : rand(2, 14)).toFixed(1) + "s",
+        ].join(";");
+        el.innerHTML = kiteMarkup(true);
+        box.appendChild(el);
+      }
     }
 
     function choose() {
@@ -603,6 +774,7 @@
     if (recipe.strike) storm(recipe, Boolean(forced));
     if (recipe.gust) gusts(recipe);
     if (recipe.burst) hailfall(recipe);
+    sky(recipe);
   })();
 
 })();

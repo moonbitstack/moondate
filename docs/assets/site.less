@@ -1241,13 +1241,20 @@ img, svg {
 }
 
 // Hail: a pellet of ice — a disc with a highlight, dropping fast and straight.
+// Hail is a bead of ice, not a soft flake: a white core, a cool rim and a cast
+// shadow. It has to hold its edge on a pale sky and against a dark one, so the
+// rim is a shade darker than the body rather than lighter.
 .hail {
-  width: var(--w, 5px);
-  height: var(--w, 5px);
+  width: var(--w, 7px);
+  height: var(--w, 7px);
   border-radius: 50%;
-  background: radial-gradient(circle at 33% 28%, #fff 10%, color-mix(in oklab, #abe4fe 70%, white) 45%, #8fc3e4);
-  box-shadow: 0 0 0 0.5px color-mix(in oklab, #7fb6dd 55%, transparent), 0 1px 5px color-mix(in oklab, #7fb6dd 40%, transparent);
-  --fall-o: 0.85;
+  // Body first, light second. A pellet paler than the page disappears into it,
+  // and a pale pellet with a dark rim reads as a bubble: the ice has to be a
+  // shade deeper than the sky it falls through, with the light on one shoulder.
+  background: linear-gradient(150deg, #f4fcff 0%, #bddcef 46%, #87b6d6 100%);
+  box-shadow: inset 0.5px 0.5px 0 rgb(255 255 255 / 0.9),
+              0 1px 4px color-mix(in oklab, #5f95bd 40%, transparent);
+  --fall-o: 0.95;
   animation-name: fall;
 }
 
@@ -1283,6 +1290,114 @@ img, svg {
   50% { top: 44%; transform: translate3d(calc(var(--fly) * 0.46), 0, 0) rotate(200deg); }
   88% { opacity: 0.8; }
   to { top: 112%; transform: translate3d(var(--fly), 0, 0) rotate(430deg); opacity: 0; }
+}
+
+// ---- spring sky -----------------------------------------------------------
+// Above the falling weather, spring occasionally has something in it: balloons
+// somebody let go, kites on their lines, or a kite whose line has parted. These
+// do not fall and they are not weather; they are the one thing in the sky that
+// is not the season happening. Rare enough that seeing one is an event.
+
+.sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--ink);
+
+  // The same sail on a dark sky goes olive: the colours are mixed for paper, so
+  // the dark theme lifts them a little rather than repainting them.
+  [data-theme="dark"] & svg { filter: saturate(1.15) brightness(1.12); }
+}
+
+// A balloon is let go, not flown: it climbs out of the bottom of the frame at a
+// walking pace and is gone over the top. `top` carries the climb rather than
+// `transform`, because the distance has to be a share of the hero instead of a
+// share of the balloon, and the sway needs the transform to itself.
+.balloon {
+  position: absolute;
+  top: 104%;
+  width: var(--w, 40px);
+  opacity: 0;
+  animation: rise var(--dur, 48s) linear var(--delay, 0s) forwards;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: sway var(--sway, 6s) ease-in-out infinite alternate;
+  }
+}
+
+@keyframes rise {
+  from { top: 104%; opacity: 0; }
+  5% { opacity: 1; }
+  88% { opacity: 1; }
+  to { top: -34%; opacity: 0; }
+}
+
+@keyframes sway {
+  from { transform: translateX(-6px) rotate(-5deg); }
+  to { transform: translateX(7px) rotate(5deg); }
+}
+
+// A kite hangs where the line holds it, swinging on the bridle, and the line
+// runs off the bottom of the frame towards somebody standing out of shot.
+.kite {
+  position: absolute;
+  width: var(--w, 58px);
+  transform-origin: 50% 6%;
+  animation: hover var(--bob, 9s) ease-in-out var(--phase, 0s) infinite alternate;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.kite-line {
+  position: absolute;
+  left: 50%;
+  top: 67%;
+  width: 1px;
+  height: 46vh;
+  transform-origin: 50% 0;
+  transform: rotate(var(--lean, -22deg));
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--ink) 40%, transparent),
+    color-mix(in oklab, var(--ink) 12%, transparent) 60%,
+    transparent
+  );
+}
+
+@keyframes hover {
+  from { transform: rotate(-4deg) translateY(-3px); }
+  to { transform: rotate(5deg) translateY(7px); }
+}
+
+// A string parts, and the kite is held by nothing: it tumbles across the sky
+// and out of the frame the way a sheet of paper does, spinning as it goes.
+.kite.runaway {
+  opacity: 0;
+  animation: runaway var(--dur, 17s) cubic-bezier(0.35, 0.05, 0.65, 0.95) var(--delay, 0s) forwards;
+
+  svg {
+    animation: tumble 3.6s linear infinite;
+  }
+}
+
+@keyframes runaway {
+  from { top: -24%; left: -16%; rotate: -12deg; opacity: 0; }
+  6% { opacity: 1; }
+  84% { opacity: 1; }
+  to { top: 104%; left: 106%; rotate: 43deg; opacity: 0; }
+}
+
+@keyframes tumble {
+  to { transform: rotate(360deg); }
 }
 
 // ---- storm ----------------------------------------------------------------
