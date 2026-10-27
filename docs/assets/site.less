@@ -33,6 +33,18 @@
 @font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 @font-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, Menlo, monospace;
 
+// The script word in the homepage headline. Interlope is not on Google Fonts,
+// so it ships with the site: 82 KB of woff2, OFL 1.1, licence in fonts/OFL.txt.
+@font-script: "Interlope", "Iowan Old Style", Georgia, serif;
+
+@font-face {
+  font-family: "Interlope";
+  src: url("fonts/Interlope-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 // ---- mixins ---------------------------------------------------------------
 
 .mono(@size: 12.8px; @lh: 1.72) {
@@ -406,7 +418,9 @@ img, svg {
     line-height: 0.98;
     letter-spacing: -0.028em;
     font-weight: 560;
-    em { font-style: italic; font-weight: 440; color: var(--accent); }
+    // cv11/ss01 are Inter's own alternates, set on body. Interlope answers ss01
+    // with glyphs drawn on top of each other, so turn features off for this word.
+    em { font-family: @font-script; font-style: normal; font-weight: 400; color: var(--accent); letter-spacing: 0; padding-right: 0.04em; font-feature-settings: normal; }
   }
   .lede { font-size: clamp(17px, 1.5vw, 19.5px); color: var(--muted); max-width: 46ch; margin-top: 20px; }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
@@ -671,7 +685,9 @@ img, svg {
 .output {
   border: 1px solid var(--line);
   border-left: 3px solid var(--accent);
-  border-radius: 10px;
+  // Same rule as .note: the accent edge stays square so the bar is a straight
+  // line, and only the far side is rounded.
+  border-radius: 0 10px 10px 0;
   background: color-mix(in oklab, var(--accent) 6%, var(--raised));
   padding: 12px 16px;
   margin-top: 14px;
@@ -696,7 +712,10 @@ img, svg {
   border: 1px solid var(--line);
   border-left: 3px solid var(--accent-2);
   background: color-mix(in oklab, var(--accent-2) 7%, var(--raised));
-  border-radius: 10px;
+  // Square on the left, round on the right: the accent border then reads as a
+  // straight rule, the way a quoted block is marked, instead of bulging into a
+  // bracket at the start and end of the line.
+  border-radius: 0 10px 10px 0;
   padding: 14px 18px;
   font-size: 14.5px;
   color: var(--muted);
@@ -1108,7 +1127,13 @@ img, svg {
   }
 }
 
-// ---- seasonal flourish (spring petals) ------------------------------------
+// ---- weather --------------------------------------------------------------
+// Every page lets its own season fall. One layer, four materials: the page's
+// `data-season` chooses whether the span in the hero falls as a petal, a drop
+// of rain, a leaf or a flake, so the markup does not change with the season.
+// Each span carries its own `left`, `--w`, `--drift`, duration and negative
+// delay — a negative delay starts the fall part-way down, which is what keeps
+// the first frame from being an empty sky.
 
 .petals {
   position: absolute;
@@ -1117,20 +1142,79 @@ img, svg {
   pointer-events: none;
   overflow: hidden;
 }
-.petal {
+
+.flake {
   position: absolute;
-  top: -20px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50% 0 50% 50%;
-  background: var(--a3);
-  opacity: 0.5;
-  animation: drift linear infinite;
+  top: -10%;
+  display: block;
+  animation: fall linear infinite;
 }
-@keyframes drift {
-  from { transform: translateY(-30px) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.55; }
-  to { transform: translateY(120vh) translateX(40px) rotate(320deg); opacity: 0; }
+
+// Two motions: `fall` drops straight and is mostly for rain and snow, `flutter`
+// swings from side to side on the way down and is for petals and leaves.
+@keyframes fall {
+  from { transform: translate3d(0, -12vh, 0) rotate(var(--turn-start, 0deg)); opacity: 0; }
+  9% { opacity: var(--fall-o, 0.55); }
+  91% { opacity: var(--fall-o, 0.55); }
+  to { transform: translate3d(var(--drift, 26px), 108vh, 0) rotate(var(--turn-end, 320deg)); opacity: 0; }
+}
+
+@keyframes flutter {
+  from { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 0; }
+  9% { opacity: var(--fall-o, 0.55); }
+  27% { transform: translate3d(calc(var(--drift, 40px) * -0.7), 24vh, 0) rotate(64deg); }
+  50% { transform: translate3d(calc(var(--drift, 40px) * 0.85), 50vh, 0) rotate(158deg); }
+  73% { transform: translate3d(calc(var(--drift, 40px) * -0.45), 77vh, 0) rotate(248deg); }
+  91% { opacity: var(--fall-o, 0.55); }
+  to { transform: translate3d(var(--drift, 40px), 108vh, 0) rotate(336deg); opacity: 0; }
+}
+
+// Spring: a petal — one round lobe, one corner left square where the stem was.
+[data-season="spring"] .flake {
+  width: var(--w, 10px);
+  height: var(--w, 10px);
+  border-radius: 50% 0 50% 50%;
+  background: color-mix(in oklab, var(--a3) 92%, white);
+  --fall-o: 0.62;
+  animation-name: flutter;
+  &:nth-child(3n) { background: color-mix(in oklab, var(--a2) 88%, white); }
+}
+
+// Summer: a drop — a hairline with a bright head, slanted so it reads as rain
+// rather than as something falling.
+[data-season="summer"] .flake {
+  width: var(--w, 1.5px);
+  height: var(--h, 24px);
+  border-radius: 1px;
+  background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--accent) 62%, var(--a2)));
+  --turn-start: 8deg;
+  --turn-end: 8deg;
+  --fall-o: 0.75;
+  animation-name: fall;
+}
+
+// Autumn: a leaf — two opposite corners rounded into points.
+[data-season="autumn"] .flake {
+  width: var(--w, 13px);
+  height: calc(var(--w, 13px) * 0.62);
+  border-radius: 0 100% 0 100%;
+  background: color-mix(in oklab, var(--main) 80%, var(--a2));
+  --fall-o: 0.72;
+  animation-name: flutter;
+  &:nth-child(3n) { background: color-mix(in oklab, var(--a2) 88%, white); }
+  &:nth-child(4n) { background: color-mix(in oklab, var(--a2) 82%, var(--main)); }
+}
+
+// Winter: a flake — a small soft disc, greyer than the page so it shows on the
+// light theme as well as the dark one.
+[data-season="winter"] .flake {
+  width: var(--w, 5px);
+  height: var(--w, 5px);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--a3) 62%, white);
+  box-shadow: 0 0 5px color-mix(in oklab, var(--a3) 40%, transparent);
+  --fall-o: 0.78;
+  animation-name: fall;
 }
 
 // ---- simple table ---------------------------------------------------------
@@ -1216,5 +1300,5 @@ img, svg {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .petal { display: none; }
+  .petals { display: none; }
 }
