@@ -81,8 +81,8 @@ has every method and every parameter.
 
 Free functions: `parse`, `of_isoformat`, `strptime`, `http`, `asn1`, `leap`,
 `length`. Constants: `min_date`, `max_date`, `min_year`, `max_year`,
-`nanosecond`, `microsecond`-free by design, `resolution`, `midnight`,
-`end_of_day`.
+`resolution`, `midnight`, `end_of_day`, and one span per unit from `nanosecond`
+to `day`.
 
 Errors are one type with three reasons: `Range` carries the field, the value it
 got and the range it wanted; `Malformed` carries what was expected; `Truncated`
