@@ -998,7 +998,10 @@ img, svg { display: block; max-width: 100%; }
   border: 1px solid var(--line);
   .mono(12.8px; 1.72);
   color: var(--code-ink);
-  white-space: pre-wrap;
+  // The diagram is drawn with box characters, so it must never wrap and must
+  // scroll instead: a wrapped box-drawing line reads as a mistake.
+  white-space: pre;
+  overflow-x: auto;
   word-break: break-word;
   .hl { color: var(--accent); }
 }

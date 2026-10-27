@@ -111,7 +111,7 @@ test "the shorthands are the ones crontab(5) lists" {
 }
 
 ///|
-test "a question mark reads as a star, which is what Quartz writes" {
+test "a question mark reads as a star" {
   assert_eq(parse("0 0 ? * MON"), parse("0 0 * * MON"))
   assert_eq(parse("0 0 13 * ?"), parse("0 0 13 * *"))
 }

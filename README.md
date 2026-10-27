@@ -111,8 +111,8 @@ let next = every_quarter.next(now)
 ```
 
 Five fields as crontab(5) defines them, or six with seconds in front. `*`, `n`,
-`a-b`, `*/n`, `a-b/n`, lists of those, month and day names, `?` as Quartz writes
-it, and the `@` shorthands. Both 0 and 7 are Sunday.
+`a-b`, `*/n`, `a-b/n`, lists of those, month and day names, `?` for a day field
+that is not in use, and the `@` shorthands. Both 0 and 7 are Sunday.
 
 Day-of-month and day-of-week are or-ed when both are restricted, which is Vixie
 cron's rule: `0 0 13 * 5` fires on the thirteenth or on any Friday, not only on

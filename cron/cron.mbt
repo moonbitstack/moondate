@@ -66,8 +66,8 @@ pub extend Cron with Eq::{not_equal, equal}
 /// ```
 ///
 /// Each field takes `*`, a number, a range `a-b`, a step `*/n` or `a-b/n`, and a
-/// comma-separated list of those. `?` reads as `*`, which is what Quartz writes in
-/// whichever of the two day fields it is not using.
+/// comma-separated list of those. `?` reads as `*`, which is how a scheduler
+/// spells the day field it is not using.
 ///
 /// The shorthands `@yearly`, `@annually`, `@monthly`, `@weekly`, `@daily`,
 /// `@midnight` and `@hourly` are the ones crontab(5) lists. `@reboot` is not here:
@@ -109,8 +109,8 @@ pub fn parse(expr : StringView) -> Cron raise Refused {
 }
 
 ///|
-/// Whether a field is unrestricted, which `?` is too (Quartz writes it in the day
-/// field it is not using).
+/// Whether a field is unrestricted, which `?` is too (a scheduler writes it in
+/// the day field it is not using).
 fn is_star(s : String) -> Bool {
   s == "*" || s == "?"
 }

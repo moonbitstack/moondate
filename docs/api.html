@@ -634,7 +634,7 @@
 │ │ │ │ ┌───────────── month (1-12 or JAN-DEC)
 │ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT, both 0 and 7 being Sunday)
 * * * * * *</code></pre>
-<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is what Quartz writes in whichever of the two day fields it is not using.</p>
+<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is how a scheduler spells the day field it is not using.</p>
 <p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
 <div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
 </article>
@@ -798,7 +798,7 @@
 │ │ │ │ ┌───────────── month (1-12 or JAN-DEC)
 │ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT, both 0 and 7 being Sunday)
 * * * * * *</code></pre>
-<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is what Quartz writes in whichever of the two day fields it is not using.</p>
+<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is how a scheduler spells the day field it is not using.</p>
 <p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
 <div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
 </article>
