@@ -104,7 +104,14 @@ h1, h2, h3, h4 {
 
 p { margin: 0 0 1em; }
 a { color: var(--link); text-decoration: none; }
-img, svg { display: block; max-width: 100%; }
+// An icon is a box, not a glyph sitting on a line of text. Every icon here is
+// drawn on a 24-unit grid with its ink inside 2..22, so the drawn part — not the
+// box — is what the eye measures; the sizes further down are set to match ink.
+img, svg {
+  display: block;
+  max-width: 100%;
+  flex: none;
+}
 ::selection { background: color-mix(in oklab, var(--accent) 26%, transparent); }
 
 // ---- seasonal palettes ----------------------------------------------------
@@ -256,14 +263,25 @@ img, svg { display: block; max-width: 100%; }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   color: var(--ink);
   font-family: @font-display;
   font-weight: 560;
   font-size: 19px;
   letter-spacing: -0.01em;
 
-  .mark { width: 26px; height: 26px; color: var(--accent); }
+  .mark {
+    width: 24px;
+    height: 24px;
+    color: var(--accent);
+    // The crescent's leftmost point sits 2 units inside its box. Pulling the
+    // mark back by that much puts the ink — not the box — on the same line the
+    // headline, cards and code blocks start on.
+    margin-left: -2px;
+    // The box is already on the cap height of the word; the crescent's mass sits
+    // a little low inside it, so half a pixel takes up the difference.
+    transform: translateY(-0.5px);
+  }
 }
 
 .mainnav {
@@ -287,19 +305,24 @@ img, svg { display: block; max-width: 100%; }
 .seasons {
   display: flex;
   gap: 6px;
-  padding: 4px;
+  padding: 8px;
   border-radius: 999px;
   background: var(--surface);
 
   .dot {
-    width: 13px; height: 13px; border-radius: 50%;
+    width: 14px; height: 14px; border-radius: 50%;
     display: block; position: relative; transition: transform 0.18s ease;
-    &:hover { transform: scale(1.18); }
+    &:hover { transform: scale(1.14); }
     &.spring { background: @spring-main; }
     &.summer { background: @summer-main; }
     &.autumn { background: @autumn-a2; }
     &.winter { background: @winter-main; }
-    &[aria-current="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
+    // Two rings: a spacer in the pill's own colour, then the ink. The 21px the
+    // pair needs fits inside the 30px pill with room to spare, so the selection
+    // never crowds the rounded end.
+    &[aria-current="true"] {
+      box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--ink);
+    }
   }
 }
 
@@ -313,11 +336,15 @@ img, svg { display: block; max-width: 100%; }
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
   &:hover { color: var(--accent); border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+
+  // Stroke icons carry their weight on 2px lines, a filled logo carries it across
+  // the whole shape, so the logo box is a step smaller for the same presence.
   svg { width: 18px; height: 18px; }
+  .octo { width: 17px; height: 17px; }
 }
 
 .theme-toggle {
-  .moon { display: none; }
+  .moon { display: none; width: 20px; height: 20px; }
 }
 [data-theme="dark"] .theme-toggle {
   .sun { display: none; }
@@ -340,7 +367,7 @@ img, svg { display: block; max-width: 100%; }
   transition: transform 0.12s, box-shadow 0.15s, background 0.15s, border-color 0.15s;
   text-decoration: none;
   &:active { transform: translateY(1px); }
-  svg { width: 17px; height: 17px; }
+  svg { width: 16px; height: 16px; }
 
   &.btn-primary {
     background: var(--accent);
@@ -406,12 +433,18 @@ img, svg { display: block; max-width: 100%; }
   .prompt { color: var(--muted); padding: 10px 4px 10px 14px; }
   code { padding: 10px 14px 10px 6px; color: var(--ink); white-space: nowrap; }
   .copy {
+    // A button centres its own text by its own rules, which lands a line ~1px
+    // below the two text nodes beside it. Stretching the button and centring the
+    // label as a grid puts all three on the same line.
+    align-self: stretch;
+    display: grid;
+    place-items: center;
     border: 0;
     border-left: 1px solid var(--line);
     background: var(--surface);
     color: var(--muted);
     font: inherit;
-    padding: 10px 13px;
+    padding: 0 13px;
     cursor: pointer;
     transition: color 0.15s, background 0.15s;
     &:hover { color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, var(--raised)); }
@@ -1015,7 +1048,10 @@ img, svg { display: block; max-width: 100%; }
   background: color-mix(in oklab, var(--surface) 50%, var(--bg));
 
   .row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .brand { font-size: 17px; }
+  .brand {
+    font-size: 17px;
+    .mark { width: 21px; height: 21px; }
+  }
   .tag { color: var(--muted); font-size: 13.5px; max-width: 42ch; }
   .links {
     margin-left: auto;

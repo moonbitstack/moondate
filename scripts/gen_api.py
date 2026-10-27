@@ -505,19 +505,22 @@ def render_sidebar(packages: list[tuple[str, dict]]) -> str:
 # --------------------------------------------------------------------------
 
 MARK = (
-    '<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">'
-    '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>'
-    '<path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-18z" fill="currentColor"/></svg>'
+    '<svg class="mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
+    '<path d="M22 12.88A10 10 0 1 1 11.12 2a7.78 7.78 0 0 0 10.88 10.88z"/></svg>'
 )
 GITHUB = (
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
+    '<svg class="octo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
     '<path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>'
 )
 SUN = (
     '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">'
-    '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2M12 19.4v2M2.6 12h2M19.4 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>'
+    '<circle cx="12" cy="12" r="4.9"/>'
+    '<path d="M12 1.7v2.4M12 19.9v2.4M1.7 12h2.4M19.9 12h2.4M4.75 4.75l1.7 1.7M17.55 17.55l1.7 1.7M19.25 4.75l-1.7 1.7M6.45 17.55l-1.7 1.7"/></svg>'
 )
-MOON = '<svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>'
+MOON = (
+    '<svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
+    '<path d="M22 12.88A10 10 0 1 1 11.12 2a7.78 7.78 0 0 0 10.88 10.88z"/></svg>'
+)
 
 
 def nav(active: str) -> str:
