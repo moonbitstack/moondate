@@ -139,6 +139,8 @@ img, svg {
   --tok-key: #4f7a2f; --tok-str: #b0506f; --tok-num: #a15a1e; --tok-com: #8a947a;
   --hero-a: color-mix(in oklab, var(--main) 42%, var(--bg));
   --hero-b: color-mix(in oklab, var(--a2) 60%, var(--bg));
+  // Young leaves, for the loads when spring carries both leaves and petals.
+  --leaf-a: #93b661; --leaf-b: #c2dd8d;
 }
 
 [data-season="summer"] {
@@ -199,6 +201,7 @@ img, svg {
 
 [data-season="spring"][data-theme="dark"] {
   --accent: #b8db80; --accent-2: #f39eb6; --link: #b8db80;
+  --leaf-a: #a6c873; --leaf-b: #cfe09a;
   --tok-key: #b8db80; --tok-str: #f39eb6; --tok-num: #f0c07a;
   --hero-a: color-mix(in oklab, #b8db80 18%, #0d1016);
   --hero-b: color-mix(in oklab, #f39eb6 12%, #0d1016);
@@ -1128,10 +1131,13 @@ img, svg {
 }
 
 // ---- weather --------------------------------------------------------------
-// Every page lets its own season fall. One layer, four materials: the page's
-// `data-season` chooses whether the span in the hero falls as a petal, a drop
-// of rain, a leaf or a flake, so the markup does not change with the season.
-// Each span carries its own `left`, `--w`, `--drift`, duration and negative
+// Every page lets its own season fall, and each load picks a variation of that
+// season: summer can storm, spring can rain on its petals, winter can blow,
+// autumn can gust. `site.js` builds the layer from that recipe, but what a
+// particle *is* is decided here, by its class, so a single page can carry two
+// or three materials at once (rain and petals, leaves and petals).
+//
+// Each span carries its own `left`, `--w`, `--drift`, duration and a negative
 // delay — a negative delay starts the fall part-way down, which is what keeps
 // the first frame from being an empty sky.
 
@@ -1151,7 +1157,7 @@ img, svg {
 }
 
 // Two motions: `fall` drops straight and is mostly for rain and snow, `flutter`
-// swings from side to side on the way down and is for petals and leaves.
+// swings from side to side on the way down and is for petals, leaves and ice.
 @keyframes fall {
   from { transform: translate3d(0, -12vh, 0) rotate(var(--turn-start, 0deg)); opacity: 0; }
   9% { opacity: var(--fall-o, 0.55); }
@@ -1170,7 +1176,7 @@ img, svg {
 }
 
 // Spring: a petal — one round lobe, one corner left square where the stem was.
-[data-season="spring"] .flake {
+.petal {
   width: var(--w, 10px);
   height: var(--w, 10px);
   border-radius: 50% 0 50% 50%;
@@ -1180,34 +1186,40 @@ img, svg {
   &:nth-child(3n) { background: color-mix(in oklab, var(--a2) 88%, white); }
 }
 
-// Summer: a drop — a hairline with a bright head, slanted so it reads as rain
-// rather than as something falling.
-[data-season="summer"] .flake {
-  width: var(--w, 1.5px);
-  height: var(--h, 24px);
-  border-radius: 1px;
-  background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--accent) 62%, var(--a2)));
-  --turn-start: 8deg;
-  --turn-end: 8deg;
-  --fall-o: 0.75;
-  animation-name: fall;
-}
-
 // Autumn: a leaf — two opposite corners rounded into points.
-[data-season="autumn"] .flake {
-  width: var(--w, 13px);
-  height: calc(var(--w, 13px) * 0.62);
+.leaf {
+  width: var(--w, 16px);
+  height: calc(var(--w, 16px) * 0.62);
   border-radius: 0 100% 0 100%;
-  background: color-mix(in oklab, var(--main) 80%, var(--a2));
+  background: var(--leaf-a, color-mix(in oklab, var(--main) 80%, var(--a2)));
   --fall-o: 0.72;
   animation-name: flutter;
-  &:nth-child(3n) { background: color-mix(in oklab, var(--a2) 88%, white); }
-  &:nth-child(4n) { background: color-mix(in oklab, var(--a2) 82%, var(--main)); }
+  &:nth-child(3n) { background: var(--leaf-b, color-mix(in oklab, var(--a2) 88%, white)); }
+  &:nth-child(4n) { background: color-mix(in oklab, var(--leaf-a, var(--main)) 62%, var(--leaf-b, var(--a2))); }
+}
+
+// Rain: a drop — a hairline with a bright head, slanted so it reads as falling
+// water rather than as something dropping.
+.drop {
+  width: var(--w, 1.6px);
+  height: var(--h, 24px);
+  border-radius: 1px;
+  background: linear-gradient(to bottom, transparent, color-mix(in oklab, #7fa9c9 88%, white));
+  --turn-start: 8deg;
+  --turn-end: 8deg;
+  --fall-o: 0.7;
+  animation-name: fall;
+
+  // On the summer page the same drop takes the season's own blue.
+  [data-season="summer"] & {
+    background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--accent) 62%, var(--a2)));
+    --fall-o: 0.75;
+  }
 }
 
 // Winter: a flake — a small soft disc, greyer than the page so it shows on the
 // light theme as well as the dark one.
-[data-season="winter"] .flake {
+.snow {
   width: var(--w, 5px);
   height: var(--w, 5px);
   border-radius: 50%;
@@ -1215,6 +1227,125 @@ img, svg {
   box-shadow: 0 0 5px color-mix(in oklab, var(--a3) 40%, transparent);
   --fall-o: 0.78;
   animation-name: fall;
+}
+
+// Hail: a pellet of ice — a disc with a highlight, dropping fast and straight.
+.hail {
+  width: var(--w, 5px);
+  height: var(--w, 5px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 28%, #fff 10%, color-mix(in oklab, #abe4fe 70%, white) 45%, #8fc3e4);
+  box-shadow: 0 0 0 0.5px color-mix(in oklab, #7fb6dd 55%, transparent), 0 1px 5px color-mix(in oklab, #7fb6dd 40%, transparent);
+  --fall-o: 0.85;
+  animation-name: fall;
+}
+
+// A crystal is the drawn snowflake rather than a dot. The sprite is injected
+// once by the script; `currentColor` lets the two tones stay two tones.
+.crystal {
+  width: var(--w, 14px);
+  height: var(--w, 14px);
+  color: color-mix(in oklab, var(--a3) 82%, white);
+  --fall-o: 0.8;
+  animation-name: flutter;
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--a3) 35%, transparent));
+}
+
+// A gust is not part of the standing weather: leaves are thrown across the hero
+// and taken away again. The direction is a sign on `--fly`.
+.gustleaf {
+  position: absolute;
+  border-radius: 0 100% 0 100%;
+  background: color-mix(in oklab, var(--main) 80%, var(--a2));
+  animation: gust cubic-bezier(0.42, 0.05, 0.58, 0.95) forwards;
+  opacity: 0;
+}
+
+@keyframes gust {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.8; }
+  50% { transform: translate3d(calc(var(--fly) * 0.55), -14px, 0) rotate(200deg); }
+  88% { opacity: 0.8; }
+  to { transform: translate3d(var(--fly), 22px, 0) rotate(430deg); opacity: 0; }
+}
+
+// ---- storm ----------------------------------------------------------------
+// The flash runs in from the top edge: a wide glow that reads as the sky being
+// lit, plus a hairline along the edge itself. It sits below the header so the
+// nav stays readable while the sky behind it goes white.
+
+.lightning {
+  // Anchored to the top of the page, not of the window: the sky is part of the
+  // hero, so it scrolls away with it instead of floating over the text.
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: min(30vh, 260px);
+  z-index: 45;
+  pointer-events: none;
+  opacity: 0;
+  // A pale sky cannot be lit any brighter, so the flash is carried by colour:
+  // a blue wash that spreads from the strike point, and a harder line along the
+  // top edge to say where the sky opened.
+  background:
+    linear-gradient(to bottom, color-mix(in oklab, var(--accent) 45%, white) 0, transparent 2px),
+    radial-gradient(42% 92% at var(--x, 50%) 0%, color-mix(in oklab, var(--accent) 72%, white) 0%, color-mix(in oklab, var(--accent) 26%, transparent) 44%, transparent 78%);
+  &.strike { animation: strike 0.78s ease-out; }
+
+  // On the pale themes the page is multiplied by the flash, on the dark one it
+  // is screened, so the same colour reads as a flash either way instead of
+  // turning into a white smear on white.
+  [data-theme="light"] & { mix-blend-mode: multiply; }
+  [data-theme="dark"] & { mix-blend-mode: screen; }
+
+  // The bolt is drawn fresh for every strike: a jagged line hanging from the
+  // edge, with one fork, mirrored left or right. It is the part that says
+  // "lightning" rather than "the sky got brighter".
+  .bolt {
+    position: absolute;
+    top: 0;
+    left: var(--x, 50%);
+    height: 100%;
+    width: auto;
+    aspect-ratio: 60 / 220;
+    transform: translateX(-50%) scaleX(var(--flip, 1));
+    overflow: visible;
+    fill: none;
+    stroke: color-mix(in oklab, var(--accent) 62%, white);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px color-mix(in oklab, var(--accent) 80%, transparent))
+            drop-shadow(0 0 22px color-mix(in oklab, var(--accent) 55%, transparent));
+  }
+}
+
+@keyframes strike {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  15% { opacity: 0.1; }
+  25% { opacity: 0.72; }
+  45% { opacity: 0.06; }
+  100% { opacity: 0; }
+}
+
+// A downpour also takes the light down and up a little, slowly, the way a heavy
+// sky does.
+.storm-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+  pointer-events: none;
+  background: #0b1220;
+  opacity: 0;
+  animation: dim 7s ease-in-out infinite;
+}
+
+@keyframes dim {
+  0%, 100% { opacity: 0; }
+  18% { opacity: 0.05; }
+  34% { opacity: 0.015; }
+  52% { opacity: 0.07; }
+  70% { opacity: 0.025; }
 }
 
 // ---- simple table ---------------------------------------------------------
