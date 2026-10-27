@@ -774,10 +774,10 @@ pub fn Moment::ctime(self : Moment) -> String {
 }
 
 ///|
-/// The nine fields C's `struct tm` holds, in its order:
-/// year, month, day, hour, minute, second, weekday from Monday as 0, day of the
-/// year, and whether daylight saving applies — always `-1` here, because that
-/// needs a zone database this package does not carry.
+/// The nine fields of a broken-down time, in the usual order:
+/// year, month, day, hour, minute, second, weekday counted from Monday as 0, day
+/// of the year, and whether daylight saving applies — always `-1` here, because
+/// that needs a zone database this package does not carry.
 pub fn Moment::timetuple(
   self : Moment,
 ) -> (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32) {

@@ -9,10 +9,22 @@ fn main raise {
   let date = @moondate.Date::new(2026, 9, 22)
 
   // Where the day sits in the year, and in the week.
-  // `weekday` counts from Monday as 0, which is what ISO and C's `struct tm` use.
-  println("weekday  " + date.weekday().to_string()) // 0 = Monday
-  println("isoweekday " + date.isoweekday().to_string()) // 1 = Monday
+  // There are two ways to number a week, and the off-by-one between them is the
+  // classic way to get a schedule wrong. `weekday` counts from Sunday as 0, which
+  // is what a calendar and cron use. `isoweekday` counts from Monday as 1, which
+  // is what ISO 8601 uses.
+  println("weekday  " + date.weekday().to_string()) // Tuesday, Sunday = 0
+  println("isoweekday " + date.isoweekday().to_string()) // Tuesday, Monday = 1
   println("yearday  " + date.yearday().to_string()) // 1 = 1 January
+
+  // A Sunday is where the two disagree: 0 in one, 7 in the other.
+  let sunday = @moondate.Date::new(2026, 9, 27)
+  println(
+    "Sunday   " +
+    sunday.weekday().to_string() +
+    " and " +
+    sunday.isoweekday().to_string(),
+  )
 
   // The ISO 8601 week date: which year the week belongs to, which week, which day.
   // The year is not always the calendar year — 1 January 2027 belongs to week 53
