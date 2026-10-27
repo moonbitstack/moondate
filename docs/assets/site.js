@@ -241,11 +241,12 @@
 
   // ---- weather -------------------------------------------------------------
   // Each page falls in its own season, and every load picks a variation of that
-  // season: summer storms one time in five, spring rains on its petals one time
-  // in ten, winter draws a snowflake three times in ten, autumn gusts three
-  // times in ten. Everything else is the plain season the markup already holds,
-  // so this only ever replaces the layer with the same weather plus or minus
-  // something.
+  // season: summer storms one time in five, squalls one time in twenty, spring
+  // rains on its petals one time in ten or brings leaves and no blossom one
+  // time in ten, winter draws a snowflake three times in ten, autumn gusts
+  // three times in ten. Everything else is the plain season the markup already
+  // holds, so this only ever replaces the layer with the same weather plus or
+  // minus something.
   //
   // `?weather=downpour` forces a state. The rare ones are hard to catch
   // otherwise, and this is how they get looked at.
@@ -270,10 +271,12 @@
       "petals-leaves-rain": { petal: 7, leaf: 6, drop: 12 },
       rain: { drop: 26 },
       thunder: { drop: 26, strike: [5000, 30000] },
+      // Rain driven across the page so hard it leans, with the storm behind it.
+      squall: { drop: 44, blow: true, strike: [4000, 20000] },
       downpour: { drop: 64, heavy: true, dim: true, strike: [2000, 7000] },
       snow: { snow: 22 },
       crystals: { crystal: 16 },
-      sleet: { snow: 14, hail: 12 },
+      sleet: { snow: 14, burst: { hail: 12, gap: [2600, 6500] } },
       wind: { snow: 16, crystal: 10, blow: true },
       leaves: { leaf: 11 },
       gust: { leaf: 11, gust: [5000, 10000] },
@@ -285,7 +288,7 @@
       drop: { w: [1.4, 2], h: [18, 30], drift: [18, 40], dur: [0.7, 1.5], o: [0.45, 0.8] },
       snow: { w: [3, 7], drift: [16, 42], dur: [15, 26], o: [0.6, 0.9] },
       crystal: { w: [12, 24], drift: [20, 60], dur: [16, 30], o: [0.6, 0.9] },
-      hail: { w: [5, 8], drift: [6, 18], dur: [1.1, 1.9], o: [0.6, 0.9] },
+      hail: { w: [5, 8], drift: [6, 18], dur: [0.75, 1.2], o: [0.6, 0.9] },
     };
 
     const HEAVY = { w: [2, 2.6], h: [30, 54], drift: [10, 26], dur: [0.42, 0.75], o: [0.6, 0.9] };
@@ -326,6 +329,7 @@
         el = document.createElement("span");
         el.className = "flake " + type;
       }
+      if (shape.mark) el.classList.add(shape.mark);
 
       // Spread each material across the full width, jittered inside its slot so
       // two materials falling at once do not line up into columns.
@@ -346,7 +350,16 @@
     function shapeFor(type, recipe) {
       if (recipe.heavy && type === "drop") return HEAVY;
       if (!recipe.blow) return SHAPE[type];
-      // Wind is the same snow, thrown leftwards and faster.
+      // Wind is the same material, thrown leftwards. Rain is shortened into a
+      // sheet and quickened; snow only needs a faster, longer slide. The rain
+      // also gets a class, because wind is not only where it goes but which way
+      // it leans.
+      if (type === "drop") {
+        return Object.assign({}, SHAPE[type], {
+          w: [1.6, 2.3], h: [24, 42], drift: [-260, -140], dur: [0.45, 0.8],
+          mark: "blown",
+        });
+      }
       const fast = type === "crystal" ? [9, 16] : [7, 13];
       const left = type === "crystal" ? [-150, -70] : [-180, -90];
       return Object.assign({}, SHAPE[type], { drift: left, dur: fast });
@@ -367,26 +380,76 @@
       if (calm) return;
       const bolt = document.createElement("div");
       bolt.className = "lightning";
-      bolt.innerHTML = '<svg class="bolt" viewBox="0 0 60 220" aria-hidden="true"><path d=""/></svg>';
+      // One gradient definition, shared by the channel and its fork; the colours
+      // come from CSS so each theme can pick its own light.
+      bolt.innerHTML =
+        '<svg class="bolt" viewBox="0 0 60 220" aria-hidden="true">' +
+        '<linearGradient id="bolt-grad" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop class="g-root" offset="0"/>' +
+        '<stop class="g-mid" offset=".45"/>' +
+        '<stop class="g-tip" offset="1"/>' +
+        "</linearGradient>" +
+        '<path class="trunk" fill="url(#bolt-grad)"/>' +
+        '<path class="fork" fill="url(#bolt-grad)"/>' +
+        "</svg>";
       document.body.appendChild(bolt);
-      const line = bolt.querySelector("path");
+      const trunkOut = bolt.querySelector(".trunk");
+      const forkOut = bolt.querySelector(".fork");
 
-      // A jagged line from the top edge down, one step every 40-odd units, with
-      // a single fork off the side so it does not read as a zigzag doodle.
+      // Lightning is not a line of one width: it leaves the sky thick, thins on
+      // the way down and ends in a point, and its fork does the same in
+      // miniature. A stroked path can only hold one width, so the channel is
+      // built as an outline instead — offsets either side of a jagged
+      // centreline by a width that falls away along the length.
+      const channel = (points, rootW, tipW) => {
+        const n = points.length;
+        const side = (sign) =>
+          points.map((p, i) => {
+            const a = points[Math.max(0, i - 1)];
+            const b = points[Math.min(n - 1, i + 1)];
+            const dx = b[0] - a[0];
+            const dy = b[1] - a[1];
+            const len = Math.hypot(dx, dy) || 1;
+            const t = i / (n - 1);
+            const w = (tipW + (rootW - tipW) * Math.pow(1 - t, 0.8)) / 2;
+            return [
+              (p[0] + (sign * -dy * w) / len).toFixed(1),
+              (p[1] + (sign * dx * w) / len).toFixed(1),
+            ];
+          });
+        const left = side(1);
+        const right = side(-1).reverse();
+        return "M" + left.concat(right).map((q) => q.join(" ")).join("L") + "Z";
+      };
+
+      // A jagged centreline from just above the top edge down, kept inside the
+      // box so the glow around the whole bolt stays even.
       const zigzag = () => {
         const steps = 4 + Math.floor(Math.random() * 3);
         const step = 220 / steps;
-        let x = rand(20, 40);
-        let d = "M" + x.toFixed(0) + " 0";
+        let x = rand(26, 38);
+        const points = [[x, -4]];
         for (let i = 1; i <= steps; i++) {
-          x += rand(-15, 15);
-          d += " L" + x.toFixed(0) + " " + (step * i).toFixed(0);
+          x = Math.max(10, Math.min(50, x + rand(-13, 13)));
+          points.push([x, step * i]);
         }
-        const fy = step * (1 + Math.floor(Math.random() * 2));
-        d +=
-          " M" + (x + rand(-10, 10)).toFixed(0) + " " + fy.toFixed(0) +
-          " l" + rand(-18, 18).toFixed(0) + " " + rand(20, 44).toFixed(0);
-        return d;
+        return points;
+      };
+
+      // One fork off the side of the trunk, at a random height, so it does not
+      // read as a plain zigzag doodle.
+      const branch = (points) => {
+        const i = 1 + Math.floor(Math.random() * (points.length - 2));
+        let [x, y] = points[i];
+        const dir = Math.random() < 0.5 ? -1 : 1;
+        const out = [[x, y]];
+        const segs = 2 + Math.floor(Math.random() * 2);
+        for (let k = 0; k < segs; k++) {
+          x = Math.max(4, Math.min(56, x + dir * rand(8, 15)));
+          y += rand(15, 26);
+          out.push([x, y]);
+        }
+        return out;
       };
 
       if (recipe.dim) {
@@ -398,7 +461,9 @@
       const fire = () => {
         bolt.style.setProperty("--x", rand(12, 88).toFixed(0) + "%");
         bolt.style.setProperty("--flip", Math.random() < 0.5 ? "1" : "-1");
-        line.setAttribute("d", zigzag());
+        const points = zigzag();
+        trunkOut.setAttribute("d", channel(points, 4.6, 0.35));
+        forkOut.setAttribute("d", channel(branch(points), 1.8, 0.2));
         bolt.classList.remove("strike");
         void bolt.offsetWidth;
         bolt.classList.add("strike");
@@ -414,41 +479,103 @@
       loop();
     }
 
-    // A gust is a burst, not a state: leaves are thrown in from one side, cross
-    // the hero and are taken away, then the wind waits again.
+    // A gust is a burst, not a state. It arrives one of three ways: it comes
+    // through and only carries the leaves already in the air off their course,
+    // or it tears a handful off the tree, or it takes a whole branch's worth and
+    // throws them across the hero. The direction is the same in all three.
     function gusts(recipe) {
       if (calm) return;
-      const blow = () => {
-        const dir = Math.random() < 0.5 ? 1 : -1;
-        const n = 6 + Math.floor(Math.random() * 4);
-        for (let i = 0; i < n; i++) {
+
+      // The leaves in the air are animated on `transform`, so a shove rides on
+      // the separate `translate` property: the fall carries on undisturbed and
+      // the whole path is simply carried sideways, which is what wind does. The
+      // offset is remembered and clamped, so a run of gusts cannot walk a leaf
+      // out of the picture.
+      const push = (dir, reach) => {
+        const leaves = layer.querySelectorAll(".flake.leaf");
+        for (let i = 0; i < leaves.length; i++) {
+          const el = leaves[i];
+          const next = Math.max(
+            -90,
+            Math.min(90, (el._shift || 0) + dir * rand(reach * 0.5, reach))
+          );
+          el._shift = next;
+          el.style.translate = next.toFixed(0) + "px 0";
+        }
+      };
+
+      const wave = (dir, count) => {
+        for (let i = 0; i < count; i++) {
           const el = document.createElement("span");
           el.className = "gustleaf";
           const w = Math.round(rand(12, 18));
+          // The height it enters and leaves at comes from the keyframes, so the
+          // flight is corner to corner; only the reach and the timing differ,
+          // which is what keeps a wave from flying in a rank.
           el.style.cssText = [
-            "top:" + rand(6, 78).toFixed(1) + "%",
             dir > 0 ? "left:-6%" : "left:104%",
             "width:" + w + "px",
             "height:" + (w * 0.62).toFixed(0) + "px",
-            "--fly:" + (dir * rand(105, 135)).toFixed(0) + "vw",
-            "animation-duration:" + rand(1.3, 2.3).toFixed(1) + "s",
-            "animation-delay:" + (i * rand(0.04, 0.12)).toFixed(2) + "s",
+            "--fly:" + (dir * rand(55, 82)).toFixed(0) + "vw",
+            "animation-duration:" + rand(1.5, 2.4).toFixed(1) + "s",
+            "animation-delay:" + (i * rand(0.05, 0.14)).toFixed(2) + "s",
           ].join(";");
           layer.appendChild(el);
-          setTimeout(() => el.remove(), 4200);
+          setTimeout(() => el.remove(), 4600);
+        }
+      };
+
+      const blow = () => {
+        const dir = Math.random() < 0.5 ? 1 : -1;
+        const roll = Math.random();
+        if (roll < 0.45) {
+          push(dir, 70);
+        } else if (roll < 0.8) {
+          wave(dir, 5 + Math.floor(Math.random() * 4));
+        } else {
+          wave(dir, 15 + Math.floor(Math.random() * 8));
+          push(dir, 40);
         }
         setTimeout(blow, pair(recipe.gust));
       };
       setTimeout(blow, rand(1200, 3000));
     }
 
+    // Hail does not fall as a curtain. It comes down in short, fast bursts with
+    // a random silence in between, so what you hear and see is a shower passing
+    // rather than sleet going on without end.
+    function hailfall(recipe) {
+      if (calm) return;
+      const spec = recipe.burst;
+      const fall = () => {
+        const n = spec.hail;
+        for (let i = 0; i < n; i++) {
+          const el = make("hail", i, n, SHAPE.hail);
+          // Each pellet is a beat behind the one before it: that is the patter.
+          el.style.animationDelay = "-" + rand(0, 0.24).toFixed(2) + "s";
+          layer.appendChild(el);
+          setTimeout(() => el.remove(), 2000);
+        }
+        setTimeout(fall, pair(spec.gap));
+      };
+      setTimeout(fall, rand(300, 1200));
+    }
+
     function choose() {
       const r = Math.random();
-      if (season === "summer") return r < 0.05 ? "downpour" : r < 0.25 ? "thunder" : "rain";
+      if (season === "summer") {
+        if (r < 0.05) return "downpour";
+        if (r < 0.1) return "squall";
+        if (r < 0.3) return "thunder";
+        return "rain";
+      }
       if (season === "spring") {
         if (r < 0.05) return "petals-leaves-rain";
         if (r < 0.15) return "petals-leaves";
         if (r < 0.25) return "petals-rain";
+        // Not every flowering week is the same week: sometimes the blossom is
+        // over and only the young leaves are still coming down.
+        if (r < 0.35) return "leaves";
         return "petals";
       }
       if (season === "winter") {
@@ -475,6 +602,7 @@
     build(recipe);
     if (recipe.strike) storm(recipe, Boolean(forced));
     if (recipe.gust) gusts(recipe);
+    if (recipe.burst) hailfall(recipe);
   })();
 
 })();

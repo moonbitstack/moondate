@@ -1194,6 +1194,10 @@ img, svg {
   background: var(--leaf-a, color-mix(in oklab, var(--main) 80%, var(--a2)));
   --fall-o: 0.72;
   animation-name: flutter;
+  // A gust carries the leaves already in the air sideways. That shove rides on
+  // the separate `translate` property, so the flutter animation keeps running
+  // underneath it and the path bends instead of restarting.
+  transition: translate 0.9s cubic-bezier(0.3, 0.7, 0.3, 1);
   &:nth-child(3n) { background: var(--leaf-b, color-mix(in oklab, var(--a2) 88%, white)); }
   &:nth-child(4n) { background: color-mix(in oklab, var(--leaf-a, var(--main)) 62%, var(--leaf-b, var(--a2))); }
 }
@@ -1214,6 +1218,13 @@ img, svg {
   [data-season="summer"] & {
     background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--accent) 62%, var(--a2)));
     --fall-o: 0.75;
+  }
+
+  // Wind-driven rain: it travels leftwards, so the streak has to lean the same
+  // way, further than the standing 8deg, or the motion and the line disagree.
+  &.blown {
+    --turn-start: 26deg;
+    --turn-end: 26deg;
   }
 }
 
@@ -1255,18 +1266,23 @@ img, svg {
 // and taken away again. The direction is a sign on `--fly`.
 .gustleaf {
   position: absolute;
+  top: -26%;
   border-radius: 0 100% 0 100%;
   background: color-mix(in oklab, var(--main) 80%, var(--a2));
-  animation: gust cubic-bezier(0.42, 0.05, 0.58, 0.95) forwards;
+  animation: gust cubic-bezier(0.36, 0.06, 0.52, 0.95) forwards;
   opacity: 0;
 }
 
+// A leaf taken by the wind travels corner to corner: it comes in over the top
+// rail on the windward side and leaves over the bottom rail on the other,
+// tumbling the whole way. Not a horizontal flight — a leaf that only crosses
+// the frame reads as a cursor, not as weather.
 @keyframes gust {
-  from { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  from { top: -26%; transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
   8% { opacity: 0.8; }
-  50% { transform: translate3d(calc(var(--fly) * 0.55), -14px, 0) rotate(200deg); }
+  50% { top: 44%; transform: translate3d(calc(var(--fly) * 0.46), 0, 0) rotate(200deg); }
   88% { opacity: 0.8; }
-  to { transform: translate3d(var(--fly), 22px, 0) rotate(430deg); opacity: 0; }
+  to { top: 112%; transform: translate3d(var(--fly), 0, 0) rotate(430deg); opacity: 0; }
 }
 
 // ---- storm ----------------------------------------------------------------
@@ -1297,9 +1313,11 @@ img, svg {
   [data-theme="light"] & { mix-blend-mode: multiply; }
   [data-theme="dark"] & { mix-blend-mode: screen; }
 
-  // The bolt is drawn fresh for every strike: a jagged line hanging from the
-  // edge, with one fork, mirrored left or right. It is the part that says
-  // "lightning" rather than "the sky got brighter".
+  // The bolt is drawn fresh for every strike: a channel hanging from the edge,
+  // with one fork, mirrored left or right. It is the part that says "lightning"
+  // rather than "the sky got brighter". A hair of white runs along its edge and
+  // two rings of the season's blue sit outside it — the edge says electric, the
+  // rings say light.
   .bolt {
     position: absolute;
     top: 0;
@@ -1309,13 +1327,25 @@ img, svg {
     aspect-ratio: 60 / 220;
     transform: translateX(-50%) scaleX(var(--flip, 1));
     overflow: visible;
-    fill: none;
-    stroke: color-mix(in oklab, var(--accent) 62%, white);
-    stroke-width: 3;
+    stroke: #fff;
+    stroke-width: 0.5;
     stroke-linejoin: round;
-    stroke-linecap: round;
-    filter: drop-shadow(0 0 7px color-mix(in oklab, var(--accent) 80%, transparent))
-            drop-shadow(0 0 22px color-mix(in oklab, var(--accent) 55%, transparent));
+    filter: drop-shadow(0 0 4px color-mix(in oklab, var(--accent) 78%, transparent))
+            drop-shadow(0 0 15px color-mix(in oklab, var(--accent) 55%, transparent));
+
+    // Pale blue where it leaves the sky, white at the point. The gradient is
+    // what makes the stroke read as light rather than as a painted zigzag. On
+    // the light themes the page multiplies the bolt, so the blue has to carry
+    // more of the accent there or it washes into the sky; on the dark one the
+    // channel is nearly white with the blue only at its root.
+    .g-root { stop-color: color-mix(in oklab, var(--accent) 62%, white); }
+    .g-mid { stop-color: color-mix(in oklab, var(--accent) 26%, white); }
+    .g-tip { stop-color: #fff; }
+
+    [data-theme="dark"] & {
+      .g-root { stop-color: color-mix(in oklab, var(--accent) 34%, white); }
+      .g-mid { stop-color: color-mix(in oklab, var(--accent) 8%, white); }
+    }
   }
 }
 
