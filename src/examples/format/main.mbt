@@ -5,7 +5,7 @@
 /// fixed meaning for each letter. This file runs one moment through every
 /// directive the library supports, then reads the pieces back.
 ///
-///     moon run examples/format
+///     moon run src/examples/format
 fn main raise {
   let moment = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
 

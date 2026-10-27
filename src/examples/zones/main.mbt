@@ -4,7 +4,7 @@
 /// spelled. Two moments written with different offsets can be the same instant,
 /// and this file shows how to tell — and how to move between the spellings.
 ///
-///     moon run examples/zones
+///     moon run src/examples/zones
 
 ///|
 /// The offset of a moment from UTC, in minutes, as a signed number.

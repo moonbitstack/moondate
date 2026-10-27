@@ -90,18 +90,18 @@ carries the name of the thing that ran out of text.
 
 ## Examples
 
-Every file under [`examples/`](examples) is a complete program with the output it
-prints. Run one with `moon run examples/hello`.
+Every file under [`src/examples/`](src/examples) is a complete program with the output it
+prints. Run one with `moon run src/examples/hello`.
 
 | | What it shows |
 |:--|:--|
-| [`hello`](examples/hello) | The smallest complete program: read, look inside, write back. |
-| [`shapes`](examples/shapes) | `Zoned`, `Plain`, `Day` and `Clock` side by side, and what each one can answer. |
-| [`calendar`](examples/calendar) | Weekdays, ISO week dates, ordinals, month lengths, adding days and months. |
-| [`zones`](examples/zones) | One instant written three ways, `astimezone`, the epoch both directions, spans. |
-| [`wire`](examples/wire) | HTTP dates in three formats, ASN.1 time in two, and the refusals. |
-| [`format`](examples/format) | Every `%` directive against one moment, then `strptime` reading it back. |
-| [`schedule`](examples/schedule) | Cron expressions: what they mean, the next few firings, the or-rule, the refusals. |
+| [`hello`](src/examples/hello) | The smallest complete program: read, look inside, write back. |
+| [`shapes`](src/examples/shapes) | `Zoned`, `Plain`, `Day` and `Clock` side by side, and what each one can answer. |
+| [`calendar`](src/examples/calendar) | Weekdays, ISO week dates, ordinals, month lengths, adding days and months. |
+| [`zones`](src/examples/zones) | One instant written three ways, `astimezone`, the epoch both directions, spans. |
+| [`wire`](src/examples/wire) | HTTP dates in three formats, ASN.1 time in two, and the refusals. |
+| [`format`](src/examples/format) | Every `%` directive against one moment, then `strptime` reading it back. |
+| [`schedule`](src/examples/schedule) | Cron expressions: what they mean, the next few firings, the or-rule, the refusals. |
 
 ## cron
 

@@ -4,7 +4,7 @@
 /// spellings working forever. These two families are the ones you meet while
 /// speaking to a server or reading a certificate.
 ///
-///     moon run examples/wire
+///     moon run src/examples/wire
 
 ///|
 /// Parse an ASN.1 time and report either the reading or the refusal, so the

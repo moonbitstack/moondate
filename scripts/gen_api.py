@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+SRC = ROOT / "src"
 OUT = ROOT / "docs" / "api.html"
 
 DERIVED = {
@@ -648,13 +649,13 @@ def main() -> None:
     params: dict = {}
 
     root_sources = [
-        ROOT / "date.mbt",
-        ROOT / "text.mbt",
-        ROOT / "python.mbt",
+        SRC / "date.mbt",
+        SRC / "text.mbt",
+        SRC / "python.mbt",
     ]
-    root_mbti = ROOT / "pkg.generated.mbti"
-    cron_sources = [ROOT / "cron" / "cron.mbt"]
-    cron_mbti = ROOT / "cron" / "pkg.generated.mbti"
+    root_mbti = SRC / "pkg.generated.mbti"
+    cron_sources = [SRC / "cron" / "cron.mbt"]
+    cron_mbti = SRC / "cron" / "pkg.generated.mbti"
 
     root_model = build_package(root_mbti, root_sources, docs, params)
     cron_model = build_package(cron_mbti, cron_sources, docs, params)

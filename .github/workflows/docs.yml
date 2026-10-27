@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "docs/**"
+      - "src/**"
+      - "scripts/**"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
@@ -13,63 +18,44 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-26.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - name: install moonbit
+      - name: install moon
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
-      - name: post install
+      - name: build the site
         run: |
-          moon version --all
           moon update
-
-      # The live demo on the homepage imports a real ES module compiled from the
-      # library, so the playground runs the actual code rather than a mock. The
-      # output is a build product: it is not committed, and .gitignore says so.
-      - name: build the browser module
-        run: |
-          moon build --target js --release ./demo
-          cp _build/js/release/build/demo/demo.js docs/assets/moondate.js
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      # The stylesheet is written in LESS and compiled here, so the browser never
-      # loads a preprocessor and the source stays one file.
-      - name: compile the stylesheet
-        run: npx --yes less docs/assets/site.less docs/assets/site.css
-
-      # The reference page is generated from the interface files and the source
-      # doc comments. Regenerating it in CI and diffing is what keeps it honest:
-      # a change to a public signature that nobody documented fails the build.
-      - name: regenerate the API reference
-        run: |
+          moon build --target js --release src/examples/browser
+          cp _build/js/release/build/examples/browser/browser.js docs/assets/moondate.js
+          npx --yes less docs/assets/site.less docs/assets/site.css
           python3 scripts/gen_api.py
           git diff --exit-code docs/api.html
 
-      - uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: configure pages
+        uses: actions/configure-pages@v6
+        with:
+          enablement: true
+
+      - name: upload the site
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -4,7 +4,7 @@
 /// Nothing in this file needs a clock or a zone. A date is a square on a wall
 /// calendar, and the operations below are all the things you can do with squares.
 ///
-///     moon run examples/calendar
+///     moon run src/examples/calendar
 fn main raise {
   let date = @moondate.Date::new(2026, 9, 22)
 

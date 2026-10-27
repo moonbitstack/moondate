@@ -6,7 +6,7 @@
 /// than filling in the guess — a bare date stays a date, it does not quietly
 /// become midnight UTC.
 ///
-///     moon run examples/shapes
+///     moon run src/examples/shapes
 
 ///|
 /// Write a zone the way an offset is usually written. `Offset` counts minutes

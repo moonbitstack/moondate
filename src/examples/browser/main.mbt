@@ -1,7 +1,7 @@
 // A thin foreign-library package that re-exposes moondate to JavaScript for the
 // docs site. Each function returns a String (or, for the listing, an Array of
 // Strings) so the browser demos can show real output without knowing MoonBit's
-// error types. Built with `moon build --target js ./demo`; the generated module
+// error types. Built with `moon build --target js src/examples/browser`; the generated module
 // exports the three #export_name'd functions.
 
 ///|

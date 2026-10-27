@@ -4,7 +4,7 @@
 /// Everything here goes through three calls — `parse`, an accessor, and one of the
 /// writers — so this is the file to read first.
 ///
-///     moon run examples/hello
+///     moon run src/examples/hello
 fn main raise {
   // `parse` takes any of the four shapes the library knows: a full instant with a
   // zone, a bare date and time, a bare date, or a bare time. This one is the first

@@ -4,7 +4,7 @@
 /// This file reads expressions, asks whether an instant matches one, and walks
 /// forward to the next few firings.
 ///
-///     moon run examples/schedule
+///     moon run src/examples/schedule
 
 ///|
 /// The next `count` firings after `from`, one per line. `next` always returns a
