@@ -6,6 +6,42 @@ import {
 }
 
 // Values
+pub const ANSIC : String = "Mon Jan _2 15:04:05 2006"
+
+pub const DateOnly : String = "2006-01-02"
+
+pub const DateTime : String = "2006-01-02 15:04:05"
+
+pub const Kitchen : String = "3:04PM"
+
+pub const RFC1123 : String = "Mon, 02 Jan 2006 15:04:05 MST"
+
+pub const RFC1123Z : String = "Mon, 02 Jan 2006 15:04:05 -0700"
+
+pub const RFC3339 : String = "2006-01-02T15:04:05Z07:00"
+
+pub const RFC3339Nano : String = "2006-01-02T15:04:05.999999999Z07:00"
+
+pub const RFC822 : String = "02 Jan 06 15:04 MST"
+
+pub const RFC822Z : String = "02 Jan 06 15:04 -0700"
+
+pub const RFC850 : String = "Monday, 02-Jan-06 15:04:05 MST"
+
+pub const RubyDate : String = "Mon Jan 02 15:04:05 -0700 2006"
+
+pub const Stamp : String = "Jan _2 15:04:05"
+
+pub const StampMicro : String = "Jan _2 15:04:05.000000"
+
+pub const StampMilli : String = "Jan _2 15:04:05.000"
+
+pub const StampNano : String = "Jan _2 15:04:05.000000000"
+
+pub const TimeOnly : String = "15:04:05"
+
+pub const UnixDate : String = "Mon Jan _2 15:04:05 MST 2006"
+
 pub fn asn1(StringView) -> Moment raise Refused
 
 pub let day : Span
@@ -37,6 +73,10 @@ pub let nanosecond : Span
 pub fn of_isoformat(StringView) -> Moment raise Refused
 
 pub fn parse(StringView) -> Moment raise Refused
+
+pub fn parse_layout(StringView, StringView) -> Moment raise Refused
+
+pub fn parse_pattern(StringView, StringView) -> Moment raise Refused
 
 pub let resolution : Span
 
@@ -105,19 +145,23 @@ pub fn Moment::epoch(Self) -> Int64?
 pub fn Moment::equal(Self, Self) -> Bool
 pub fn Moment::http_text(Self) -> String raise Refused
 pub fn Moment::isocalendar(Self) -> (Int32, Int32, Int32)?
-pub fn Moment::isoformat(Self, sep? : Char) -> String
+pub fn Moment::isoformat(Self, sep? : Char, fraction? : Int32, offset? : Bool) -> String
+pub fn Moment::layout(Self, StringView) -> String
 pub fn Moment::not_equal(Self, Self) -> Bool
 pub fn Moment::of_epoch(Int64, nano? : Int32, zone? : Zone) -> Self
 pub fn Moment::ordinal(Self) -> Int32?
 pub fn Moment::output(Self, &Logger) -> Unit
+pub fn Moment::pattern(Self, StringView) -> String
 pub fn Moment::plus(Self, Span) -> Self
 pub fn Moment::replace(Self, year? : Int32, month? : Int32, day? : Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, zone? : Zone) -> Self raise Refused
 pub fn Moment::strftime(Self, StringView) -> String
 pub fn Moment::time(Self) -> Time
 pub fn Moment::timestamp(Self) -> Double?
 pub fn Moment::timetuple(Self) -> (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32)
+pub fn Moment::to_iso_string(Self) -> String
 pub fn Moment::to_repr(Self) -> @debug.Repr
 pub fn Moment::to_string(Self) -> String
+pub fn Moment::to_utc_string(Self) -> String raise Refused
 pub fn Moment::utcoffset(Self) -> Span?
 pub fn Moment::weekday(Self) -> Int32?
 pub fn Moment::zone(Self) -> Zone?

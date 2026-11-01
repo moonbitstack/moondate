@@ -2,12 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // The rest of the surface beyond the calendar itself: the ordinal, the ISO week
-// date, combining and replacing parts, the epoch both ways, and the directive-
-// driven format and parse of `strftime` and `strptime`.
-//
-// The names are the words a reader already has — `ordinal`, `isocalendar`,
-// `astimezone` — and each one means what its name says rather than something only
-// this file knows.
+// date, combining and replacing parts, the epoch both ways, and the text forms
+// RFC 3339, TOML, HTTP and ASN.1 name. The directive language lives in
+// `strftime.mbt`.
 
 ///|
 /// The earliest and latest dates this calendar writes with a four-digit year.
@@ -251,470 +248,6 @@ pub fn Span::parts(self : Span) -> (Int32, Int32, Int32) {
   )
 }
 
-// -- strftime and strptime ----------------------------------------------------
-
-///|
-/// A moment written by a format string of `%` directives.
-///
-/// The directives are the ones C89 defines, less the two
-/// that need a locale (`%c`, `%x`, `%X` are the C locale's) and the one that needs
-/// a zone database (`%Z` writes `UTC` or the offset, never a name like `CEST`,
-/// because a name cannot be recovered from an offset).
-///
-/// | | |
-/// |:--:|:--|
-/// | `%Y` `%y` `%m` `%d` `%e` | year of four digits, two-digit year, month, day, day padded with a space |
-/// | `%H` `%I` `%M` `%S` `%f` | hour, twelve-hour, minute, second, microseconds |
-/// | `%.Nf` `%Nf` `%.f` | N fractional digits with or without the dot; as many as the nanoseconds need, three, six or nine, with the dot |
-/// | `%p` `%j` `%a` `%A` `%b` `%B` | AM/PM, day of year, day and month names |
-/// | `%z` `%:z` `%Z` | offset as `+HHMM` and as `+HH:MM`, and `UTC` |
-/// | `%F` `%T` | `%Y-%m-%d` and `%H:%M:%S` |
-/// | `%G` `%V` `%u` `%w` | ISO year, ISO week, ISO weekday, weekday from Sunday |
-/// | `%%` | a per cent sign |
-///
-/// `%e`, `%F`, `%T` and `%:z` are C99's and Python's; the fractional forms are
-/// chrono's, which a log line wants and C never had. A moment with no date writes
-/// its date directives as 1 January 1900, as Python's `time.strftime` does.
-pub fn Moment::strftime(self : Moment, format : StringView) -> String {
-  let (d, t, z) = match self {
-    Zoned(date~, time~, zone~) => (date, time, Some(zone))
-    Plain(date~, time~) => (date, time, None)
-    Day(date~) => (date, midnight, None)
-    Clock(time~) => ({ year: 1900, month: 1, day: 1, }, time, None)
-  }
-  let f = expand(format.to_owned())
-  let out = StringBuilder()
-  let mut i = 0
-  while i < f.length() {
-    guard f[i].to_int() == 0x25 && directive(f, i) is Some((spec, next)) else {
-      out.write_char(f[i].unsafe_to_char())
-      i = i + 1
-      continue
-    }
-    let start = i
-    i = next
-    let (iso_year, iso_week, iso_day) = d.isocalendar()
-    out.write_string(
-      match spec.conv {
-        'Y' => if d.year < 0 { "-" + pad(-d.year, 4) } else { pad(d.year, 4) }
-        'y' => pad(d.year % 100, 2)
-        'm' => pad(d.month, 2)
-        'd' => pad(d.day, 2)
-        'e' =>
-          if d.day < 10 {
-            " " + d.day.to_string()
-          } else {
-            d.day.to_string()
-          }
-        'H' => pad(t.hour, 2)
-        'I' => pad(if t.hour % 12 == 0 { 12 } else { t.hour % 12 }, 2)
-        'M' => pad(t.minute, 2)
-        'S' => pad(t.second, 2)
-        'f' => fraction(t.nano, spec)
-        'p' => if t.hour < 12 { "AM" } else { "PM" }
-        'j' => pad(d.yearday(), 3)
-        'a' => weekdays[d.weekday()]
-        'A' => long_days[d.weekday()]
-        'b' => months[d.month - 1]
-        'B' => long_months[d.month - 1]
-        'G' => iso_year.to_string()
-        'V' => pad(iso_week, 2)
-        'u' => iso_day.to_string()
-        'w' => d.weekday().to_string()
-        'z' => {
-          let sep = if spec.colon { ":" } else { "" }
-          match z {
-            Some(Utc) => "+00" + sep + "00"
-            Some(Offset(m)) => {
-              let sign = if m < 0 { "-" } else { "+" }
-              let a = if m < 0 { -m } else { m }
-              sign + pad(a / 60, 2) + sep + pad(a % 60, 2)
-            }
-            None => ""
-          }
-        }
-        'Z' =>
-          match z {
-            Some(_) => "UTC"
-            None => ""
-          }
-        '%' => "%"
-        _ => f[start:next].to_owned()
-      },
-    )
-  }
-  out.to_string()
-}
-
-///|
-/// One directive's parts: the conversion letter, the `.` and digit count of the
-/// fractional forms (`-1` for none), and the `:` of `%:z`.
-priv struct Spec {
-  conv : Char
-  dot : Bool
-  width : Int32
-  colon : Bool
-}
-
-///|
-/// The directive that starts at the `%` at `i`, and the index after it; `None` when
-/// the format ends before a conversion letter, which is then written as it stands.
-fn directive(f : String, i : Int32) -> (Spec, Int32)? {
-  let mut k = i + 1
-  let dot = k < f.length() && f[k].to_int() == 0x2e
-  if dot {
-    k = k + 1
-  }
-  let start = k
-  let mut width = 0
-  while k < f.length() && is_digit(f[k].to_int()) {
-    width = width * 10 + (f[k].to_int() - 48)
-    k = k + 1
-  }
-  let width = if k == start { -1 } else { width }
-  let colon = k < f.length() && f[k].to_int() == 0x3a
-  if colon {
-    k = k + 1
-  }
-  guard k < f.length() else { return None }
-  Some(({ conv: f[k].unsafe_to_char(), dot, width, colon, }, k + 1))
-}
-
-///|
-/// `%F` and `%T` are shorthands, so they are spelt out once before either
-/// direction reads the format; `%%F` stays a per cent sign and an F.
-fn expand(f : String) -> String {
-  let out = StringBuilder()
-  let mut i = 0
-  while i < f.length() {
-    if f[i].to_int() == 0x25 && i + 1 < f.length() {
-      match f[i + 1].unsafe_to_char() {
-        'F' => out.write_string("%Y-%m-%d")
-        'T' => out.write_string("%H:%M:%S")
-        c => {
-          out.write_char('%')
-          out.write_char(c)
-        }
-      }
-      i = i + 2
-    } else {
-      out.write_char(f[i].unsafe_to_char())
-      i = i + 1
-    }
-  }
-  out.to_string()
-}
-
-///|
-/// The fractional second as a directive asks for it: Python's six digits for a bare
-/// `%f`; exactly N digits, truncated, for `%Nf`, with a leading dot for `%.Nf`; and
-/// for `%.f` as many as the value needs, three, six or nine, or nothing at all on a
-/// whole second, as chrono writes it.
-fn fraction(nano : Int32, spec : Spec) -> String {
-  if spec.width > 0 {
-    let n = if spec.width > 9 { 9 } else { spec.width }
-    let mut scale = 1
-    for _ in 0..<(9 - n) {
-      scale = scale * 10
-    }
-    let digits = pad(nano / scale, n)
-    return if spec.dot { "." + digits } else { digits }
-  }
-  if !spec.dot {
-    return pad(nano / 1000, 6)
-  }
-  if nano == 0 {
-    ""
-  } else if nano % 1_000_000 == 0 {
-    "." + pad(nano / 1_000_000, 3)
-  } else if nano % 1000 == 0 {
-    "." + pad(nano / 1000, 6)
-  } else {
-    "." + pad(nano, 9)
-  }
-}
-
-///|
-/// A moment read by a format string of `%` directives.
-///
-/// The directives are the ones [`Moment::strftime`] writes. Literal characters in
-/// the format must match the text exactly, except that whitespace in the format
-/// matches any run of whitespace, which is what C's `strptime` does and what makes
-/// a format survive a double space.
-///
-/// The result is `Zoned` when the text carried an offset, `Plain` when it carried a
-/// date and a time, `Day` when only a date, and `Clock` when only a time — the same
-/// four shapes [`parse`] answers with.
-pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
-  let s = src.to_owned()
-  let f = expand(format.to_owned())
-  let mut year = 1900
-  let mut month = 1
-  let mut mday = 1
-  let mut hour = 0
-  let mut minute = 0
-  let mut sec = 0
-  let mut nano = 0
-  let mut offset : Int32? = None
-  let mut pm : Bool? = None
-  let mut saw_date = false
-  let mut saw_time = false
-  let mut i = 0
-  let mut j = 0
-  while i < f.length() {
-    let fc = f[i].to_int()
-    if fc == 0x20 || fc == 0x09 {
-      while j < s.length() && (s[j].to_int() == 0x20 || s[j].to_int() == 0x09) {
-        j = j + 1
-      }
-      i = i + 1
-      continue
-    }
-    if fc != 0x25 {
-      if j >= s.length() || s[j].to_int() != fc {
-        raise Malformed("text does not match the format at \{j}")
-      }
-      i = i + 1
-      j = j + 1
-      continue
-    }
-    guard directive(f, i) is Some((spec, next)) else {
-      raise Malformed("a % at the end of the format")
-    }
-    i = next
-    match spec.conv {
-      'Y' => {
-        let (v, k) = take(s, j, 4)
-        year = v
-        j = k
-        saw_date = true
-      }
-      'y' => {
-        let (v, k) = take(s, j, 2)
-        // The two-digit window: 69 and over are 1900s, under are 2000s.
-        year = if v >= 69 { 1900 + v } else { 2000 + v }
-        j = k
-        saw_date = true
-      }
-      'm' => {
-        let (v, k) = take(s, j, 2)
-        month = v
-        j = k
-        saw_date = true
-      }
-      'd' | 'e' => {
-        if spec.conv == 'e' && j < s.length() && s[j].to_int() == 0x20 {
-          j = j + 1
-        }
-        let (v, k) = take(s, j, 2)
-        mday = v
-        j = k
-        saw_date = true
-      }
-      'H' | 'I' => {
-        let (v, k) = take(s, j, 2)
-        hour = v
-        j = k
-        saw_time = true
-      }
-      'M' => {
-        let (v, k) = take(s, j, 2)
-        minute = v
-        j = k
-        saw_time = true
-      }
-      'S' => {
-        let (v, k) = take(s, j, 2)
-        sec = v
-        j = k
-        saw_time = true
-      }
-      'f' => {
-        saw_time = true
-        if spec.dot {
-          // `%.f` may stand for nothing on a whole second; `%.Nf` always has its dot.
-          if j < s.length() && s[j].to_int() == 0x2e {
-            j = j + 1
-          } else if spec.width < 0 {
-            continue
-          } else {
-            raise Malformed("expected a dot before the fraction at \{j}")
-          }
-        }
-        let most = if spec.width > 0 && spec.width < 9 { spec.width } else { 9 }
-        let start = j
-        let mut v = 0
-        while j < s.length() && is_digit(s[j].to_int()) && j - start < most {
-          v = v * 10 + (s[j].to_int() - 48)
-          j = j + 1
-        }
-        if j == start {
-          raise Malformed("expected digits for %f at \{start}")
-        }
-        for k = j - start; k < 9; k = k + 1 {
-          v = v * 10
-        }
-        nano = v
-      }
-      'j' => {
-        let (v, k) = take(s, j, 3)
-        j = k
-        // Day of the year sets the date once the year is known.
-        let base : Date = { year, month: 1, day: 1, }
-        let d = base.plus_days(v - 1)
-        month = d.month
-        mday = d.day
-        saw_date = true
-      }
-      'p' => {
-        if j + 2 > s.length() {
-          raise Truncated("expected AM or PM")
-        }
-        let word = s[j:j + 2].to_owned().to_upper()
-        pm = match word {
-          "AM" => Some(false)
-          "PM" => Some(true)
-          _ => raise Malformed("expected AM or PM, got " + word)
-        }
-        j = j + 2
-      }
-      'a' | 'A' => j = skip_name(s, j)
-      'b' | 'B' => {
-        let (m, k) = read_month(s, j)
-        month = m
-        j = k
-        saw_date = true
-      }
-      'z' => {
-        let (o, k) = read_offset(s, j)
-        offset = Some(o)
-        j = k
-      }
-      'Z' => j = skip_name(s, j)
-      '%' => {
-        if j >= s.length() || s[j].to_int() != 0x25 {
-          raise Malformed("expected a per cent sign at \{j}")
-        }
-        j = j + 1
-      }
-      other => raise Malformed("unknown directive %" + other.to_string())
-    }
-  }
-  match pm {
-    Some(true) => if hour < 12 { hour = hour + 12 }
-    Some(false) => if hour == 12 { hour = 0 }
-    None => ()
-  }
-  let time = Time::new(hour, minute, second=sec, nano~)
-  if !saw_date {
-    return Clock(time~)
-  }
-  let date = Date::new(year, month, mday)
-  if !saw_time {
-    return Day(date~)
-  }
-  match offset {
-    Some(0) => Zoned(date~, time~, zone=Utc)
-    Some(m) => Zoned(date~, time~, zone=Offset(m))
-    None => Plain(date~, time~)
-  }
-}
-
-///|
-/// Up to `n` digits at `j`, and where reading stopped.
-///
-/// Fewer than `n` is allowed when what follows is not a digit, because `%m` reads
-/// `1-2-3` the way a person writes it.
-fn take(s : String, j : Int32, n : Int32) -> (Int32, Int32) raise Refused {
-  let mut v = 0
-  let mut k = j
-  while k < s.length() && k - j < n && is_digit(s[k].to_int()) {
-    v = v * 10 + (s[k].to_int() - 48)
-    k = k + 1
-  }
-  if k == j {
-    raise Malformed("expected a digit at \{j}")
-  }
-  (v, k)
-}
-
-///|
-fn is_digit(c : Int32) -> Bool {
-  c >= 0x30 && c <= 0x39
-}
-
-///|
-/// Past a run of letters, for a name this parser does not need to keep.
-fn skip_name(s : String, j : Int32) -> Int32 {
-  let mut k = j
-  while k < s.length() {
-    let c = s[k].to_int()
-    let letter = (c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a)
-    if !letter {
-      break
-    }
-    k = k + 1
-  }
-  k
-}
-
-///|
-/// A month name at `j`, long form or short, as its number.
-fn read_month(s : String, j : Int32) -> (Int32, Int32) raise Refused {
-  let end = skip_name(s, j)
-  if end == j {
-    raise Malformed("expected a month name at \{j}")
-  }
-  let word = s[j:end].to_owned()
-  for k = 0; k < 12; k = k + 1 {
-    if long_months[k] == word {
-      return (k + 1, end)
-    }
-  }
-  if word.length() >= 3 {
-    let three = word[0:3].to_owned()
-    for k = 0; k < 12; k = k + 1 {
-      if months[k] == three {
-        return (k + 1, j + 3)
-      }
-    }
-  }
-  raise Malformed("not a month name: " + word)
-}
-
-///|
-/// An offset at `j`, as `+HHMM`, `+HH:MM` or `Z`.
-fn read_offset(s : String, j : Int32) -> (Int32, Int32) raise Refused {
-  if j < s.length() && (s[j].to_int() == 0x5a || s[j].to_int() == 0x7a) {
-    return (0, j + 1)
-  }
-  if j + 5 > s.length() {
-    raise Truncated("an offset")
-  }
-  let sign = s[j].to_int()
-  if sign != 0x2b && sign != 0x2d {
-    raise Malformed("an offset begins with a sign at \{j}")
-  }
-  let (h, a) = take(s, j + 1, 2)
-  let b = if a < s.length() && s[a].to_int() == 0x3a { a + 1 } else { a }
-  let (m, c) = take(s, b, 2)
-  let total = h * 60 + m
-  (if sign == 0x2d { -total } else { total }, c)
-}
-
-///|
-let long_days : Array[String] = [
-  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
-]
-
-///|
-let long_months : Array[String] = [
-  "January", "February", "March", "April", "May", "June", "July", "August", "September",
-  "October", "November", "December",
-]
-
-// -- the rest of the surface ---------------------------------------------------
-
 ///|
 /// The years this calendar spans.
 pub let min_year : Int32 = 1
@@ -832,22 +365,123 @@ pub fn Moment::ordinal(self : Moment) -> Int32? {
 ///
 /// `sep` is the character between the date and the time, `T` by default; any
 /// character works, and a space is what a log line wants.
-pub fn Moment::isoformat(self : Moment, sep~ : Char = 'T') -> String {
-  let text = self.to_string()
-  if sep == 'T' {
-    return text
+///
+/// `fraction` is the number of fractional-second digits: `-1`, the default, writes
+/// as many as the value needs and none for a whole second, which is Temporal's
+/// `auto`; `0` writes none; `1` to `9` write exactly that many, truncated.
+///
+/// `offset` writes the zone the moment carries, `Z` for UTC and `±HH:MM` for an
+/// offset; `false` leaves the zone off, which is Temporal's `offset: "never"`.
+pub fn Moment::isoformat(
+  self : Moment,
+  sep~ : Char = 'T',
+  fraction~ : Int32 = -1,
+  offset~ : Bool = true,
+) -> String {
+  match self {
+    Zoned(date~, time~, zone~) =>
+      text_of(date) +
+      sep.to_string() +
+      iso_time(time, fraction) +
+      iso_zone(Some(zone), offset)
+    Plain(date~, time~) =>
+      text_of(date) + sep.to_string() + iso_time(time, fraction)
+    Day(date~) => text_of(date)
+    Clock(time~) => iso_time(time, fraction)
   }
-  let out = StringBuilder()
-  let mut swapped = false
-  for i = 0; i < text.length(); i = i + 1 {
-    if !swapped && text[i].to_int() == 0x54 {
-      out.write_char(sep)
-      swapped = true
-    } else {
-      out.write_char(text[i].unsafe_to_char())
+}
+
+///|
+/// The time part with the fractional-second digits `fraction` asks for.
+fn iso_time(t : Time, fraction : Int32) -> String {
+  let head = pad(t.hour, 2) + ":" + pad(t.minute, 2) + ":" + pad(t.second, 2)
+  if fraction == 0 {
+    return head
+  }
+  if fraction > 0 {
+    let n = if fraction > 9 { 9 } else { fraction }
+    let digits = pad(t.nano / power10(9 - n), n)
+    if fraction > 9 {
+      let extra = StringBuilder()
+      extra.write_string(digits)
+      for k = 9; k < fraction; k = k + 1 {
+        extra.write_char('0')
+      }
+      return head + "." + extra.to_string()
+    }
+    return head + "." + digits
+  }
+  if t.nano == 0 {
+    return head
+  }
+  let mut frac = pad(t.nano, 9)
+  while frac.length() > 1 && frac[frac.length() - 1].to_int() == 48 {
+    frac = frac[0:frac.length() - 1].to_owned()
+  }
+  head + "." + frac
+}
+
+///|
+/// The zone part, or nothing when the moment carries none or `show` is false.
+fn iso_zone(z : Zone?, show : Bool) -> String {
+  if !show {
+    return ""
+  }
+  match z {
+    None => ""
+    Some(Utc) => "Z"
+    Some(Offset(m)) => {
+      let sign = if m < 0 { "-" } else { "+" }
+      let a = if m < 0 { -m } else { m }
+      sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
     }
   }
-  out.to_string()
+}
+
+///|
+/// The `Date.prototype.toISOString` shape: always the UTC instant, always three
+/// fractional digits, always a trailing `Z`.
+///
+/// A moment with no zone has no instant of its own, so its wall clock is taken as
+/// UTC — the same convention [`Moment::strftime`] uses for a bare time.
+pub fn Moment::to_iso_string(self : Moment) -> String {
+  let (d0, t0, z) = match self {
+    Zoned(date~, time~, zone~) => (date, time, Some(zone))
+    Plain(date~, time~) => (date, time, None)
+    Day(date~) => (date, midnight, None)
+    Clock(time~) => ({ year: 1900, month: 1, day: 1, }, time, None)
+  }
+  let (date, time) = match z {
+    Some(_) =>
+      match self.epoch() {
+        Some(secs) =>
+          match Moment::of_epoch(secs, nano=self.time().nano, zone=Utc) {
+            Zoned(date~, time~, ..) => (date, time)
+            _ => (d0, t0)
+          }
+        None => (d0, t0)
+      }
+    None => (d0, t0)
+  }
+  text_of(date) +
+  "T" +
+  pad(time.hour, 2) +
+  ":" +
+  pad(time.minute, 2) +
+  ":" +
+  pad(time.second, 2) +
+  "." +
+  pad(time.nano / 1_000_000, 3) +
+  "Z"
+}
+
+///|
+/// The `Date.prototype.toUTCString` shape: `Tue, 22 Sep 2026 05:30:05 GMT`.
+///
+/// This is the HTTP date form [`Moment::http_text`] already writes, on the UTC
+/// instant, which is exactly what ECMAScript's `toUTCString` produces.
+pub fn Moment::to_utc_string(self : Moment) -> String raise Refused {
+  self.http_text()
 }
 
 ///|
