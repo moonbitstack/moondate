@@ -738,9 +738,9 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
     }
     _ => ()
   }
-  // A Sunday- or Monday-based week number with a weekday decides the date when no
-  // year-month-day was otherwise given, again following Python's rule.
-  if !saw_date && week_mode != 0 {
+  // A Sunday- or Monday-based week number with a weekday decides the date, whatever else was
+  // read, which is Python's rule.
+  if week_mode != 0 {
     match week_wd {
       Some(wd) => {
         let dd = date_from_week(year, week_num, wd, week_mode)
