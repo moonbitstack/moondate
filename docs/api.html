@@ -285,10 +285,12 @@
 
 </article>
 <article class="api-item" id="m-moondate-Moment-isoformat">
-<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char) -&gt; String</div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char, fraction? : Int32, offset? : Bool) -&gt; String</div>
 <div class="doc"><p>The moment as ISO 8601 text, which is what [<code>Show</code>] writes.</p>
-<p><code>sep</code> is the character between the date and the time, <code>T</code> by default; any character works, and a space is what a log line wants.</p></div>
-<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span></div>
+<p><code>sep</code> is the character between the date and the time, <code>T</code> by default; any character works, and a space is what a log line wants.</p>
+<p><code>fraction</code> is the number of fractional-second digits: <code>-1</code>, the default, writes as many as the value needs and none for a whole second, which is Temporal's <code>auto</code>; <code>0</code> writes none; <code>1</code> to <code>9</code> write exactly that many, truncated.</p>
+<p><code>offset</code> writes the zone the moment carries, <code>Z</code> for UTC and <code>±HH:MM</code> for an offset; <code>false</code> leaves the zone off, which is Temporal's <code>offset: "never"</code>.</p></div>
+<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-moondate-Moment-of_epoch">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::of_epoch</span>(Int64, nano? : Int32, zone? : Zone) -&gt; Self</div>
@@ -312,14 +314,6 @@
 <div class="doc"><p>The same moment with some parts replaced.</p></div>
 <div class="params"><span class="p"><b>year?</b> <span class="pt">Int32</span></span><span class="p"><b>month?</b> <span class="pt">Int32</span></span><span class="p"><b>day?</b> <span class="pt">Int32</span></span><span class="p"><b>hour?</b> <span class="pt">Int32</span></span><span class="p"><b>minute?</b> <span class="pt">Int32</span></span><span class="p"><b>second?</b> <span class="pt">Int32</span></span><span class="p"><b>nano?</b> <span class="pt">Int32</span></span><span class="p"><b>zone?</b> <span class="pt">Zone</span></span></div>
 </article>
-<article class="api-item" id="m-moondate-Moment-strftime">
-<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::strftime</span>(Self, StringView) -&gt; String</div>
-<div class="doc"><p>A moment written by a format string of <code>%</code> directives.</p>
-<p>The directives are the ones C89 defines, less the two that need a locale (<code>%c</code>, <code>%x</code>, <code>%X</code> are the C locale's) and the one that needs a zone database (<code>%Z</code> writes <code>UTC</code> or the offset, never a name like <code>CEST</code>, because a name cannot be recovered from an offset).</p>
-<table><thead><tr><th style="text-align:center"></th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:center"><code>%Y</code> <code>%y</code> <code>%m</code> <code>%d</code> <code>%e</code></td><td style="text-align:left">year of four digits, two-digit year, month, day, day padded with a space</td></tr><tr><td style="text-align:center"><code>%H</code> <code>%I</code> <code>%M</code> <code>%S</code> <code>%f</code></td><td style="text-align:left">hour, twelve-hour, minute, second, microseconds</td></tr><tr><td style="text-align:center"><code>%.Nf</code> <code>%Nf</code> <code>%.f</code></td><td style="text-align:left">N fractional digits with or without the dot; as many as the nanoseconds need, three, six or nine, with the dot</td></tr><tr><td style="text-align:center"><code>%p</code> <code>%j</code> <code>%a</code> <code>%A</code> <code>%b</code> <code>%B</code></td><td style="text-align:left">AM/PM, day of year, day and month names</td></tr><tr><td style="text-align:center"><code>%z</code> <code>%:z</code> <code>%Z</code></td><td style="text-align:left">offset as <code>+HHMM</code> and as <code>+HH:MM</code>, and <code>UTC</code></td></tr><tr><td style="text-align:center"><code>%F</code> <code>%T</code></td><td style="text-align:left"><code>%Y-%m-%d</code> and <code>%H:%M:%S</code></td></tr><tr><td style="text-align:center"><code>%G</code> <code>%V</code> <code>%u</code> <code>%w</code></td><td style="text-align:left">ISO year, ISO week, ISO weekday, weekday from Sunday</td></tr><tr><td style="text-align:center"><code>%%</code></td><td style="text-align:left">a per cent sign</td></tr></tbody></table>
-<p><code>%e</code>, <code>%F</code>, <code>%T</code> and <code>%:z</code> are C99's and Python's; the fractional forms are chrono's, which a log line wants and C never had. A moment with no date writes its date directives as 1 January 1900, as Python's <code>time.strftime</code> does.</p></div>
-<div class="params"><span class="p"><b>format</b> <span class="pt">StringView</span></span></div>
-</article>
 <article class="api-item" id="m-moondate-Moment-time">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::time</span>(Self) -&gt; Time</div>
 <div class="doc"><p>The time out of a moment.</p>
@@ -334,6 +328,18 @@
 <article class="api-item" id="m-moondate-Moment-timetuple">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::timetuple</span>(Self) -&gt; (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32)</div>
 <div class="doc"><p>The nine fields of a broken-down time, in the usual order: year, month, day, hour, minute, second, weekday counted from Monday as 0, day of the year, and whether daylight saving applies — always <code>-1</code> here, because that needs a zone database this package does not carry.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-to_iso_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::to_iso_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The <code>Date.prototype.toISOString</code> shape: always the UTC instant, always three fractional digits, always a trailing <code>Z</code>.</p>
+<p>A moment with no zone has no instant of its own, so its wall clock is taken as UTC — the same convention [<code>Moment::strftime</code>] uses for a bare time.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-to_utc_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::to_utc_string</span>(Self) -&gt; String <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The <code>Date.prototype.toUTCString</code> shape: <code>Tue, 22 Sep 2026 05:30:05 GMT</code>.</p>
+<p>This is the HTTP date form [<code>Moment::http_text</code>] already writes, on the UTC instant, which is exactly what ECMAScript's <code>toUTCString</code> produces.</p></div>
 
 </article>
 <article class="api-item" id="m-moondate-Moment-utcoffset">
@@ -358,6 +364,11 @@
 <div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
 
 </article>
+<article class="api-item" id="m-moondate-Moment-layout">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::layout</span>(Self, StringView) -&gt; String</div>
+
+
+</article>
 <article class="api-item" id="m-moondate-Moment-not_equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::not_equal</span>(Self, Self) -&gt; Bool</div>
 <div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
@@ -366,6 +377,16 @@
 <article class="api-item" id="m-moondate-Moment-output">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::output</span>(Self, &amp;Logger) -&gt; Unit</div>
 <div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Moment-pattern">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::pattern</span>(Self, StringView) -&gt; String</div>
+
+
+</article>
+<article class="api-item" id="m-moondate-Moment-strftime">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::strftime</span>(Self, StringView) -&gt; String</div>
+
 
 </article>
 <article class="api-item" id="m-moondate-Moment-to_repr">
@@ -653,14 +674,112 @@
 <p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
 <div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
 </article>
+<article class="api-item" id="fn-moondate-parse_layout">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse_layout</span>(StringView, StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+
+
+</article>
+<article class="api-item" id="fn-moondate-parse_pattern">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse_pattern</span>(StringView, StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
+
+
+</article>
 <article class="api-item" id="fn-moondate-strptime">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">strptime</span>(StringView, StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
-<div class="doc"><p>A moment read by a format string of <code>%</code> directives.</p>
-<p>The directives are the ones [<code>Moment::strftime</code>] writes. Literal characters in the format must match the text exactly, except that whitespace in the format matches any run of whitespace, which is what C's <code>strptime</code> does and what makes a format survive a double space.</p>
-<p>The result is <code>Zoned</code> when the text carried an offset, <code>Plain</code> when it carried a date and a time, <code>Day</code> when only a date, and <code>Clock</code> when only a time — the same four shapes [<code>parse</code>] answers with.</p></div>
-<div class="params"><span class="p"><b>src</b> <span class="pt">StringView</span></span><span class="p"><b>format</b> <span class="pt">StringView</span></span></div>
+
+
 </article>
 <div class="api-cat" id="const-moondate"><h3>Constants</h3></div>
+<article class="api-item" id="const-moondate-ANSIC">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">ANSIC</span> : String = "Mon Jan _2 15:04:05 2006"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-DateOnly">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">DateOnly</span> : String = "2006-01-02"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-DateTime">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">DateTime</span> : String = "2006-01-02 15:04:05"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-Kitchen">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">Kitchen</span> : String = "3:04PM"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC1123">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC1123</span> : String = "Mon, 02 Jan 2006 15:04:05 MST"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC1123Z">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC1123Z</span> : String = "Mon, 02 Jan 2006 15:04:05 -0700"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC3339">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC3339</span> : String = "2006-01-02T15:04:05Z07:00"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC3339Nano">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC3339Nano</span> : String = "2006-01-02T15:04:05.999999999Z07:00"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC822">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC822</span> : String = "02 Jan 06 15:04 MST"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC822Z">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC822Z</span> : String = "02 Jan 06 15:04 -0700"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RFC850">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RFC850</span> : String = "Monday, 02-Jan-06 15:04:05 MST"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-RubyDate">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">RubyDate</span> : String = "Mon Jan 02 15:04:05 -0700 2006"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-Stamp">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">Stamp</span> : String = "Jan _2 15:04:05"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-StampMicro">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">StampMicro</span> : String = "Jan _2 15:04:05.000000"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-StampMilli">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">StampMilli</span> : String = "Jan _2 15:04:05.000"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-StampNano">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">StampNano</span> : String = "Jan _2 15:04:05.000000000"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-TimeOnly">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">TimeOnly</span> : String = "15:04:05"</div>
+
+
+</article>
+<article class="api-item" id="const-moondate-UnixDate">
+<div class="sig"><span class="kw">pub</span> <span class="kw">const</span> <span class="name">UnixDate</span> : String = "Mon Jan _2 15:04:05 MST 2006"</div>
+
+
+</article>
 <article class="api-item" id="const-moondate-day">
 <div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">day</span> : Span</div>
 

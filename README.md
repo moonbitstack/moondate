@@ -14,9 +14,9 @@ Dates, times, instants, durations and cron schedules.
 
 ---
 
-A calendar with the arithmetic that goes with it, the text forms four
-specifications define, and a second package that answers when a schedule fires
-next.
+A calendar with the arithmetic that goes with it, the five ways to write a moment
+that C, Python, Rust, Go and JavaScript each speak, and a second package that
+answers when a schedule fires next.
 
 ```bash
 moon add moonbitstack/moondate
@@ -59,11 +59,49 @@ shape the text had; nothing is padded with a hidden midnight.
 | RFC 3339 / ISO 8601 | TOML, JSON Schema's `date-time`, most of the wire |
 | IMF-fixdate, RFC 850, asctime | HTTP's `Date` header (RFC 9110 §5.6.7): all three read, the first written |
 | UTCTime, GeneralizedTime | ASN.1, so X.509 validity (ITU-T X.680 §47) |
-| `strftime` / `strptime` | The `%` directives C89 defines |
+| `strftime` / `strptime` | The `%` directives of C23, POSIX, glibc, Python, chrono and C++20 |
+| `layout` / `parse_layout` | Go's `time` reference layouts (`RFC3339`, `RFC1123`, …) |
+| `pattern` / `parse_pattern` | Unicode LDML patterns, what ICU, `Intl` and Java use |
+| `isoformat`, `to_iso_string`, `to_utc_string` | ECMA-262's Date Time String Format and Temporal |
 
 The two-digit-year windows differ between HTTP and X.509: 69/70 against 49/50.
 Each is applied where its own specification says, because a certificate read by
 HTTP's rule expires a century early.
+
+## Five ways to write a moment
+
+The same instant can be written five ways, and moondate speaks all of them in both
+directions: whatever it writes, `strptime`, `parse_layout` or `parse_pattern` reads
+back to the same moment.
+
+| Style | Write | Read | Where it is from |
+|:--|:--|:--|:--|
+| `%` directives | `strftime` | `strptime` | C23, POSIX, glibc, Python, chrono, C++20 |
+| Reference-time layout | `layout` | `parse_layout` | Go's `time` package |
+| LDML pattern | `pattern` | `parse_pattern` | Unicode UTS #35, ICU, `Intl`, Java |
+| ECMAScript ISO | `isoformat`, `to_iso_string`, `to_utc_string` | `parse` | ECMA-262 and Temporal |
+
+```moonbit
+let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+
+m.strftime("%A %d %B %Y, %I:%M %p")           // Tuesday 22 September 2026, 02:30 PM
+m.layout(@moondate.RFC1123)                    // Tue, 22 Sep 2026 14:30:05 +08:00
+m.pattern("EEEE, MMMM d, yyyy 'at' HH:mm")     // Tuesday, September 22, 2026 at 14:30
+m.to_iso_string()                              // 2026-09-22T06:30:05.123Z
+m.isoformat(fraction=3, offset=false)          // 2026-09-22T14:30:05.123
+```
+
+The `%` set is the union of the six lineages, with the conflicts settled in the
+table: `%f` is Python's six digits (chrono's nine are `%9f` or `%N`), `%Z` writes
+`UTC±HH:MM` for a fixed offset, and `%+` is chrono's form. The Go layout and the
+LDML pattern work against a fixed offset rather than a zone database, so their zone
+letters fall back to the offset (`GMT±HH:MM` in LDML), which is what ICU and babel
+do for a zone they only know by its offset.
+
+The vectors come from each language's own implementation — CPython for the `%`
+directives, a Rust program for chrono's additions, Go for the layout, Babel for
+LDML, and Node for the ECMAScript strings — and are committed under `src/`; CI only
+replays them. The generators are in `scripts/`.
 
 ## Interface
 
@@ -74,15 +112,16 @@ has every method and every parameter.
 |:--|:--|:--|
 | `Date` | `Date::new`, `of_days`, `of_ordinal`, `of_isocalendar` | `weekday`, `yearday`, `isocalendar`, `ordinal`, `days`, `diff`, `plus_days`, `plus_months`, `replace` |
 | `Time` | `Time::new`, `midnight`, `end_of_day` | `nanos`, `replace` |
-| `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strptime`, `combine`, `of_epoch` | `epoch`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `strftime`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
+| `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
 | `Span` | `Span::new`, `of`, `nanosecond` … `day` | `add`, `sub`, `seconds`, `total_seconds`, `parts`, `neg`, `abs` |
 | `Zone` | `Utc`, `Offset(minutes)` | — |
 | `Cron` | `@cron.parse` | `matches`, `next` |
 
-Free functions: `parse`, `of_isoformat`, `strptime`, `http`, `asn1`, `leap`,
-`length`. Constants: `min_date`, `max_date`, `min_year`, `max_year`,
-`resolution`, `midnight`, `end_of_day`, and one span per unit from `nanosecond`
-to `day`.
+Free functions: `parse`, `of_isoformat`, `strptime`, `parse_layout`,
+`parse_pattern`, `http`, `asn1`, `leap`, `length`. Constants: `min_date`,
+`max_date`, `min_year`, `max_year`, `resolution`, `midnight`, `end_of_day`, the Go
+layout constants (`RFC3339`, `RFC1123`, `ANSIC`, …), and one span per unit from
+`nanosecond` to `day`.
 
 Errors are one type with three reasons: `Range` carries the field, the value it
 got and the range it wanted; `Malformed` carries what was expected; `Truncated`
@@ -100,7 +139,7 @@ prints. Run one with `moon run src/examples/hello`.
 | [`calendar`](src/examples/calendar) | Weekdays, ISO week dates, ordinals, month lengths, adding days and months. |
 | [`zones`](src/examples/zones) | One instant written three ways, `astimezone`, the epoch both directions, spans. |
 | [`wire`](src/examples/wire) | HTTP dates in three formats, ASN.1 time in two, and the refusals. |
-| [`format`](src/examples/format) | Every `%` directive against one moment, then `strptime` reading it back. |
+| [`format`](src/examples/format) | One moment through all five styles: `%` directives, Go layout, LDML pattern, ECMAScript. |
 | [`schedule`](src/examples/schedule) | Cron expressions: what they mean, the next few firings, the or-rule, the refusals. |
 
 ## cron
@@ -124,18 +163,19 @@ instead of searching forever.
 
 ## Reading the code
 
-The calendar is `date.mbt`, the wire formats are `text.mbt`, the rest of the
-surface is `python.mbt`, and the schedule is `cron/`. Each public item has a doc
-comment saying what it does and, where there is a rule behind it, which
-specification the rule comes from.
+The calendar is `date.mbt`, the wire formats are `text.mbt`, the `%` directives
+are `strftime.mbt`, the Go layout is `layout.mbt`, the LDML pattern is
+`pattern.mbt`, the rest of the surface is `python.mbt`, and the schedule is
+`cron/`. Each public item has a doc comment saying what it does and, where there
+is a rule behind it, which specification the rule comes from.
 
 There is no `now()`. Reading the clock is I/O, this package has none, so a caller
 passes what its own clock said to `Moment::of_epoch`.
 
 Named zones — daylight saving, the IANA database — are not here. `Zone` is a
 fixed offset. A zone database is a different thing with a different update
-cadence, and `%Z` writes `UTC` or nothing rather than inventing a name it cannot
-recover.
+cadence, and `%Z` writes `UTC`, or `UTC±HH:MM` for a fixed offset, rather than
+inventing a name it cannot recover.
 
 ## Licence
 

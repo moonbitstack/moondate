@@ -1,9 +1,9 @@
 ///|
-/// `strftime` and `strptime`, one directive at a time.
+/// The five writing styles, one moment at a time.
 ///
-/// The format language is the one every Unix has: percent signs, letters, and a
-/// fixed meaning for each letter. This file runs one moment through every
-/// directive the library supports, then reads the pieces back.
+/// The `%` directives every Unix has, Go's reference-time layout, the Unicode
+/// LDML pattern, and the ECMAScript ISO shapes. This file runs one moment through
+/// each language, then reads the pieces back.
 ///
 ///     moon run src/examples/format
 fn main raise {
@@ -68,6 +68,27 @@ fn main raise {
   println(
     @moondate.strptime("Sun Nov  6 08:49:37 1994", "%a %b %d %H:%M:%S %Y"),
   )
+  println("")
+
+  // Go's reference-time layout. The template is Go's own reference moment
+  // (`Mon Jan 2 15:04:05 MST 2006`), and each recognisable piece names a field.
+  println(moment.layout(@moondate.RFC3339))
+  println(moment.layout(@moondate.RFC1123))
+  println(moment.layout("Monday, 02-Jan-06 15:04:05 MST"))
+  println("")
+
+  // A Unicode LDML pattern: a run of a letter names a field, and its length is the
+  // width. Text in single quotes is literal.
+  println(moment.pattern("EEEE, MMMM d, yyyy 'at' HH:mm"))
+  println(moment.pattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
+  println("")
+
+  // The ECMAScript shapes: `to_iso_string` is always the UTC instant with
+  // milliseconds, `to_utc_string` is the HTTP-style GMT form, and `isoformat`
+  // picks its own precision and writes the offset or leaves it off.
+  println(moment.to_iso_string())
+  println(moment.to_utc_string())
+  println(moment.isoformat(fraction=3, offset=false))
   println("")
 
   // A format that does not match the text is refused, and the reason says which

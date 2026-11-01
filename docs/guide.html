@@ -89,7 +89,7 @@
         <ol>
           <li><a href="#install">Install and first look</a></li>
           <li><a href="#shapes">The four shapes</a></li>
-          <li><a href="#writing">Reading and writing</a></li>
+          <li><a href="#writing">Five ways to write</a></li>
           <li><a href="#calendar">Calendar arithmetic</a></li>
           <li><a href="#instants">Instants and zones</a></li>
           <li><a href="#durations">Durations</a></li>
@@ -147,8 +147,20 @@
         </article>
 
         <article class="step" id="writing">
-          <h2><span class="n">03</span> Reading and writing</h2>
-          <p><span class="mono">to_string</span> and <span class="mono">isoformat</span> write a moment back as RFC 3339. When you want another layout, <span class="mono">strftime</span> takes the <span class="mono">%</span> directives, and <span class="mono">strptime</span> reads them back.</p>
+          <h2><span class="n">03</span> Five ways to write a moment</h2>
+          <p>The same instant can be written five ways, and moondate speaks all of them in both directions. Whatever it writes, <span class="mono">strptime</span>, <span class="mono">parse_layout</span> or <span class="mono">parse_pattern</span> reads back to the same moment.</p>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Style</th><th>Write</th><th>Read</th><th>From</th></tr></thead>
+              <tbody>
+                <tr><td><span class="mono">%</span> directives</td><td><span class="mono">strftime</span></td><td><span class="mono">strptime</span></td><td>C23, POSIX, glibc, Python, chrono, C++20</td></tr>
+                <tr><td>Go layout</td><td><span class="mono">layout</span></td><td><span class="mono">parse_layout</span></td><td>Go's <span class="mono">time</span> package</td></tr>
+                <tr><td>LDML pattern</td><td><span class="mono">pattern</span></td><td><span class="mono">parse_pattern</span></td><td>Unicode UTS #35, ICU, <span class="mono">Intl</span></td></tr>
+                <tr><td>ECMAScript ISO</td><td><span class="mono">isoformat</span> · <span class="mono">to_iso_string</span></td><td><span class="mono">parse</span></td><td>ECMA-262, Temporal</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The first style is the <span class="mono">%</span> directives every Unix has.</p>
           <div class="code">
             <div class="bar"><span class="name">write.mbt</span><button class="copy" data-copy="self">Copy</button></div>
             <pre><code>fn main raise {
@@ -166,7 +178,44 @@ Tue Tuesday Sep September
 14:30:05.123456 +0800
 2026-W39-2
 2026-09-22</div>
-          <p>The directive set is the one C89 defines, less the two that need a locale and the one that needs a zone database. <span class="mono">%Z</span> writes <span class="mono">UTC</span> or nothing, never a name it could not recover from an offset.</p>
+          <p>The second is Go's reference-time layout, where the template is Go's own reference moment and each recognisable piece names a field.</p>
+          <div class="code">
+            <div class="bar"><span class="name">layout.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+  println(m.layout(@moondate.RFC3339))
+  println(m.layout(@moondate.RFC1123))
+  println(m.layout("Monday, 02-Jan-06 15:04:05 MST"))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22T14:30:05+08:00
+Tue, 22 Sep 2026 14:30:05 +08:00
+Tuesday, 22-Sep-26 14:30:05 +08:00</div>
+          <p>The third is the Unicode LDML pattern: a run of a letter names a field, its length is the width, and text in single quotes is literal.</p>
+          <div class="code">
+            <div class="bar"><span class="name">pattern.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+  println(m.pattern("EEEE, MMMM d, yyyy 'at' HH:mm"))
+  println(m.pattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>Tuesday, September 22, 2026 at 14:30
+2026-09-22T14:30:05+08:00</div>
+          <p>The fourth is the ECMAScript shapes: <span class="mono">to_iso_string</span> is always the UTC instant with milliseconds, <span class="mono">to_utc_string</span> is the HTTP-style GMT form, and <span class="mono">isoformat</span> picks its own precision and either writes the offset or leaves it off.</p>
+          <div class="code">
+            <div class="bar"><span class="name">ecma.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+  println(m.to_iso_string())
+  println(m.to_utc_string())
+  println(m.isoformat(fraction=3, offset=false))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22T06:30:05.123Z
+Tue, 22 Sep 2026 06:30:05 GMT
+2026-09-22T14:30:05.123</div>
+          <p>The <span class="mono">%</span> set is the union of the six lineages, with the conflicts settled in the table: <span class="mono">%f</span> is Python's six digits (chrono's nine are <span class="mono">%9f</span> or <span class="mono">%N</span>), <span class="mono">%Z</span> writes <span class="mono">UTC</span> or <span class="mono">UTC±HH:MM</span> for a fixed offset, and <span class="mono">%+</span> is chrono's form. The vectors come from each language's own implementation and are committed under <span class="mono">src/</span>; CI only replays them.</p>
         </article>
 
         <article class="step" id="calendar">

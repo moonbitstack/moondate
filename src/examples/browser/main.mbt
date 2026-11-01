@@ -26,6 +26,25 @@ pub fn demo_strftime(s : String, fmt : String) -> String {
 }
 
 ///|
+/// Format a parsed moment in any of the five styles: a `%` directive string, a Go
+/// layout, an LDML pattern, or the ECMAScript ISO shape.
+#export_name("demo_format")
+pub fn demo_format(s : String, style : String, arg : String) -> String {
+  try {
+    let m = @moondate.parse(s)
+    match style {
+      "pct" => m.strftime(arg)
+      "layout" => m.layout(arg)
+      "pattern" => m.pattern(arg)
+      "iso" => m.isoformat()
+      _ => "refused: unknown style " + style
+    }
+  } catch {
+    e => "refused: " + e.to_string()
+  }
+}
+
+///|
 /// The single next cron firing after a starting moment.
 #export_name("demo_cron_next")
 pub fn demo_cron_next(expr : String, from : String) -> String {

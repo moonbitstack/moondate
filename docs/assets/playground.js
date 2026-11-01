@@ -43,7 +43,27 @@ function initParse(cfg) {
   const input = $(cfg.input);
   const format = $(cfg.format);
   const out = $(cfg.out);
+  const styleBar = cfg.style ? $(cfg.style) : null;
   if (!input || !out) return;
+
+  // A sensible starting pattern for each style; `iso` needs none.
+  const styleDefaults = {
+    pct: "%A, %d %B %Y",
+    layout: "Mon, 02 Jan 2006 15:04:05 MST",
+    pattern: "EEEE, MMMM d, yyyy",
+    iso: "",
+  };
+  let style = "pct";
+
+  // Prefer the multi-style dispatcher; fall back to the original `%` export so an
+  // older compiled module still works.
+  const formatWith = (raw, fmt) => {
+    if (typeof api.demo_format === "function") return api.demo_format(raw, style, fmt);
+    if (style === "pct" && typeof api.demo_strftime === "function") {
+      return api.demo_strftime(raw, fmt);
+    }
+    return "refused: this style needs a rebuilt module";
+  };
 
   const render = () => {
     if (!api) return unavailable(out);
@@ -54,7 +74,8 @@ function initParse(cfg) {
       return;
     }
     const shape = shapeOf(canon);
-    const formatted = format && format.value ? api.demo_strftime(raw, format.value) : "";
+    const fmt = format ? format.value : "";
+    const formatted = style === "iso" ? formatWith(raw, "") : fmt ? formatWith(raw, fmt) : "";
     let html = "";
     html += '<span class="k">' + padEnd("shape", 8) + "</span> " + '<span class="ok">' + shape + "</span>\n";
     html += '<span class="k">' + padEnd("canon", 8) + "</span> " + canon + "\n";
@@ -84,6 +105,27 @@ function initParse(cfg) {
       render();
     });
   });
+
+  if (styleBar) {
+    const buttons = styleBar.querySelectorAll("[data-style]");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        style = btn.getAttribute("data-style");
+        buttons.forEach((b) => b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+        if (format) {
+          if (style === "iso") {
+            format.value = "";
+            format.disabled = true;
+            format.placeholder = "the ISO shape needs no pattern";
+          } else {
+            format.disabled = false;
+            format.value = styleDefaults[style] || format.value;
+          }
+        }
+        render();
+      });
+    });
+  }
 
   render();
 }
@@ -146,5 +188,5 @@ function initCron(cfg) {
 initParse({ key: "date", input: "demo-date", format: "demo-format", out: "demo-out" });
 initCron({ key: "home", expr: "demo-cron", from: "demo-cron-from", out: "demo-cron-out", n: 4 });
 
-initParse({ key: "p", input: "p-date", format: "p-fmt", out: "p-out" });
+initParse({ key: "p", input: "p-date", format: "p-fmt", out: "p-out", style: "p-style" });
 initCron({ key: "c", expr: "c-expr", from: "c-from", count: "c-count", out: "c-list" });

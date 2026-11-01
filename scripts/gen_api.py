@@ -166,6 +166,7 @@ def ident_of(line: str) -> str | None:
     for pat in (
         r"^\s*pub\s+fn\s+([A-Za-z_]\w*(?:::[A-Za-z_]\w*)?)",
         r"^\s*pub\s+let\s+([A-Za-z_]\w*)",
+        r"^\s*pub\s+const\s+([A-Za-z_]\w*)",
         r"^\s*pub\(all\)\s+(?:struct|enum|suberror)\s+([A-Za-z_]\w*)",
         r"^\s*pub\s+typealias\s+([A-Za-z_]\w*)",
         r"^\s*pub\s+trait\s+([A-Za-z_]\w*)",
@@ -291,15 +292,15 @@ def parse_mbti(path: Path):
 
 def classify(item: dict):
     first = item["lines"][0]
-    m = re.match(r"^pub(?:\(all\))?\s+(fn|let|struct|enum|suberror|impl|typealias|trait)\b\s*([A-Za-z_][\w:]*)?", first)
+    m = re.match(r"^pub(?:\(all\))?\s+(fn|let|const|struct|enum|suberror|impl|typealias|trait)\b\s*([A-Za-z_][\w:]*)?", first)
     if not m:
         return None
     kind, name = m.group(1), m.group(2) or ""
     if kind == "fn":
         mm = re.search(r"\bfn\s+([A-Za-z_]\w*(?:::[A-Za-z_]\w*)?)", first)
         name = mm.group(1) if mm else name
-    elif kind == "let":
-        mm = re.search(r"\blet\s+([A-Za-z_]\w*)", first)
+    elif kind in ("let", "const"):
+        mm = re.search(r"\b(?:let|const)\s+([A-Za-z_]\w*)", first)
         name = mm.group(1) if mm else name
     elif kind in ("struct", "enum", "suberror"):
         mm = re.search(r"\b(?:struct|enum|suberror)\s+([A-Za-z_]\w*)", first)
@@ -315,12 +316,12 @@ def classify(item: dict):
 def sig_html(sig: str) -> str:
     e = esc(sig)
     e = re.sub(
-        r"\b(pub|fn|let|struct|enum|suberror|impl|typealias|trait|derive|raise|for|with)\b",
+        r"\b(pub|fn|let|const|struct|enum|suberror|impl|typealias|trait|derive|raise|for|with)\b",
         r'<span class="kw">\1</span>',
         e,
     )
     e = re.sub(
-        r'(<span class="kw">(?:fn|let|struct|enum|suberror|typealias|trait)</span>\s+)([A-Za-z_][\w:]*)',
+        r'(<span class="kw">(?:fn|let|const|struct|enum|suberror|typealias|trait)</span>\s+)([A-Za-z_][\w:]*)',
         r'\1<span class="name">\2</span>',
         e,
     )
@@ -396,7 +397,7 @@ def build_package(mbti_path: Path, sources: list[Path], docs: dict, params: dict
                 methods.setdefault(recv, []).append(c)
             else:
                 model["functions"].append(c)
-        elif c["kind"] == "let":
+        elif c["kind"] in ("let", "const"):
             model["constants"].append(c)
 
     def mkey(c):
