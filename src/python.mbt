@@ -263,12 +263,18 @@ pub fn Span::parts(self : Span) -> (Int32, Int32, Int32) {
 ///
 /// | | |
 /// |:--:|:--|
-/// | `%Y` `%y` `%m` `%d` | year, two-digit year, month, day |
+/// | `%Y` `%y` `%m` `%d` `%e` | year of four digits, two-digit year, month, day, day padded with a space |
 /// | `%H` `%I` `%M` `%S` `%f` | hour, twelve-hour, minute, second, microseconds |
+/// | `%.Nf` `%Nf` `%.f` | N fractional digits with or without the dot; as many as the nanoseconds need, three, six or nine, with the dot |
 /// | `%p` `%j` `%a` `%A` `%b` `%B` | AM/PM, day of year, day and month names |
-/// | `%z` `%Z` | offset as `+HHMM`, and `UTC` |
+/// | `%z` `%:z` `%Z` | offset as `+HHMM` and as `+HH:MM`, and `UTC` |
+/// | `%F` `%T` | `%Y-%m-%d` and `%H:%M:%S` |
 /// | `%G` `%V` `%u` `%w` | ISO year, ISO week, ISO weekday, weekday from Sunday |
 /// | `%%` | a per cent sign |
+///
+/// `%e`, `%F`, `%T` and `%:z` are C99's and Python's; the fractional forms are
+/// chrono's, which a log line wants and C never had. A moment with no date writes
+/// its date directives as 1 January 1900, as Python's `time.strftime` does.
 pub fn Moment::strftime(self : Moment, format : StringView) -> String {
   let (d, t, z) = match self {
     Zoned(date~, time~, zone~) => (date, time, Some(zone))
@@ -276,29 +282,35 @@ pub fn Moment::strftime(self : Moment, format : StringView) -> String {
     Day(date~) => (date, midnight, None)
     Clock(time~) => ({ year: 1900, month: 1, day: 1, }, time, None)
   }
-  let f = format.to_owned()
+  let f = expand(format.to_owned())
   let out = StringBuilder()
   let mut i = 0
   while i < f.length() {
-    if f[i].to_int() != 0x25 || i + 1 >= f.length() {
+    guard f[i].to_int() == 0x25 && directive(f, i) is Some((spec, next)) else {
       out.write_char(f[i].unsafe_to_char())
       i = i + 1
       continue
     }
-    let c = f[i + 1].unsafe_to_char()
-    i = i + 2
+    let start = i
+    i = next
     let (iso_year, iso_week, iso_day) = d.isocalendar()
     out.write_string(
-      match c {
-        'Y' => d.year.to_string()
+      match spec.conv {
+        'Y' => if d.year < 0 { "-" + pad(-d.year, 4) } else { pad(d.year, 4) }
         'y' => pad(d.year % 100, 2)
         'm' => pad(d.month, 2)
         'd' => pad(d.day, 2)
+        'e' =>
+          if d.day < 10 {
+            " " + d.day.to_string()
+          } else {
+            d.day.to_string()
+          }
         'H' => pad(t.hour, 2)
         'I' => pad(if t.hour % 12 == 0 { 12 } else { t.hour % 12 }, 2)
         'M' => pad(t.minute, 2)
         'S' => pad(t.second, 2)
-        'f' => pad(t.nano / 1000, 6)
+        'f' => fraction(t.nano, spec)
         'p' => if t.hour < 12 { "AM" } else { "PM" }
         'j' => pad(d.yearday(), 3)
         'a' => weekdays[d.weekday()]
@@ -309,27 +321,117 @@ pub fn Moment::strftime(self : Moment, format : StringView) -> String {
         'V' => pad(iso_week, 2)
         'u' => iso_day.to_string()
         'w' => d.weekday().to_string()
-        'z' =>
+        'z' => {
+          let sep = if spec.colon { ":" } else { "" }
           match z {
-            Some(Utc) => "+0000"
+            Some(Utc) => "+00" + sep + "00"
             Some(Offset(m)) => {
               let sign = if m < 0 { "-" } else { "+" }
               let a = if m < 0 { -m } else { m }
-              sign + pad(a / 60, 2) + pad(a % 60, 2)
+              sign + pad(a / 60, 2) + sep + pad(a % 60, 2)
             }
             None => ""
           }
+        }
         'Z' =>
           match z {
             Some(_) => "UTC"
             None => ""
           }
         '%' => "%"
-        other => "%" + other.to_string()
+        _ => f[start:next].to_owned()
       },
     )
   }
   out.to_string()
+}
+
+///|
+/// One directive's parts: the conversion letter, the `.` and digit count of the
+/// fractional forms (`-1` for none), and the `:` of `%:z`.
+priv struct Spec {
+  conv : Char
+  dot : Bool
+  width : Int32
+  colon : Bool
+}
+
+///|
+/// The directive that starts at the `%` at `i`, and the index after it; `None` when
+/// the format ends before a conversion letter, which is then written as it stands.
+fn directive(f : String, i : Int32) -> (Spec, Int32)? {
+  let mut k = i + 1
+  let dot = k < f.length() && f[k].to_int() == 0x2e
+  if dot {
+    k = k + 1
+  }
+  let start = k
+  let mut width = 0
+  while k < f.length() && is_digit(f[k].to_int()) {
+    width = width * 10 + (f[k].to_int() - 48)
+    k = k + 1
+  }
+  let width = if k == start { -1 } else { width }
+  let colon = k < f.length() && f[k].to_int() == 0x3a
+  if colon {
+    k = k + 1
+  }
+  guard k < f.length() else { return None }
+  Some(({ conv: f[k].unsafe_to_char(), dot, width, colon, }, k + 1))
+}
+
+///|
+/// `%F` and `%T` are shorthands, so they are spelt out once before either
+/// direction reads the format; `%%F` stays a per cent sign and an F.
+fn expand(f : String) -> String {
+  let out = StringBuilder()
+  let mut i = 0
+  while i < f.length() {
+    if f[i].to_int() == 0x25 && i + 1 < f.length() {
+      match f[i + 1].unsafe_to_char() {
+        'F' => out.write_string("%Y-%m-%d")
+        'T' => out.write_string("%H:%M:%S")
+        c => {
+          out.write_char('%')
+          out.write_char(c)
+        }
+      }
+      i = i + 2
+    } else {
+      out.write_char(f[i].unsafe_to_char())
+      i = i + 1
+    }
+  }
+  out.to_string()
+}
+
+///|
+/// The fractional second as a directive asks for it: Python's six digits for a bare
+/// `%f`; exactly N digits, truncated, for `%Nf`, with a leading dot for `%.Nf`; and
+/// for `%.f` as many as the value needs, three, six or nine, or nothing at all on a
+/// whole second, as chrono writes it.
+fn fraction(nano : Int32, spec : Spec) -> String {
+  if spec.width > 0 {
+    let n = if spec.width > 9 { 9 } else { spec.width }
+    let mut scale = 1
+    for _ in 0..<(9 - n) {
+      scale = scale * 10
+    }
+    let digits = pad(nano / scale, n)
+    return if spec.dot { "." + digits } else { digits }
+  }
+  if !spec.dot {
+    return pad(nano / 1000, 6)
+  }
+  if nano == 0 {
+    ""
+  } else if nano % 1_000_000 == 0 {
+    "." + pad(nano / 1_000_000, 3)
+  } else if nano % 1000 == 0 {
+    "." + pad(nano / 1000, 6)
+  } else {
+    "." + pad(nano, 9)
+  }
 }
 
 ///|
@@ -345,7 +447,7 @@ pub fn Moment::strftime(self : Moment, format : StringView) -> String {
 /// four shapes [`parse`] answers with.
 pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
   let s = src.to_owned()
-  let f = format.to_owned()
+  let f = expand(format.to_owned())
   let mut year = 1900
   let mut month = 1
   let mut mday = 1
@@ -376,12 +478,11 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
       j = j + 1
       continue
     }
-    if i + 1 >= f.length() {
+    guard directive(f, i) is Some((spec, next)) else {
       raise Malformed("a % at the end of the format")
     }
-    let c = f[i + 1].unsafe_to_char()
-    i = i + 2
-    match c {
+    i = next
+    match spec.conv {
       'Y' => {
         let (v, k) = take(s, j, 4)
         year = v
@@ -401,7 +502,10 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
         j = k
         saw_date = true
       }
-      'd' => {
+      'd' | 'e' => {
+        if spec.conv == 'e' && j < s.length() && s[j].to_int() == 0x20 {
+          j = j + 1
+        }
         let (v, k) = take(s, j, 2)
         mday = v
         j = k
@@ -426,9 +530,21 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
         saw_time = true
       }
       'f' => {
+        saw_time = true
+        if spec.dot {
+          // `%.f` may stand for nothing on a whole second; `%.Nf` always has its dot.
+          if j < s.length() && s[j].to_int() == 0x2e {
+            j = j + 1
+          } else if spec.width < 0 {
+            continue
+          } else {
+            raise Malformed("expected a dot before the fraction at \{j}")
+          }
+        }
+        let most = if spec.width > 0 && spec.width < 9 { spec.width } else { 9 }
         let start = j
         let mut v = 0
-        while j < s.length() && is_digit(s[j].to_int()) && j - start < 9 {
+        while j < s.length() && is_digit(s[j].to_int()) && j - start < most {
           v = v * 10 + (s[j].to_int() - 48)
           j = j + 1
         }
@@ -439,7 +555,6 @@ pub fn strptime(src : StringView, format : StringView) -> Moment raise Refused {
           v = v * 10
         }
         nano = v
-        saw_time = true
       }
       'j' => {
         let (v, k) = take(s, j, 3)
