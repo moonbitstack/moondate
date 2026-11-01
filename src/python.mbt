@@ -366,16 +366,15 @@ pub fn Moment::ordinal(self : Moment) -> Int32? {
 /// `sep` is the character between the date and the time, `T` by default; any
 /// character works, and a space is what a log line wants.
 ///
-/// `fraction` is the number of fractional-second digits: `-1`, the default, writes
-/// as many as the value needs and none for a whole second, which is Temporal's
-/// `auto`; `0` writes none; `1` to `9` write exactly that many, truncated.
+/// `fraction` is the number of fractional-second digits, 0 to 9, truncated. Left out, it writes as
+/// many as the value needs and none for a whole second, which is Temporal's `auto`.
 ///
 /// `offset` writes the zone the moment carries, `Z` for UTC and `±HH:MM` for an
 /// offset; `false` leaves the zone off, which is Temporal's `offset: "never"`.
 pub fn Moment::isoformat(
   self : Moment,
   sep~ : Char = 'T',
-  fraction~ : Int32 = -1,
+  fraction? : Int32,
   offset~ : Bool = true,
 ) -> String {
   match self {
@@ -393,32 +392,25 @@ pub fn Moment::isoformat(
 
 ///|
 /// The time part with the fractional-second digits `fraction` asks for.
-fn iso_time(t : Time, fraction : Int32) -> String {
+fn iso_time(t : Time, fraction : Int32?) -> String {
   let head = pad(t.hour, 2) + ":" + pad(t.minute, 2) + ":" + pad(t.second, 2)
-  if fraction == 0 {
-    return head
-  }
-  if fraction > 0 {
-    let n = if fraction > 9 { 9 } else { fraction }
-    let digits = pad(t.nano / power10(9 - n), n)
-    if fraction > 9 {
-      let extra = StringBuilder()
-      extra.write_string(digits)
-      for k = 9; k < fraction; k = k + 1 {
-        extra.write_char('0')
-      }
-      return head + "." + extra.to_string()
+  match fraction {
+    Some(n) if n <= 0 => head
+    Some(n) => {
+      let n = if n > 9 { 9 } else { n }
+      head + "." + pad(t.nano / power10(9 - n), n)
     }
-    return head + "." + digits
+    None => {
+      if t.nano == 0 {
+        return head
+      }
+      let mut frac = pad(t.nano, 9)
+      while frac.length() > 1 && frac[frac.length() - 1].to_int() == 48 {
+        frac = frac[0:frac.length() - 1].to_owned()
+      }
+      head + "." + frac
+    }
   }
-  if t.nano == 0 {
-    return head
-  }
-  let mut frac = pad(t.nano, 9)
-  while frac.length() > 1 && frac[frac.length() - 1].to_int() == 48 {
-    frac = frac[0:frac.length() - 1].to_owned()
-  }
-  head + "." + frac
 }
 
 ///|

@@ -77,7 +77,7 @@ for (const c of cases) {
   checks.push(["to_utc_string()", esc(utc)]);
   checks.push(["isoformat(fraction=3)", esc(iso)]);
   checks.push(["isoformat(fraction=0)", esc(secs)]);
-  checks.push(["isoformat(fraction=-1)", esc(auto(iso))]);
+  checks.push(["isoformat()", esc(auto(iso))]);
   checks.push(["isoformat(fraction=3, offset=false)", esc(iso.slice(0, -1))]);
   checks.push(["isoformat(fraction=1)", esc(iso.slice(0, 20) + fracDigits(millis3, 1) + "Z")]);
   checks.push(["isoformat(fraction=2)", esc(iso.slice(0, 20) + fracDigits(millis3, 2) + "Z")]);

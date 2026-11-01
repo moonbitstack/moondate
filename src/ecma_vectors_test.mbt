@@ -37,7 +37,7 @@ test "ecma 0" {
     "2026-09-22T14:30:05Z",
   )
   assert_eq(
-    e_utc(2026, 9, 22, 14, 30, 5, 0).isoformat(fraction=-1),
+    e_utc(2026, 9, 22, 14, 30, 5, 0).isoformat(),
     "2026-09-22T14:30:05Z",
   )
   assert_eq(
@@ -81,7 +81,7 @@ test "ecma 1" {
     "2026-09-22T14:30:05Z",
   )
   assert_eq(
-    e_utc(2026, 9, 22, 14, 30, 5, 123).isoformat(fraction=-1),
+    e_utc(2026, 9, 22, 14, 30, 5, 123).isoformat(),
     "2026-09-22T14:30:05.123Z",
   )
   assert_eq(
@@ -124,10 +124,7 @@ test "ecma 2" {
     e_utc(1999, 1, 5, 3, 4, 7, 0).isoformat(fraction=0),
     "1999-01-05T03:04:07Z",
   )
-  assert_eq(
-    e_utc(1999, 1, 5, 3, 4, 7, 0).isoformat(fraction=-1),
-    "1999-01-05T03:04:07Z",
-  )
+  assert_eq(e_utc(1999, 1, 5, 3, 4, 7, 0).isoformat(), "1999-01-05T03:04:07Z")
   assert_eq(
     e_utc(1999, 1, 5, 3, 4, 7, 0).isoformat(fraction=3, offset=false),
     "1999-01-05T03:04:07.000",
@@ -169,7 +166,7 @@ test "ecma 3" {
     "2000-02-29T23:59:59Z",
   )
   assert_eq(
-    e_utc(2000, 2, 29, 23, 59, 59, 0).isoformat(fraction=-1),
+    e_utc(2000, 2, 29, 23, 59, 59, 0).isoformat(),
     "2000-02-29T23:59:59Z",
   )
   assert_eq(
@@ -213,7 +210,7 @@ test "ecma 4" {
     "2026-09-22T14:30:05Z",
   )
   assert_eq(
-    e_utc(2026, 9, 22, 14, 30, 5, 500).isoformat(fraction=-1),
+    e_utc(2026, 9, 22, 14, 30, 5, 500).isoformat(),
     "2026-09-22T14:30:05.5Z",
   )
   assert_eq(
@@ -257,7 +254,7 @@ test "ecma 5" {
     "2026-09-22T14:30:05Z",
   )
   assert_eq(
-    e_utc(2026, 9, 22, 14, 30, 5, 999).isoformat(fraction=-1),
+    e_utc(2026, 9, 22, 14, 30, 5, 999).isoformat(),
     "2026-09-22T14:30:05.999Z",
   )
   assert_eq(

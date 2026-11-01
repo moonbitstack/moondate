@@ -508,7 +508,7 @@ img, svg {
   display: grid;
   gap: 6px;
 
-  label { .mono(12px; 1.4); color: var(--muted); letter-spacing: 0.02em; }
+  label, .field-name { .mono(12px; 1.4); color: var(--muted); letter-spacing: 0.02em; }
   input {
     .mono(13.5px; 1.4);
     color: var(--ink);
@@ -547,6 +547,7 @@ img, svg {
   background: transparent;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
+  &[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); background: var(--surface); }
   &:hover { color: var(--accent); border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
 }
 

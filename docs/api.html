@@ -288,9 +288,9 @@
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char, fraction? : Int32, offset? : Bool) -&gt; String</div>
 <div class="doc"><p>The moment as ISO 8601 text, which is what [<code>Show</code>] writes.</p>
 <p><code>sep</code> is the character between the date and the time, <code>T</code> by default; any character works, and a space is what a log line wants.</p>
-<p><code>fraction</code> is the number of fractional-second digits: <code>-1</code>, the default, writes as many as the value needs and none for a whole second, which is Temporal's <code>auto</code>; <code>0</code> writes none; <code>1</code> to <code>9</code> write exactly that many, truncated.</p>
+<p><code>fraction</code> is the number of fractional-second digits, 0 to 9, truncated. Left out, it writes as many as the value needs and none for a whole second, which is Temporal's <code>auto</code>.</p>
 <p><code>offset</code> writes the zone the moment carries, <code>Z</code> for UTC and <code>±HH:MM</code> for an offset; <code>false</code> leaves the zone off, which is Temporal's <code>offset: "never"</code>.</p></div>
-<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
+<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-moondate-Moment-of_epoch">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::of_epoch</span>(Int64, nano? : Int32, zone? : Zone) -&gt; Self</div>

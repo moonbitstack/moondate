@@ -55,16 +55,6 @@ function initParse(cfg) {
   };
   let style = "pct";
 
-  // Prefer the multi-style dispatcher; fall back to the original `%` export so an
-  // older compiled module still works.
-  const formatWith = (raw, fmt) => {
-    if (typeof api.demo_format === "function") return api.demo_format(raw, style, fmt);
-    if (style === "pct" && typeof api.demo_strftime === "function") {
-      return api.demo_strftime(raw, fmt);
-    }
-    return "refused: this style needs a rebuilt module";
-  };
-
   const render = () => {
     if (!api) return unavailable(out);
     const raw = input.value;
@@ -75,7 +65,7 @@ function initParse(cfg) {
     }
     const shape = shapeOf(canon);
     const fmt = format ? format.value : "";
-    const formatted = style === "iso" ? formatWith(raw, "") : fmt ? formatWith(raw, fmt) : "";
+    const formatted = style === "iso" || fmt ? api.demo_format(raw, style, fmt) : "";
     let html = "";
     html += '<span class="k">' + padEnd("shape", 8) + "</span> " + '<span class="ok">' + shape + "</span>\n";
     html += '<span class="k">' + padEnd("canon", 8) + "</span> " + canon + "\n";
