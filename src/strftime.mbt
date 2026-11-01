@@ -464,17 +464,13 @@ fn zone_offset(z : Zone?, spec : Spec) -> String {
 ///|
 /// The week number with Sunday as the first day, as `%U` writes it.
 fn week_sun(d : Date) -> Int32 {
-  let doy = d.yearday()
-  let jan1 = { year: d.year, month: 1, day: 1, }.weekday()
-  (doy + jan1 - 1) / 7
+  (d.yearday() - 1 + 7 - d.weekday()) / 7
 }
 
 ///|
 /// The week number with Monday as the first day, as `%W` writes it.
 fn week_mon(d : Date) -> Int32 {
-  let doy = d.yearday()
-  let jan1 = ({ year: d.year, month: 1, day: 1, }.weekday() + 6) % 7
-  (doy + jan1 - 1) / 7
+  (d.yearday() - 1 + 7 - (d.weekday() + 6) % 7) / 7
 }
 
 ///|
@@ -784,22 +780,19 @@ fn date_from_week(
   wd_sun : Int32,
   mode : Int32,
 ) -> Date {
-  if mode == 1 {
-    let jan1 = { year, month: 1, day: 1, }.weekday()
-    let mut doy = week * 7 + wd_sun - jan1 + 1
-    if doy < 1 {
-      doy = doy + 7
-    }
-    { year, month: 1, day: 1, }.plus_days(doy - 1)
+  let jan1 = { year, month: 1, day: 1, }.weekday()
+  // The days are counted from the week's first day, which is Sunday in mode 1 and Monday otherwise.
+  let (first, day) = if mode == 1 {
+    (jan1, wd_sun)
   } else {
-    let jan1 = ({ year, month: 1, day: 1, }.weekday() + 6) % 7
-    let target = (wd_sun + 6) % 7
-    let mut doy = week * 7 + target - jan1 + 1
-    if doy < 1 {
-      doy = doy + 7
-    }
-    { year, month: 1, day: 1, }.plus_days(doy - 1)
+    ((jan1 + 6) % 7, (wd_sun + 6) % 7)
   }
+  let doy = if week == 0 {
+    1 + day - first
+  } else {
+    1 + (7 - first) % 7 + (week - 1) * 7 + day
+  }
+  { year, month: 1, day: 1, }.plus_days(doy - 1)
 }
 
 ///|
