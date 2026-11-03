@@ -299,7 +299,7 @@ pub fn Moment::http_text(self : Moment) -> String raise Refused {
   " " +
   months[d.month - 1] +
   " " +
-  pad(d.year, 4) +
+  http_year(d.year) +
   " " +
   pad(t.hour, 2) +
   ":" +
@@ -307,6 +307,18 @@ pub fn Moment::http_text(self : Moment) -> String raise Refused {
   ":" +
   pad(t.second, 2) +
   " GMT"
+}
+
+///|
+/// A year as the HTTP date forms write it: at least four digits, with a minus for
+/// a negative year and nothing extra for one that needs five, which is what
+/// ECMAScript's `toUTCString` does.
+fn http_year(year : Int32) -> String {
+  if year < 0 {
+    "-" + pad(-year, 4)
+  } else {
+    pad(year, 4)
+  }
 }
 
 ///|

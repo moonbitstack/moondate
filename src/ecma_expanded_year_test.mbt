@@ -54,3 +54,12 @@ test "an expanded year reads back" {
     "2026-09-22T14:30:05Z",
   )
 }
+
+///|
+test "an expanded year in the GMT form" {
+  // `toUTCString` writes the year as it stands: four digits, a minus for a
+  // negative year, and five digits when the year needs them.
+  assert_eq(far_zoned(12026).to_utc_string(), "Fri, 02 Jan 12026 03:04:05 GMT")
+  assert_eq(far_zoned(-1).to_utc_string(), "Sat, 02 Jan -0001 03:04:05 GMT")
+  assert_eq(far_zoned(9999).to_utc_string(), "Sat, 02 Jan 9999 03:04:05 GMT")
+}
