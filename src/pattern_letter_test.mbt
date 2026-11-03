@@ -94,3 +94,24 @@ test "the new letters read back" {
   let standalone = @moondate.parse_pattern("2 09/2026", "c MM/yyyy")
   assert_eq(standalone.isoformat(), "2026-09-01")
 }
+
+///|
+test "a day of the year and a week date read back" {
+  let m = letter_moment(2026, 9, 22, 14, 30)
+  assert_eq(m.pattern("yyyy-DDD"), "2026-265")
+  assert_eq(
+    @moondate.parse_pattern("2026-265", "yyyy-DDD").isoformat(),
+    "2026-09-22",
+  )
+  assert_eq(m.pattern("Y-'W'ww-e"), "2026-W39-2")
+  assert_eq(
+    @moondate.parse_pattern("2026-W39-2", "Y-'W'ww-e").isoformat(),
+    "2026-09-22",
+  )
+  // The first day of a week year, where the week number and the Tuesday meet on a
+  // date in the year before the week year.
+  assert_eq(
+    @moondate.parse_pattern("2025-W01-1", "Y-'W'ww-e").isoformat(),
+    "2024-12-30",
+  )
+}

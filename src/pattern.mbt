@@ -63,6 +63,10 @@ pub fn parse_pattern(
   let mut nano = 0
   let mut pm : Bool? = None
   let mut off : Int32? = None
+  let mut doy : Int32? = None
+  let mut week_year_value : Int32? = None
+  let mut week_value : Int32? = None
+  let mut weekday_value : Int32? = None
   let mut saw_date = false
   let mut saw_time = false
   let mut j = 0
@@ -91,7 +95,15 @@ pub fn parse_pattern(
       }
       'Y' => {
         let (v, k) = take(s, j, if count == 2 { 2 } else { 4 })
-        year = v
+        week_year_value = Some(
+          if count == 2 && v < 69 {
+            2000 + v
+          } else if count == 2 {
+            1900 + v
+          } else {
+            v
+          },
+        )
         j = k
       }
       'M' | 'L' => {
@@ -113,13 +125,26 @@ pub fn parse_pattern(
         j = k
         saw_date = true
       }
-      'D' => j = skip_digits_or_name(s, j)
-      'F' | 'w' | 'W' => j = skip_digits_or_name(s, j)
+      'D' => {
+        // A day of the year, one to three digits, which decides the date once the
+        // year is known.
+        let (v, k) = take(s, j, 3)
+        doy = Some(v)
+        j = k
+      }
+      'w' => {
+        let (v, k) = take(s, j, 2)
+        week_value = Some(v)
+        j = k
+      }
+      'F' | 'W' => j = skip_digits_or_name(s, j)
       'E' | 'e' | 'c' =>
         if count >= 3 {
           j = skip_name(s, j)
         } else {
-          j = skip_digits_or_name(s, j)
+          let (v, k) = take(s, j, if count == 2 { 2 } else { 1 })
+          weekday_value = Some(v)
+          j = k
         }
       'a' => {
         if j + 2 > s.length() {
@@ -191,6 +216,30 @@ pub fn parse_pattern(
   match pm {
     Some(true) => if hour < 12 { hour = hour + 12 }
     Some(false) => if hour == 12 { hour = 0 }
+    None => ()
+  }
+  // A week date — the week year, the week and a weekday — decides the date, and a
+  // day of the year does so once the year is known. Both are what `Y`/`w`/`e` and
+  // `D` write, so a pattern that carries them reads back.
+  match (week_year_value, week_value, weekday_value) {
+    (Some(y), Some(w), Some(wd)) => {
+      let first = week_start({ year: y, month: 1, day: 1, })
+      let dd = first.plus_days((w - 1) * 7 + (wd - 1))
+      year = dd.year
+      month = dd.month
+      mday = dd.day
+      saw_date = true
+    }
+    _ => ()
+  }
+  match doy {
+    Some(v) => {
+      let dd = { year, month: 1, day: 1, }.plus_days(v - 1)
+      year = dd.year
+      month = dd.month
+      mday = dd.day
+      saw_date = true
+    }
     None => ()
   }
   let time = Time::new(hour, minute, second=sec, nano~)
