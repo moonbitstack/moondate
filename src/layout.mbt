@@ -21,6 +21,7 @@ priv enum GKind {
   GDay1
   GDaySpace
   GDayYear3
+  GDaySpaceYear3
   GWDShort
   GWDLong
   GH24
@@ -203,6 +204,14 @@ pub fn parse_layout(
         doy = Some(v)
         j = k
       }
+      GDaySpaceYear3 => {
+        while j < s.length() && s[j].to_int() == 0x20 {
+          j = j + 1
+        }
+        let (v, k) = take(s, j, 3)
+        doy = Some(v)
+        j = k
+      }
       GWDShort | GWDLong => j = skip_name(s, j)
       GH24 | GH12z | GH12 => {
         let (v, k) = take(s, j, 2)
@@ -223,7 +232,8 @@ pub fn parse_layout(
         saw_time = true
       }
       GFrac => {
-        if j < s.length() && s[j].to_int() == 0x2e {
+        let sep = tok.text[0].to_int()
+        if j < s.length() && s[j].to_int() == sep {
           j = j + 1
         } else {
           raise Malformed("expected a dot before the fraction at \{j}")
@@ -320,6 +330,7 @@ fn render_token(tok : GToken, d : Date, t : Time, off : Int32) -> String {
         d.day.to_string()
       }
     GDayYear3 => pad(d.yearday(), 3)
+    GDaySpaceYear3 => pad_space(d.yearday(), 3)
     GWDShort => weekdays[d.weekday()]
     GWDLong => long_days[d.weekday()]
     GH24 => pad(t.hour, 2)
@@ -369,16 +380,34 @@ fn year_field(year : Int32, width : Int32) -> String {
 }
 
 ///|
-/// The fractional second Go's `.999…` or `.000…` asks for.
+/// `n` right-aligned in `width` with spaces, which is how Go's `_2` and `__2`
+/// pad.
+fn pad_space(n : Int32, width : Int32) -> String {
+  let s = n.to_string()
+  if s.length() >= width {
+    return s
+  }
+  let out = StringBuilder()
+  for i = s.length(); i < width; i = i + 1 {
+    out.write_char(' ')
+  }
+  out.write_string(s)
+  out.to_string()
+}
+
+///|
+/// The fractional second Go's `.999…` or `.000…` asks for, with the separator the
+/// layout used.
 fn frac_text(nano : Int32, text : String) -> String {
   let p = text.length() - 1
+  let sep = text[0].unsafe_to_char().to_string()
   let scale = power10(9 - p)
   let first = nano / scale
   let digits = pad(first, p)
   // A token of nines drops trailing zeros, and the whole fractional part when the
   // value is a whole second; a token of zeros always keeps its width.
   if text[1].to_int() == 0x30 {
-    "." + digits
+    sep + digits
   } else {
     let mut s = digits
     while s.length() > 0 && s[s.length() - 1].to_int() == 48 {
@@ -387,7 +416,7 @@ fn frac_text(nano : Int32, text : String) -> String {
     if s.length() == 0 {
       ""
     } else {
-      "." + s
+      sep + s
     }
   }
 }
@@ -451,19 +480,26 @@ fn scan_layout(layout : String) -> Array[GToken] {
 ///|
 /// The token that starts at `i`, and where the layout continues after it.
 fn scan_token(layout : String, i : Int32) -> (GToken, Int32) {
-  if layout[i].to_int() == 0x2e {
-    let mut k = i + 1
-    while k < layout.length() {
-      let c = layout[k].to_int()
-      if c == 0x39 || c == 0x30 {
+  // A fractional second is a dot or a comma and a run of the same digit, `0` for a
+  // fixed width and `9` for a trimmed one. The run has to be the last of the
+  // digits there, so `2006.002` keeps its day of year rather than reading `00` as
+  // a fraction.
+  let c = layout[i].to_int()
+  if (c == 0x2e || c == 0x2c) && i + 1 < layout.length() {
+    let digit = layout[i + 1].to_int()
+    if digit == 0x30 || digit == 0x39 {
+      let mut k = i + 1
+      while k < layout.length() && layout[k].to_int() == digit {
         k = k + 1
-      } else {
-        break
+      }
+      if k == layout.length() || !is_digit(layout[k].to_int()) {
+        return ({ kind: GFrac, text: layout[i:k].to_owned(), }, k)
       }
     }
-    if k > i + 1 {
-      return ({ kind: GFrac, text: layout[i:k].to_owned(), }, k)
-    }
+  }
+  // `_2006` is a space and a four-digit year, not a padded day.
+  if c == 0x5f && starts_at(layout, i + 1, "2006") {
+    return ({ kind: GLit, text: "_", }, i + 1)
   }
   let candidates : Array[(String, GKind)] = [
     ("Monday", GWDLong),
@@ -492,6 +528,7 @@ fn scan_token(layout : String, i : Int32) -> (GToken, Int32) {
     ("pm", GMeridiem),
     ("AM", GMeridiem),
     ("am", GMeridiem),
+    ("__2", GDaySpaceYear3),
     ("_2", GDaySpace),
     ("04", GMin2),
     ("05", GSec2),
