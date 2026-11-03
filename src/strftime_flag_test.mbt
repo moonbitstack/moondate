@@ -127,3 +127,17 @@ test "an offset without minutes reads back" {
   )
   assert_eq(basic.isoformat(), "2026-09-22T14:30:05-05:30")
 }
+
+///|
+test "the basic offset and the epoch round-trip" {
+  let m = @moondate.Moment::Zoned(
+    date=@moondate.Date::new(2000, 2, 29),
+    time=@moondate.Time::new(23, 59, second=59),
+    zone=@moondate.Offset(-330),
+  )
+  assert_eq(
+    @moondate.strptime(m.strftime("%Y-%m-%dT%H:%M:%S%z"), "%Y-%m-%dT%H:%M:%S%z"),
+    m,
+  )
+  assert_eq(@moondate.strptime(m.strftime("%s"), "%s").epoch(), m.epoch())
+}
