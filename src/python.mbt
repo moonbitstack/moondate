@@ -379,15 +379,30 @@ pub fn Moment::isoformat(
 ) -> String {
   match self {
     Zoned(date~, time~, zone~) =>
-      text_of(date) +
+      iso_date(date) +
       sep.to_string() +
       iso_time(time, fraction) +
       iso_zone(Some(zone), offset)
     Plain(date~, time~) =>
-      text_of(date) + sep.to_string() + iso_time(time, fraction)
-    Day(date~) => text_of(date)
+      iso_date(date) + sep.to_string() + iso_time(time, fraction)
+    Day(date~) => iso_date(date)
     Clock(time~) => iso_time(time, fraction)
   }
+}
+
+///|
+/// A date as the ECMAScript and Temporal ISO strings write it: four digits inside
+/// 0000 to 9999, and `+012026` or `-000001` outside that, which is the expanded
+/// year both name.
+fn iso_date(d : Date) -> String {
+  let head = if d.year >= 0 && d.year <= 9999 {
+    pad(d.year, 4)
+  } else if d.year < 0 {
+    "-" + pad(-d.year, 6)
+  } else {
+    "+" + pad(d.year, 6)
+  }
+  head + "-" + pad(d.month, 2) + "-" + pad(d.day, 2)
 }
 
 ///|
@@ -455,7 +470,7 @@ pub fn Moment::to_iso_string(self : Moment) -> String {
       }
     None => (d0, t0)
   }
-  text_of(date) +
+  iso_date(date) +
   "T" +
   pad(time.hour, 2) +
   ":" +

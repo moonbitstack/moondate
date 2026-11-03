@@ -8,34 +8,53 @@
 /// `Plain`; a bare `2026-09-22` is `Day` and a bare `14:30:00` is `Clock`. TOML
 /// 1.0.0 names these four and allows a space in place of the `T`, which is what a
 /// person writes; RFC 3339 §5.6 allows it too, under NOTE.
+///
+/// A year outside 0000 to 9999 keeps the expanded form Temporal writes for it —
+/// `+012026-01-02T03:04:05Z`, `-000001-01-02` — so what [`Moment::isoformat`]
+/// writes reads back.
 pub fn parse(src : StringView) -> Moment raise Refused {
   let s = src.to_owned()
   // A bare time has a colon where a date would have a dash.
   if s.length() >= 5 && at(s, 2) == ':' {
     return Clock(time=time_of(s, 0, s.length()))
   }
-  if s.length() < 10 {
+  // An expanded year is a sign and six digits, and the month and day follow the
+  // dash after it; `rest` is where `MM-DD` starts.
+  let mut rest = 5
+  let mut year : Int32? = None
+  if s.length() >= 8 && (at(s, 0) == '+' || at(s, 0) == '-') && at(s, 7) == '-' {
+    let y = digits(s, 1, 6)
+    year = Some(if at(s, 0) == '-' { -y } else { y })
+    rest = 8
+  }
+  if s.length() < rest + 5 {
     raise Truncated("a date needs ten characters")
   }
-  let date = date_of(s, 0)
-  if s.length() == 10 {
+  if at(s, rest + 2) != '-' {
+    raise Malformed("a date is YYYY-MM-DD")
+  }
+  let date = match year {
+    Some(y) => Date::new(y, digits(s, rest, 2), digits(s, rest + 3, 2))
+    None => date_of(s, 0)
+  }
+  if s.length() == rest + 5 {
     return Day(date~)
   }
-  let sep = at(s, 10)
+  let sep = at(s, rest + 5)
   if sep != 'T' && sep != 't' && sep != ' ' {
     raise Malformed("a date and a time are joined by T or a space")
   }
   // The zone, if any, begins at the first Z or at a sign that is not part of the
   // time — which is any sign at all, since the time itself carries none.
   let mut cut = s.length()
-  for i = 11; i < s.length(); i = i + 1 {
+  for i = rest + 6; i < s.length(); i = i + 1 {
     let c = at(s, i)
     if c == 'Z' || c == 'z' || c == '+' || c == '-' {
       cut = i
       break
     }
   }
-  let time = time_of(s, 11, cut)
+  let time = time_of(s, rest + 6, cut)
   if cut == s.length() {
     return Plain(date~, time~)
   }
