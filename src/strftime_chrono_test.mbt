@@ -130,7 +130,6 @@ test "chrono vectors #3" {
     vc_zoned(2000, 2, 29, 23, 59, 59, 0, -330).strftime("%::z"),
     "-05:30:00",
   )
-  assert_eq(vc_zoned(2000, 2, 29, 23, 59, 59, 0, -330).strftime("%:::z"), "-05")
   assert_eq(
     vc_zoned(2000, 2, 29, 23, 59, 59, 0, -330).strftime("%+"),
     "2000-02-29T23:59:59-05:30",

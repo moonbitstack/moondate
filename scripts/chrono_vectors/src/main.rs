@@ -35,6 +35,11 @@ fn main() {
         Case { y: 2026, m: 9, d: 22, h: 14, mi: 30, s: 5, nanos: 123456789, off_min: 0 },
     ];
 
+    // NOTE: `%:::z` drops the minutes of a half-hour offset in chrono (`-05` for
+    // `-05:30`), while glibc's rule is the offset at the precision it needs
+    // (`-05:30`). The library follows glibc, so that one case is left out here and
+    // checked in src/strftime_offset_test.mbt instead.
+    //
     // NOTE: `%f` is intentionally omitted here. This project's `%f` follows
     // Python (six microsecond digits) per the task spec, which differs from
     // chrono's nine-digit `%f`. The six-digit form is covered by the CPython
@@ -54,6 +59,9 @@ fn main() {
     for (i, c) in cases.iter().enumerate() {
         println!("test \"chrono vectors #{}\" {{", i);
         for fmt in &formats {
+            if *fmt == "%:::z" && c.off_min % 60 != 0 {
+                continue;
+            }
             let expected = match dt(c).format(fmt).to_string() {
                 v if v.contains('\n') => v.replace('\n', "\\n"),
                 v => v,

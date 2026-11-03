@@ -5,11 +5,12 @@
 // and C++20 `std::format`. Both directions are here: [`Moment::strftime`] writes a
 // moment the way each directive says, and [`strptime`] reads it back.
 //
-// The modifiers glibc and chrono share — `-` no padding, `_` space padding, `0`
-// zero padding, `^` upper case, `#` swap case — work on the directives they make
-// sense on, and an optional width sits between the flags and the letter. The two
-// C99 locale selectors `E` and `O` are kept for compatibility and behave like the
-// plain directive, because this package carries no locale.
+// The flags glibc and chrono share — `-` no padding, `_` space padding, `0` zero
+// padding, `^` upper case, `#` change case — work on the directives they make sense
+// on, and an optional width sits between the flags and the letter. `#` is glibc's:
+// it upper-cases a name and lower-cases `%p`, because AM and PM are already upper.
+// The two C99 selectors `E` and `O` are kept: on a composite they spell nothing new,
+// and on `%z` they are the two ISO 8601 forms of C++20, `+08:00` and `+0800`.
 
 ///|
 /// A moment written by a format string of `%` directives.
@@ -34,10 +35,16 @@
 /// | `%p` `%P` | AM/PM and am/pm |
 /// | `%f` `%.f` `%.Nf` `%Nf` `%N` | fractional second, dot or not, N digits or auto |
 /// | `%s` | seconds since the epoch |
-/// | `%z` `%:z` `%::z` `%:::z` `%#z` `%Ez` `%Oz` | offset, with and without colons |
+/// | `%z` `%:z` `%::z` `%:::z` `%#z` `%Ez` `%Oz` | offset: `+0800`, `+08:00`, `+08:00:00`, `+08` at the precision it needs, and the two ISO 8601 forms of C++20 |
 /// | `%Z` | `UTC`, `UTC±HH:MM` for a fixed offset, or nothing when there is no zone |
 /// | `%c` `%x` `%X` `%D` `%F` `%T` `%R` `%r` `%v` `%+` | the composite forms |
 /// | `%n` `%t` `%%` | a newline, a tab, a per cent sign |
+///
+/// A flag may sit between the sign and the letter: `-` drops the padding, `_` pads
+/// with spaces, `0` pads with zeros, a number sets the width, `^` upper-cases, and
+/// `#` upper-cases a name but lower-cases `%p`. The `E` and `O` selectors are kept
+/// as well: `%Ec` is `%c`, and `%Ez` and `%Oz` are the two ISO 8601 spellings of an
+/// offset, `+08:00` and `+0800`.
 ///
 /// A moment with no date writes its date directives as 1 January 1900, as Python's
 /// `time.strftime` and C's `struct tm` do, so a bare time still formats.
@@ -95,7 +102,9 @@ fn wall_epoch(d : Date, t : Time) -> Int64 {
 
 ///|
 /// One directive's parts: the conversion letter, the flags, the width, and the
-/// count of colons on a `%z` form.
+/// count of colons on a `%z` form. `modifier` keeps the C99 `E` or `O` that came
+/// before the letter, because `%Ez` and `%Oz` are the two ISO 8601 spellings of an
+/// offset rather than locale variants.
 priv struct Spec {
   conv : Char
   minus : Bool
@@ -104,7 +113,7 @@ priv struct Spec {
   upper : Bool
   swap : Bool
   dot : Bool
-  alt : Bool
+  modifier : Char
   width : Int32
   colon : Int32
 }
@@ -120,7 +129,7 @@ fn directive(f : String, i : Int32) -> (Spec, Int32)? {
   let mut upper = false
   let mut swap = false
   let mut dot = false
-  let mut alt = false
+  let mut modifier = ' '
   while k < f.length() {
     match f[k].to_int() {
       0x2d => {
@@ -148,7 +157,7 @@ fn directive(f : String, i : Int32) -> (Spec, Int32)? {
         k = k + 1
       } // .
       0x45 | 0x4f => {
-        alt = true
+        modifier = f[k].unsafe_to_char()
         k = k + 1
       } // E or O
       _ => break
@@ -177,7 +186,7 @@ fn directive(f : String, i : Int32) -> (Spec, Int32)? {
         upper,
         swap,
         dot,
-        alt,
+        modifier,
         width,
         colon,
       },
@@ -189,28 +198,32 @@ fn directive(f : String, i : Int32) -> (Spec, Int32)? {
 ///|
 /// `%F` and `%T` are shorthands, as are the composite forms the C locale and chrono
 /// name, so they are spelt out once before either direction reads the format;
-/// `%%F` stays a per cent sign and an F.
+/// `%%F` stays a per cent sign and an F. An `E` or `O` before a composite changes
+/// nothing — C99 lets `%Ec` stand for `%c` — so those are spelt out too.
 fn expand(f : String) -> String {
   let out = StringBuilder()
   let mut i = 0
   while i < f.length() {
     if f[i].to_int() == 0x25 && i + 1 < f.length() {
-      match f[i + 1].unsafe_to_char() {
-        'F' => out.write_string("%Y-%m-%d")
-        'T' => out.write_string("%H:%M:%S")
-        'D' => out.write_string("%m/%d/%y")
-        'R' => out.write_string("%H:%M")
-        'r' => out.write_string("%I:%M:%S %p")
-        'v' => out.write_string("%e-%b-%Y")
-        'c' => out.write_string("%a %b %e %H:%M:%S %Y")
-        'x' => out.write_string("%m/%d/%y")
-        'X' => out.write_string("%H:%M:%S")
-        '+' => out.write_string("%Y-%m-%dT%H:%M:%S%.f%:z")
-        c => {
+      let first = f[i + 1].unsafe_to_char()
+      if i + 2 < f.length() && (first == 'E' || first == 'O') {
+        guard composite(f[i + 2].unsafe_to_char()) is Some(body) else {
           out.write_char('%')
-          out.write_char(c)
+          out.write_char(first)
+          i = i + 2
+          continue
         }
+        out.write_string(body)
+        i = i + 3
+        continue
       }
+      guard composite(first) is Some(body) else {
+        out.write_char('%')
+        out.write_char(first)
+        i = i + 2
+        continue
+      }
+      out.write_string(body)
       i = i + 2
     } else {
       out.write_char(f[i].unsafe_to_char())
@@ -218,6 +231,25 @@ fn expand(f : String) -> String {
     }
   }
   out.to_string()
+}
+
+///|
+/// The directives that stand for a longer spelling, as the C locale and chrono
+/// write them. Everything else answers `None` and is read as it stands.
+fn composite(c : Char) -> String? {
+  match c {
+    'F' => Some("%Y-%m-%d")
+    'T' => Some("%H:%M:%S")
+    'D' => Some("%m/%d/%y")
+    'R' => Some("%H:%M")
+    'r' => Some("%I:%M:%S %p")
+    'v' => Some("%e-%b-%Y")
+    'c' => Some("%a %b %e %H:%M:%S %Y")
+    'x' => Some("%m/%d/%y")
+    'X' => Some("%H:%M:%S")
+    '+' => Some("%Y-%m-%dT%H:%M:%S%.f%:z")
+    _ => None
+  }
 }
 
 ///|
@@ -255,31 +287,15 @@ fn render_num(
 }
 
 ///|
+/// Text as the case flags ask for it. `#` is glibc's "change case", which for a
+/// name means upper case; `%p` and `%P` are the exception and take lower case from
+/// it, so those two are handled where they are written.
 fn render_text(spec : Spec, s : String) -> String {
-  if spec.upper {
+  if spec.upper || spec.swap {
     s.to_upper()
-  } else if spec.swap {
-    swap_case(s)
   } else {
     s
   }
-}
-
-///|
-fn swap_case(s : String) -> String {
-  let out = StringBuilder()
-  for i = 0; i < s.length(); i = i + 1 {
-    let c = s[i].unsafe_to_char()
-    let u = c.to_int()
-    if u >= 0x41 && u <= 0x5a {
-      out.write_char((u + 32).unsafe_to_char())
-    } else if u >= 0x61 && u <= 0x7a {
-      out.write_char((u - 32).unsafe_to_char())
-    } else {
-      out.write_char(c)
-    }
-  }
-  out.to_string()
 }
 
 ///|
@@ -332,21 +348,32 @@ fn power10(n : Int32) -> Int32 {
 
 ///|
 /// The offset text for a `%z` form, with the colon count the directive carried.
+/// `%Ez` and `%Oz` are the two ISO 8601 spellings — `+08:00` and `+0800` — which
+/// is what C++20's `std::format` gives them; the C `E` and `O` selectors mean
+/// nothing else here, since there is no locale.
 fn offset_text(minutes : Int32, spec : Spec) -> String {
   let sign = if minutes < 0 { "-" } else { "+" }
   let a = if minutes < 0 { -minutes } else { minutes }
   let hh = a / 60
   let mm = a % 60
   let ss = 0
-  if spec.colon == 0 {
+  let colon = match spec.modifier {
+    'E' => 1
+    'O' => 0
+    _ => spec.colon
+  }
+  if colon == 0 {
     sign + pad(hh, 2) + pad(mm, 2)
-  } else if spec.colon == 1 {
+  } else if colon == 1 {
     sign + pad(hh, 2) + ":" + pad(mm, 2)
-  } else if spec.colon == 2 {
+  } else if colon == 2 {
     sign + pad(hh, 2) + ":" + pad(mm, 2) + ":" + pad(ss, 2)
-  } else {
-    // chrono's `%:::z`: the offset written only as whole hours.
+    // chrono's `%:::z`: the offset at the precision it needs, so whole hours stay
+    // two digits and a half-hour offset keeps its minutes.
+  } else if mm == 0 {
     sign + pad(hh, 2)
+  } else {
+    sign + pad(hh, 2) + ":" + pad(mm, 2)
   }
 }
 
@@ -389,8 +416,28 @@ fn write_spec(
     'l' => render_num(spec, hour12(t).to_int64(), 2, ' ')
     'M' => render_num(spec, t.minute.to_int64(), 2, '0')
     'S' => render_num(spec, t.second.to_int64(), 2, '0')
-    'p' => render_text(spec, if t.hour < 12 { "AM" } else { "PM" })
-    'P' => render_text(spec, if t.hour < 12 { "am" } else { "pm" })
+    'p' =>
+      if spec.swap {
+        if t.hour < 12 {
+          "am"
+        } else {
+          "pm"
+        }
+      } else {
+        render_text(spec, if t.hour < 12 { "AM" } else { "PM" })
+      }
+    'P' =>
+      if spec.upper {
+        if t.hour < 12 {
+          "AM"
+        } else {
+          "PM"
+        }
+      } else if t.hour < 12 {
+        "am"
+      } else {
+        "pm"
+      }
     'f' => fraction(t.nano, spec)
     'N' => fraction(t.nano, spec)
     's' => epoch_secs.to_string()
@@ -437,27 +484,8 @@ fn hour12(t : Time) -> Int32 {
 fn zone_offset(z : Zone?, spec : Spec) -> String {
   match z {
     None => ""
-    Some(Utc) =>
-      if spec.conv == 'Z' {
-        "UTC"
-      } else if spec.colon == 0 {
-        "+0000"
-      } else if spec.colon == 1 {
-        "+00:00"
-      } else if spec.colon == 2 {
-        "+00:00:00"
-      } else {
-        "+00"
-      }
-    Some(Offset(m)) =>
-      if spec.conv == 'Z' {
-        "UTC"
-      } else if m == 0 && spec.alt {
-        // chrono's `%#z` writes `Z` for UTC.
-        "Z"
-      } else {
-        offset_text(m, spec)
-      }
+    Some(Utc) => offset_text(0, spec)
+    Some(Offset(m)) => offset_text(m, spec)
   }
 }
 
@@ -892,9 +920,15 @@ fn read_offset(s : String, j : Int32) -> (Int32, Int32) raise Refused {
     raise Malformed("an offset begins with a sign at \{j}")
   }
   let (h, a) = take(s, j + 1, 2)
-  let b = if a < s.length() && s[a].to_int() == 0x3a { a + 1 } else { a }
-  let (m, c) = take(s, b, 2)
-  let mut d = c
+  // The minutes may be left out, as `%:::z` writes them for a whole-hour offset.
+  let mut m = 0
+  let mut d = a
+  if a < s.length() && (s[a].to_int() == 0x3a || is_digit(s[a].to_int())) {
+    let b = if s[a].to_int() == 0x3a { a + 1 } else { a }
+    let (mm, c) = take(s, b, 2)
+    m = mm
+    d = c
+  }
   if d < s.length() && s[d].to_int() == 0x3a {
     let (_sec, e) = take(s, d + 1, 2)
     d = e
