@@ -175,6 +175,7 @@ pub fn parse_pattern(
         saw_time = true
       }
       'A' => j = skip_digits_or_name(s, j)
+      'b' | 'B' => j = skip_words(s, j)
       'z' | 'Z' | 'O' | 'v' | 'V' | 'X' | 'x' => {
         // Long forms prefix the offset with `GMT`; skip it before the sign.
         if j + 3 <= s.length() && s[j:j + 3].to_owned() == "GMT" {
@@ -220,13 +221,19 @@ fn write_ptoken(
     return
   }
   let count = tok.count
-  let (iso_year, _, _) = d.isocalendar()
   let wd = d.weekday()
   let q = (d.month - 1) / 3 + 1
   match tok.letter {
-    'G' => out.write_string(if count >= 4 { "Anno Domini" } else { "AD" })
+    'G' =>
+      if count <= 3 {
+        out.write_string("AD")
+      } else if count == 4 {
+        out.write_string("Anno Domini")
+      } else {
+        out.write_string("A")
+      }
     'y' => out.write_string(year_digits(d.year, count))
-    'Y' => out.write_string(year_digits(iso_year, count))
+    'Y' => out.write_string(year_digits(week_year(d).0, count))
     'u' => out.write_string(year_digits(d.year, count))
     'Q' | 'q' =>
       if count == 1 {
@@ -235,8 +242,10 @@ fn write_ptoken(
         out.write_string(pad(q, 2))
       } else if count == 3 {
         out.write_string("Q" + q.to_string())
-      } else {
+      } else if count == 4 {
         out.write_string(ordinal(q) + " quarter")
+      } else {
+        out.write_string(q.to_string())
       }
     'M' | 'L' =>
       if count == 1 {
@@ -250,7 +259,7 @@ fn write_ptoken(
       } else {
         out.write_string(first_chars(long_months[d.month - 1], 1))
       }
-    'w' => out.write_string(pad(week_mon(d) + 1, count))
+    'w' => out.write_string(pad(week_year(d).1, count))
     'W' => out.write_string(pad(week_of_month(d), count))
     'd' => out.write_string(pad(d.day, count))
     'D' => out.write_string(pad(d.yearday(), count))
@@ -265,7 +274,7 @@ fn write_ptoken(
       } else {
         out.write_string(first_chars(long_days[wd], 2))
       }
-    'e' =>
+    'e' | 'c' =>
       if count == 1 {
         out.write_string(d.isoweekday().to_string())
       } else if count == 2 {
@@ -279,7 +288,14 @@ fn write_ptoken(
       } else {
         out.write_string(first_chars(long_days[wd], 2))
       }
-    'a' => out.write_string(if t.hour < 12 { "AM" } else { "PM" })
+    'a' =>
+      if count >= 5 {
+        out.write_string(if t.hour < 12 { "a" } else { "p" })
+      } else {
+        out.write_string(if t.hour < 12 { "AM" } else { "PM" })
+      }
+    'b' => out.write_string(day_period(t, false, false))
+    'B' => out.write_string(day_period(t, true, count >= 5))
     'h' => out.write_string(pad(hour12(t), count))
     'H' => out.write_string(pad(t.hour, count))
     'K' => out.write_string(pad(t.hour % 12, count))
@@ -323,10 +339,69 @@ fn year_digits(year : Int32, count : Int32) -> String {
 }
 
 ///|
+/// The week year and the week of it: a week starts on Monday and the first week is
+/// the one that holds 1 January, which UTS #35 calls a first day of Monday and one
+/// minimal day. A day in the last days of December can therefore belong to week 1
+/// of the next year, and the pair [`write_ptoken`] uses for `Y` and `w` stays
+/// consistent.
+fn week_year(d : Date) -> (Int32, Int32) {
+  let mut year = d.year
+  let mut first = week_start({ year, month: 1, day: 1, })
+  if d.days() < first.days() {
+    year = year - 1
+    first = week_start({ year, month: 1, day: 1, })
+  } else {
+    let next = week_start({ year: year + 1, month: 1, day: 1, })
+    if d.days() >= next.days() {
+      year = year + 1
+      first = next
+    }
+  }
+  (year, (d.days() - first.days()) / 7 + 1)
+}
+
+///|
+/// The Monday on or before 1 January, which is where the first week begins.
+fn week_start(jan1 : Date) -> Date {
+  jan1.plus_days(-((jan1.weekday() + 6) % 7))
+}
+
+///|
 fn week_of_month(d : Date) -> Int32 {
   let first = { year: d.year, month: d.month, day: 1, }
   let offset = (first.weekday() + 6) % 7
   (d.day - 1 + offset) / 7 + 1
+}
+
+///|
+/// The day period of a clock: the short form, which `b` writes, or the long one,
+/// which `B` writes. Midnight and noon have names of their own in both widths, and
+/// English carries no separate narrow form, so a fifth letter gives what the fourth
+/// does — except for those two, whose narrow forms are `mi` and `n`.
+fn day_period(t : Time, long : Bool, narrow : Bool) -> String {
+  if t.minute == 0 && t.second == 0 && (t.hour == 0 || t.hour == 12) {
+    let name = if t.hour == 0 { "midnight" } else { "noon" }
+    if narrow {
+      return if t.hour == 0 { "mi" } else { "n" }
+    }
+    return name
+  }
+  let (short, wide) = if t.hour < 6 {
+    ("night", "at night")
+  } else if t.hour < 12 {
+    ("morning", "in the morning")
+  } else if t.hour < 18 {
+    ("afternoon", "in the afternoon")
+  } else if t.hour < 21 {
+    ("evening", "in the evening")
+  } else {
+    ("night", "at night")
+  }
+  if long {
+    wide
+  } else {
+    short
+  }
 }
 
 ///|
@@ -516,6 +591,22 @@ fn plit(s : String, j : Int32, text : String) -> Int32 raise Refused {
       }
       k = k + 1
     }
+  }
+  k
+}
+
+///|
+/// Past a day period, which is one word in the short form and two or three in the
+/// long one (`in the afternoon`, `at night`).
+fn skip_words(s : String, j : Int32) -> Int32 {
+  let mut k = skip_name(s, j)
+  let mut words = 1
+  while words < 3 &&
+        k + 1 < s.length() &&
+        s[k].to_int() == 0x20 &&
+        is_letter(s[k + 1].to_int()) {
+    k = skip_name(s, k + 1)
+    words = words + 1
   }
   k
 }
