@@ -93,10 +93,26 @@ m.isoformat(fraction=3, offset=false)          // 2026-09-22T14:30:05.123
 
 The `%` set is the union of the six lineages, with the conflicts settled in the
 table: `%f` is Python's six digits (chrono's nine are `%9f` or `%N`), `%Z` writes
-`UTC±HH:MM` for a fixed offset, and `%+` is chrono's form. The Go layout and the
-LDML pattern work against a fixed offset rather than a zone database, so their zone
-letters fall back to the offset (`GMT±HH:MM` in LDML), which is what ICU and babel
-do for a zone they only know by its offset.
+`UTC±HH:MM` for a fixed offset, and `%+` is chrono's form. Flags sit between the
+sign and the letter — `-` drops the padding, `_` pads with spaces, `0` pads with
+zeros, a number sets the width, `^` and `#` change the case of a name — and the
+C99 selectors `E` and `O` are kept: `%Ec` is `%c`, `%Ez` is `+08:00` and `%Oz` is
+`+0800`. The Go layout and the LDML pattern work against a fixed offset rather than
+a zone database, so their zone letters fall back to the offset (`GMT±HH:MM` in
+LDML), which is what ICU and babel do for a zone they only know by its offset.
+
+```moonbit
+m.strftime("%#B %10Y %-d")                     // SEPTEMBER 0000002026 22
+m.strftime("%Ez %Oz")                          // +08:00 +0800
+m.pattern("Y-'W'ww c B")                       // 2026-W39 2 in the afternoon
+m.isoformat()                                  // 2026-09-22T14:30:05.123456+08:00
+```
+
+LDML answers in every width UTS #35 names, including the narrow era, quarter and
+weekday, the day periods (`b` short, `B` long, with midnight and noon named), the
+standalone weekday `c`, and the week year `Y` with its week `w`. A year outside
+0000 to 9999 is written in the expanded form Temporal gives it — `+012026-01-02` —
+and `parse` reads that form back.
 
 The vectors come from each language's own implementation — CPython for the `%`
 directives, a Rust program for chrono's additions, Go for the layout, Babel for

@@ -202,6 +202,19 @@ Tuesday, 22-Sep-26 14:30:05 +08:00</div>
           </div>
           <div class="output"><span class="lbl">output</span>Tuesday, September 22, 2026 at 14:30
 2026-09-22T14:30:05+08:00</div>
+          <p>The rest of the pattern letters answer in the widths they name. <span class="mono">Y</span> and <span class="mono">w</span> are the week year and its week — a week starts on Monday and the first week is the one that holds 1 January — <span class="mono">b</span> and <span class="mono">B</span> name the day period, <span class="mono">c</span> is the standalone weekday, and a fifth letter asks for the narrow form of an era, a quarter or a weekday.</p>
+          <div class="code">
+            <div class="bar"><span class="name">letters.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+  println(m.pattern("Y-'W'ww c"))
+  println(m.pattern("B"))
+  println(m.pattern("GGGGG QQQQQ"))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-W39 2
+in the afternoon
+A 3</div>
           <p>The fourth is the ECMAScript shapes: <span class="mono">to_iso_string</span> is always the UTC instant with milliseconds, <span class="mono">to_utc_string</span> is the HTTP-style GMT form, and <span class="mono">isoformat</span> picks its own precision and either writes the offset or leaves it off.</p>
           <div class="code">
             <div class="bar"><span class="name">ecma.mbt</span><button class="copy" data-copy="self">Copy</button></div>
@@ -216,6 +229,19 @@ Tuesday, 22-Sep-26 14:30:05 +08:00</div>
 Tue, 22 Sep 2026 06:30:05 GMT
 2026-09-22T14:30:05.123</div>
           <p>The <span class="mono">%</span> set is the union of the six lineages, with the conflicts settled in the table: <span class="mono">%f</span> is Python's six digits (chrono's nine are <span class="mono">%9f</span> or <span class="mono">%N</span>), <span class="mono">%Z</span> writes <span class="mono">UTC</span> or <span class="mono">UTC±HH:MM</span> for a fixed offset, and <span class="mono">%+</span> is chrono's form. The vectors come from each language's own implementation and are committed under <span class="mono">src/</span>; CI only replays them.</p>
+          <p>Flags sit between the per cent sign and the letter: <span class="mono">-</span> drops the padding, <span class="mono">_</span> pads with spaces, <span class="mono">0</span> pads with zeros, a number sets the width, and <span class="mono">^</span> and <span class="mono">#</span> change the case of a name. The C99 selectors <span class="mono">E</span> and <span class="mono">O</span> are kept as well: <span class="mono">%Ec</span> is <span class="mono">%c</span>, and the two ISO 8601 spellings of an offset are <span class="mono">%Ez</span> and <span class="mono">%Oz</span>.</p>
+          <div class="code">
+            <div class="bar"><span class="name">flags.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
+  println(m.strftime("%#B %10Y %-d"))
+  println(m.strftime("%Ez %Oz"))
+  println(m.strftime("%Ec"))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>SEPTEMBER 0000002026 22
++08:00 +0800
+Tue Sep 22 14:30:05 2026</div>
         </article>
 
         <article class="step" id="calendar">
