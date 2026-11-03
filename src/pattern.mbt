@@ -138,7 +138,10 @@ pub fn parse_pattern(
         j = k
       }
       'F' | 'W' => j = skip_digits_or_name(s, j)
-      'E' | 'e' | 'c' =>
+      // `E` is a name at every width; `e` and `c` are a number until the third
+      // letter, where they turn into the same names.
+      'E' => j = skip_name(s, j)
+      'e' | 'c' =>
         if count >= 3 {
           j = skip_name(s, j)
         } else {

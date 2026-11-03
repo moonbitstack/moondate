@@ -115,3 +115,16 @@ test "a day of the year and a week date read back" {
     "2024-12-30",
   )
 }
+
+///|
+test "a weekday name still reads past" {
+  // `E` is a name at every width, so a pattern that writes `Tue` reads over it.
+  assert_eq(
+    @moondate.parse_pattern("Tue 2026-09-22", "E yyyy-MM-dd").isoformat(),
+    "2026-09-22",
+  )
+  assert_eq(
+    @moondate.parse_pattern("Tuesday 2026-09-22", "EEEE yyyy-MM-dd").isoformat(),
+    "2026-09-22",
+  )
+}
