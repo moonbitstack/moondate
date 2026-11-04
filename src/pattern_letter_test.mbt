@@ -128,3 +128,17 @@ test "a weekday name still reads past" {
     "2026-09-22",
   )
 }
+
+///|
+/// Two letters of a year read two digits, so a pattern with no separators still
+/// finds the month after them. The century follows the pivot the other tests use.
+test "a two-letter year stops at two digits" {
+  assert_eq(
+    @moondate.parse_pattern("260922", "yyMMdd").isoformat(),
+    "2026-09-22",
+  )
+  assert_eq(
+    @moondate.parse_pattern("990922", "yyMMdd").isoformat(),
+    "1999-09-22",
+  )
+}
