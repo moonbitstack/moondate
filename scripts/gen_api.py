@@ -237,6 +237,9 @@ def parse_source(path: Path, docs: dict, params: dict) -> None:
             pending.append(d)
             i += 1
             continue
+        if line.startswith("#"):
+            i += 1
+            continue
         if line.strip() == "":
             pending = []
             i += 1
