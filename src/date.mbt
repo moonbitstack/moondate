@@ -6,11 +6,12 @@
 ///
 /// A calendar that accepted the thirty-first of February would be no use as a
 /// check, so every constructor here validates and says what was wrong.
+#derive(Eq, Debug)
 pub(all) suberror Refused {
   Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
   Truncated(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub impl Show for Refused with fn output(self, logger) {
@@ -37,11 +38,12 @@ pub extend Refused with Eq::{not_equal, equal}
 /// Proleptic means the Gregorian rules are applied before 1582 as well, which is
 /// what every interchange format in reach assumes and what makes arithmetic over
 /// the whole range uniform.
+#derive(Eq, Compare, Debug)
 pub(all) struct Date {
   year : Int32
   month : Int32
   day : Int32
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 pub extend Date with Debug::{to_repr}
@@ -58,12 +60,13 @@ pub extend Date with Compare::{compare, op_lt, op_le, op_ge, op_gt}
 /// A second of 60 is allowed: RFC 3339 §5.6 permits it for a leap second, and a
 /// timestamp that records one is a real timestamp that a reader should not throw
 /// away.
+#derive(Eq, Compare, Debug)
 pub(all) struct Time {
   hour : Int32
   minute : Int32
   second : Int32
   nano : Int32
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 pub extend Time with Debug::{to_repr}
@@ -80,10 +83,11 @@ pub extend Time with Compare::{compare, op_lt, op_le, op_ge, op_gt}
 /// `Utc` and `Offset(0)` are both midnight-at-Greenwich, but they are not the same
 /// thing to write down: RFC 3339 §4.3 gives `-00:00` to a timestamp whose offset is
 /// unknown, and `Z` to one that is genuinely UTC.
+#derive(Eq, Debug)
 pub(all) enum Zone {
   Utc
   Offset(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Zone with Debug::{to_repr}
@@ -98,12 +102,13 @@ pub extend Zone with Eq::{not_equal, equal}
 /// defines only `Zoned`. The distinction is not decoration: `Plain` is a wall
 /// clock, which is what an alarm or an opening time is, and turning it into an
 /// instant needs a zone nobody has supplied.
+#derive(Eq, Debug)
 pub(all) enum Moment {
   Zoned(date~ : Date, time~ : Time, zone~ : Zone)
   Plain(date~ : Date, time~ : Time)
   Day(date~ : Date)
   Clock(time~ : Time)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Moment with Debug::{to_repr}
@@ -116,9 +121,10 @@ pub extend Moment with Eq::{not_equal, equal}
 ///
 /// A span is not a number of months: a month is not a fixed length, so adding one
 /// is a calendar operation (`Date::plus_months`) rather than arithmetic.
+#derive(Eq, Compare, Debug)
 pub(all) struct Span {
   nanos : Int64
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 pub extend Span with Debug::{to_repr}

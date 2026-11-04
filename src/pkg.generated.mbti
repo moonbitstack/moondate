@@ -85,11 +85,12 @@ pub let second : Span
 pub fn strptime(StringView, StringView) -> Moment raise Refused
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror Refused {
   Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
   Truncated(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn Refused::equal(Self, Self) -> Bool
 pub fn Refused::not_equal(Self, Self) -> Bool
 pub fn Refused::output(Self, &Logger) -> Unit
@@ -98,11 +99,12 @@ pub fn Refused::to_string(Self) -> String
 pub impl Show for Refused
 
 // Types and methods
+#derive(Compare, Eq, @debug.Debug)
 pub(all) struct Date {
   year : Int32
   month : Int32
   day : Int32
-} derive(Compare, Eq, @debug.Debug)
+}
 pub fn Date::compare(Self, Self) -> Int32
 pub fn Date::days(Self) -> Int32
 pub fn Date::diff(Self, Self) -> Span
@@ -129,12 +131,13 @@ pub fn Date::weekday(Self) -> Int32
 pub fn Date::yearday(Self) -> Int32
 pub impl Show for Date
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Moment {
   Zoned(date~ : Date, time~ : Time, zone~ : Zone)
   Plain(date~ : Date, time~ : Time)
   Day(date~ : Date)
   Clock(time~ : Time)
-} derive(Eq, @debug.Debug)
+}
 pub fn Moment::asn1_text(Self) -> String raise Refused
 pub fn Moment::astimezone(Self, Zone) -> Self?
 pub fn Moment::combine(Date, Time, zone? : Zone) -> Self
@@ -167,9 +170,10 @@ pub fn Moment::weekday(Self) -> Int32?
 pub fn Moment::zone(Self) -> Zone?
 pub impl Show for Moment
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) struct Span {
   nanos : Int64
-} derive(Compare, Eq, @debug.Debug)
+}
 pub fn Span::abs(Self) -> Self
 pub fn Span::add(Self, Self) -> Self
 pub fn Span::compare(Self, Self) -> Int32
@@ -188,12 +192,13 @@ pub fn Span::sub(Self, Self) -> Self
 pub fn Span::to_repr(Self) -> @debug.Repr
 pub fn Span::total_seconds(Self) -> Double
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) struct Time {
   hour : Int32
   minute : Int32
   second : Int32
   nano : Int32
-} derive(Compare, Eq, @debug.Debug)
+}
 pub fn Time::compare(Self, Self) -> Int32
 pub fn Time::equal(Self, Self) -> Bool
 pub fn Time::nanos(Self) -> Int64
@@ -209,10 +214,11 @@ pub fn Time::to_repr(Self) -> @debug.Repr
 pub fn Time::to_string(Self) -> String
 pub impl Show for Time
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Zone {
   Utc
   Offset(Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn Zone::equal(Self, Self) -> Bool
 pub fn Zone::not_equal(Self, Self) -> Bool
 pub fn Zone::to_repr(Self) -> @debug.Repr

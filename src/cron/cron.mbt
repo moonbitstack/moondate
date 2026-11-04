@@ -3,11 +3,12 @@
 
 ///|
 /// Why an expression was refused.
+#derive(Eq, Debug)
 pub(all) suberror Refused {
   Fields(got~ : Int32)
   Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)
   Malformed(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub impl Show for Refused with fn output(self, logger) {
@@ -34,6 +35,7 @@ pub extend Refused with Eq::{not_equal, equal}
 /// Each field is a bit set, so asking whether a moment matches is six bit tests
 /// rather than a search. `star_day` and `star_week` are kept because the two fields
 /// interact — see [`Cron::matches`].
+#derive(Eq, Debug)
 pub(all) struct Cron {
   seconds : Int64
   minutes : Int64
@@ -43,7 +45,7 @@ pub(all) struct Cron {
   weekdays : Int32
   star_day : Bool
   star_week : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Cron with Debug::{to_repr}
