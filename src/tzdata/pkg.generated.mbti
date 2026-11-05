@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondate/tzdata"
+
+import {
+  "moonbitstack/moondate/zone",
+}
+
+// Values
+pub fn find(StringView) -> @zone.Tz?
+
+pub fn links() -> Array[(String, String)]
+
+pub fn load(StringView) -> @zone.Tz raise @zone.Refused
+
+pub let release : String
+
+pub let source_digest : String
+
+pub fn zones() -> Array[String]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

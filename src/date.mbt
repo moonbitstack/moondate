@@ -172,10 +172,10 @@ pub fn Zone::name(self : Zone) -> String {
 pub fn Zone::abbrev(self : Zone) -> String {
   match self {
     Utc => "UTC"
-    Offset(minutes) => where_text(minutes * 60, false)
+    Offset(minutes) => where_text(minutes * 60, true)
     Named(zone) =>
       if zone.abbrev == "" {
-        where_text(zone.offset, false)
+        where_text(zone.offset, true)
       } else {
         zone.abbrev
       }
@@ -183,8 +183,8 @@ pub fn Zone::abbrev(self : Zone) -> String {
 }
 
 ///|
-/// A fixed offset as `UTC` and `UTC±HH:MM`, or as the bare `UTC±HH:MM` and
-/// `±HHMM` a zone abbreviation takes.
+/// A fixed offset as `UTC`, `UTC±HH:MM`, or the bare `±HHMM` a zone abbreviation
+/// takes.
 fn where_text(seconds : Int32, named : Bool) -> String {
   let sign = if seconds < 0 { "-" } else { "+" }
   let a = if seconds < 0 { -seconds } else { seconds }

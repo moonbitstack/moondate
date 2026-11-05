@@ -1,0 +1,15 @@
+// Named zones, compiled from the IANA release this package carries.
+//
+// The data is the release's own compendium — the `Rule`, `Zone` and `Link` lines
+// its editors maintain — so the reader here is the small language `zic` compiles:
+// a zone is a run of stretches of time, each with a standard offset, a rule set (or
+// one fixed amount of saving) and a format for the abbreviation, and each ending
+// where the next begins.
+//
+// A separate package because the database is 105 kB of text that most callers do
+// not need: one that formats an HTTP date carries the calendar, one that answers
+// "what time is it in São Paulo" carries this as well.
+import {
+  "moonbitstack/moondate",
+  "moonbitstack/moondate/zone",
+}
