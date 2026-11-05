@@ -40,6 +40,11 @@ FIXTURES = ["Etc/UTC", "Asia/Kathmandu", "America/New_York"]
 # end of the years the file itself covers.
 SAMPLES_PER_ZONE = 4
 
+# Two mid-January and mid-July instants in 2100, past the end of every table zic
+# writes: their readings come from the POSIX rule in the footer, which is the only
+# thing that answers for a date that far out.
+PROBES = [4103654400, 4119292800]
+
 LINES_PER_CHUNK = 40
 
 
@@ -168,6 +173,10 @@ def samples_of(vectors):
             {0, len(rows) // 3, 2 * len(rows) // 3, len(rows) - 1}
         )[:SAMPLES_PER_ZONE]
         out.extend(rows[i] for i in picks)
+        for when in PROBES:
+            state = [row for row in rows if row[1] <= when]
+            if state:
+                out.append((name, when, state[-1][2], state[-1][3], state[-1][4]))
     return out
 
 

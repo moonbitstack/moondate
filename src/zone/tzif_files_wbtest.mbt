@@ -16,4 +16,4 @@ let tzif_chunks : Array[String] = [
 
 ///|
 /// `name instant offset abbreviation daylight`, one reading per line.
-let tzif_samples : String = "Etc/UTC -5364662400 0 UTC 0\nAsia/Kathmandu -5364662400 20476 LMT 0\nAsia/Kathmandu -1577943676 19800 +0530 0\nAsia/Kathmandu 504901800 20700 +0545 0\nAmerica/New_York -5364662400 -17762 LMT 0\nAmerica/New_York 325666800 -14400 EDT 1\nAmerica/New_York 2235621600 -18000 EST 0\nAmerica/New_York 4129250400 -18000 EST 0"
+let tzif_samples : String = "Etc/UTC -5364662400 0 UTC 0\nEtc/UTC 4103654400 0 UTC 0\nEtc/UTC 4119292800 0 UTC 0\nAsia/Kathmandu -5364662400 20476 LMT 0\nAsia/Kathmandu -1577943676 19800 +0530 0\nAsia/Kathmandu 504901800 20700 +0545 0\nAsia/Kathmandu 4103654400 20700 +0545 0\nAsia/Kathmandu 4119292800 20700 +0545 0\nAmerica/New_York -5364662400 -17762 LMT 0\nAmerica/New_York 325666800 -14400 EDT 1\nAmerica/New_York 2235621600 -18000 EST 0\nAmerica/New_York 4129250400 -18000 EST 0\nAmerica/New_York 4103654400 -18000 EST 0\nAmerica/New_York 4119292800 -14400 EDT 1"
