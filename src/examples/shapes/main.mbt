@@ -10,7 +10,8 @@
 
 ///|
 /// Write a zone the way an offset is usually written. `Offset` counts minutes
-/// east of UTC, which is how RFC 3339 and every zone database spell it.
+/// east of UTC, which is how RFC 3339 and every zone database spell it; a named
+/// zone carries the offset its database read at that instant.
 fn zone_text(zone : @moondate.Zone) -> String {
   match zone {
     @moondate.Utc => "UTC"
@@ -22,6 +23,7 @@ fn zone_text(zone : @moondate.Zone) -> String {
       let pad = if mm < 10 { "0" } else { "" }
       "\{sign}0\{hh}:\{pad}\{mm}"
     }
+    @moondate.Named(name) => name.name + " " + name.abbrev
   }
 }
 

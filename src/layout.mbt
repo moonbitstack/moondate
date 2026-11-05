@@ -110,8 +110,7 @@ pub const TimeOnly : String = "15:04:05"
 pub fn Moment::layout(self : Moment, layout : StringView) -> String {
   let (d, t, z, _) = decompose(self)
   let off = match z {
-    Some(Utc) => 0
-    Some(Offset(m)) => m
+    Some(zone) => zone.minutes()
     None => 0
   }
   let toks = scan_layout(layout.to_owned())

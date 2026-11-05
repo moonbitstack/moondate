@@ -29,8 +29,7 @@ priv struct PToken {
 pub fn Moment::pattern(self : Moment, pattern : StringView) -> String {
   let (d, t, z, _) = decompose(self)
   let off = match z {
-    Some(Utc) => 0
-    Some(Offset(m)) => m
+    Some(zone) => zone.minutes()
     None => 0
   }
   let toks = scan_pattern(pattern.to_owned())

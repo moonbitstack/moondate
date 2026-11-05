@@ -351,12 +351,16 @@ fn power10(n : Int32) -> Int32 {
 /// `%Ez` and `%Oz` are the two ISO 8601 spellings — `+08:00` and `+0800` — which
 /// is what C++20's `std::format` gives them; the C `E` and `O` selectors mean
 /// nothing else here, since there is no locale.
-fn offset_text(minutes : Int32, spec : Spec) -> String {
-  let sign = if minutes < 0 { "-" } else { "+" }
-  let a = if minutes < 0 { -minutes } else { minutes }
-  let hh = a / 60
-  let mm = a % 60
-  let ss = 0
+///
+/// `seconds` is the offset east of UTC. The `%z` forms count minutes, so a zone
+/// read before standard time keeps its minutes and drops the rest; `%::z` is the
+/// one form with a seconds field, and it fills it.
+fn offset_text(seconds : Int32, spec : Spec) -> String {
+  let sign = if seconds < 0 { "-" } else { "+" }
+  let a = if seconds < 0 { -seconds } else { seconds }
+  let hh = a / 3600
+  let mm = a % 3600 / 60
+  let ss = a % 60
   let colon = match spec.modifier {
     'E' => 1
     'O' => 0
@@ -370,10 +374,12 @@ fn offset_text(minutes : Int32, spec : Spec) -> String {
     sign + pad(hh, 2) + ":" + pad(mm, 2) + ":" + pad(ss, 2)
     // chrono's `%:::z`: the offset at the precision it needs, so whole hours stay
     // two digits and a half-hour offset keeps its minutes.
-  } else if mm == 0 {
+  } else if mm == 0 && ss == 0 {
     sign + pad(hh, 2)
-  } else {
+  } else if ss == 0 {
     sign + pad(hh, 2) + ":" + pad(mm, 2)
+  } else {
+    sign + pad(hh, 2) + ":" + pad(mm, 2) + ":" + pad(ss, 2)
   }
 }
 
@@ -444,15 +450,7 @@ fn write_spec(
     'z' => zone_offset(z, spec)
     'Z' =>
       match z {
-        Some(Utc) => "UTC"
-        Some(Offset(m)) =>
-          if m == 0 {
-            "UTC"
-          } else {
-            let sign = if m < 0 { "-" } else { "+" }
-            let a = if m < 0 { -m } else { m }
-            "UTC" + sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
-          }
+        Some(zone) => zone.abbrev()
         None => ""
       }
     'n' => "\n"
@@ -484,8 +482,7 @@ fn hour12(t : Time) -> Int32 {
 fn zone_offset(z : Zone?, spec : Spec) -> String {
   match z {
     None => ""
-    Some(Utc) => offset_text(0, spec)
-    Some(Offset(m)) => offset_text(m, spec)
+    Some(zone) => offset_text(zone.seconds(), spec)
   }
 }
 

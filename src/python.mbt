@@ -171,10 +171,7 @@ pub fn Moment::of_epoch(
   nano~ : Int32 = 0,
   zone~ : Zone = Utc,
 ) -> Moment {
-  let offset = match zone {
-    Utc => 0L
-    Offset(m) => m.to_int64() * 60L
-  }
+  let offset = zone.seconds().to_int64()
   let wall = seconds + offset
   let mut days = wall / 86400L
   let mut rest = wall % 86400L
@@ -297,8 +294,7 @@ pub fn Moment::zone(self : Moment) -> Zone? {
 /// How far the moment's clock is from UTC.
 pub fn Moment::utcoffset(self : Moment) -> Span? {
   match self.zone() {
-    Some(Utc) => Some(Span::of(minute, 0L))
-    Some(Offset(m)) => Some(Span::of(minute, m.to_int64()))
+    Some(zone) => Some(Span::of(second, zone.seconds().to_int64()))
     None => None
   }
 }
@@ -437,11 +433,7 @@ fn iso_zone(z : Zone?, show : Bool) -> String {
   match z {
     None => ""
     Some(Utc) => "Z"
-    Some(Offset(m)) => {
-      let sign = if m < 0 { "-" } else { "+" }
-      let a = if m < 0 { -m } else { m }
-      sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
-    }
+    Some(zone) => hhmmss(zone.seconds())
   }
 }
 

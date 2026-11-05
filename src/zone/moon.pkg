@@ -1,0 +1,10 @@
+// Named time zones: the TZif files RFC 9636 defines, the POSIX TZ strings a
+// file's footer carries, and the two questions a wall clock raises in a zone —
+// which instant it names, and what happens when it names none or two.
+//
+// A separate package because a calendar with a zone database is not the same
+// product as one without: a caller that formats an HTTP date should not have to
+// carry the database, and a caller that does need it wants the whole of it.
+import {
+  "moonbitstack/moondate",
+}

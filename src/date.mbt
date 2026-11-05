@@ -78,15 +78,45 @@ pub extend Time with Eq::{not_equal, equal}
 pub extend Time with Compare::{compare, op_lt, op_le, op_ge, op_gt}
 
 ///|
-/// How far the clock is from UTC, in minutes east of it.
+/// A zone named by a database, read at one instant.
+///
+/// The offset and the abbreviation are the ones in force at the instant the moment
+/// carries, which is what makes a `Zoned` a value: it can be compared, written and
+/// moved to another zone with no database in reach. Crossing a transition is a
+/// question for the rules, so a moment that has to survive one goes back through
+/// [`@zone.Tz::moment`](moonbitstack/moondate/zone).
+///
+/// The offset is in seconds east of UTC, because a zone's local mean time before
+/// standard time was adopted is not a whole number of minutes: New York ran
+/// 4:56:02 behind Greenwich. Offsets in whole minutes are what [`Zone::Offset`]
+/// carries, and [`Zone::seconds`] puts both on the same footing.
+#derive(Eq, Debug)
+pub(all) struct ZoneName {
+  name : String
+  offset : Int32
+  abbrev : String
+}
+
+///|
+pub extend ZoneName with Debug::{to_repr}
+
+///|
+pub extend ZoneName with Eq::{not_equal, equal}
+
+///|
+/// How far the clock is from UTC.
 ///
 /// `Utc` and `Offset(0)` are both midnight-at-Greenwich, but they are not the same
 /// thing to write down: RFC 3339 §4.3 gives `-00:00` to a timestamp whose offset is
 /// unknown, and `Z` to one that is genuinely UTC.
+///
+/// `Offset` counts minutes; `Named` counts seconds and carries the name the zone is
+/// filed under, so `VV` and a Go layout's `MST` have something to write.
 #derive(Eq, Debug)
 pub(all) enum Zone {
   Utc
   Offset(Int32)
+  Named(ZoneName)
 }
 
 ///|
@@ -94,6 +124,86 @@ pub extend Zone with Debug::{to_repr}
 
 ///|
 pub extend Zone with Eq::{not_equal, equal}
+
+///|
+/// How far east of UTC the zone is, in seconds.
+pub fn Zone::seconds(self : Zone) -> Int32 {
+  match self {
+    Utc => 0
+    Offset(minutes) => minutes * 60
+    Named(zone) => zone.offset
+  }
+}
+
+///|
+/// How far east of UTC the zone is, in minutes, rounded towards zero.
+///
+/// A named zone whose local mean time is not a whole number of minutes loses the
+/// remainder here, which is what the `%z` forms write and what every other
+/// implementation writes for those years.
+pub fn Zone::minutes(self : Zone) -> Int32 {
+  self.seconds() / 60
+}
+
+///|
+/// The name the zone is filed under: `EST5EDT` for a POSIX rule, the path in the
+/// database for a named zone.
+///
+/// A fixed offset has no name of its own, so it is spelled the way a POSIX rule
+/// spells one — `UTC`, `UTC-05:00` — which is what `VV` writes for it.
+pub fn Zone::name(self : Zone) -> String {
+  match self {
+    Utc => "Etc/UTC"
+    Offset(minutes) => where_text(minutes * 60, true)
+    Named(zone) =>
+      if zone.name == "" {
+        where_text(zone.offset, true)
+      } else {
+        zone.name
+      }
+  }
+}
+
+///|
+/// The abbreviation written for the zone: `EST`, `GMT`, `+0530`.
+///
+/// A named zone read from text that carried no abbreviation falls back to the
+/// numeric spelling, which is what a fixed offset writes anyway.
+pub fn Zone::abbrev(self : Zone) -> String {
+  match self {
+    Utc => "UTC"
+    Offset(minutes) => where_text(minutes * 60, false)
+    Named(zone) =>
+      if zone.abbrev == "" {
+        where_text(zone.offset, false)
+      } else {
+        zone.abbrev
+      }
+  }
+}
+
+///|
+/// A fixed offset as `UTC` and `UTC±HH:MM`, or as the bare `UTC±HH:MM` and
+/// `±HHMM` a zone abbreviation takes.
+fn where_text(seconds : Int32, named : Bool) -> String {
+  let sign = if seconds < 0 { "-" } else { "+" }
+  let a = if seconds < 0 { -seconds } else { seconds }
+  let hh = a / 3600
+  let mm = a % 3600 / 60
+  if named {
+    if a == 0 {
+      "UTC"
+    } else {
+      "UTC" + sign + pad(hh, 2) + ":" + pad(mm, 2)
+    }
+  } else if a == 0 {
+    "UTC"
+  } else if mm == 0 {
+    sign + pad(hh, 2)
+  } else {
+    sign + pad(hh, 2) + pad(mm, 2)
+  }
+}
 
 ///|
 /// A point in time, in one of the four shapes a format names.
@@ -330,14 +440,11 @@ pub fn Time::nanos(self : Time) -> Int64 {
 pub fn Moment::epoch(self : Moment) -> Int64? {
   match self {
     Zoned(date~, time~, zone~) => {
-      let offset = match zone {
-        Utc => 0
-        Offset(m) => m
-      }
+      let offset = zone.seconds()
       Some(
         date.days().to_int64() * 86400L +
         time.nanos() / 1_000_000_000L -
-        offset.to_int64() * 60L,
+        offset.to_int64(),
       )
     }
     _ => None

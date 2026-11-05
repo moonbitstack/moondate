@@ -218,10 +218,25 @@ pub impl Show for Time
 pub(all) enum Zone {
   Utc
   Offset(Int32)
+  Named(ZoneName)
 }
+pub fn Zone::abbrev(Self) -> String
 pub fn Zone::equal(Self, Self) -> Bool
+pub fn Zone::minutes(Self) -> Int32
+pub fn Zone::name(Self) -> String
 pub fn Zone::not_equal(Self, Self) -> Bool
+pub fn Zone::seconds(Self) -> Int32
 pub fn Zone::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneName {
+  name : String
+  offset : Int32
+  abbrev : String
+}
+pub fn ZoneName::equal(Self, Self) -> Bool
+pub fn ZoneName::not_equal(Self, Self) -> Bool
+pub fn ZoneName::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

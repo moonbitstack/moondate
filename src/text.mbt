@@ -116,6 +116,10 @@ fn time_of(s : String, from : Int32, end : Int32) -> Time raise Refused {
 
 ///|
 /// `Z`, `+HH:MM` or `-HH:MM` at `from`.
+///
+/// RFC 3339 §5.6 has no seconds field, so `+HH:MM:SS` is read for Temporal's sake:
+/// its grammar allows the seconds, and a zone read before standard time needs them
+/// to write an exact instant.
 fn zone_of(s : String, from : Int32) -> Zone raise Refused {
   let c = at(s, from)
   if c == 'Z' || c == 'z' {
@@ -124,8 +128,9 @@ fn zone_of(s : String, from : Int32) -> Zone raise Refused {
     }
     return Utc
   }
-  if s.length() - from != 6 || at(s, from + 3) != ':' {
-    raise Malformed("an offset is +HH:MM or -HH:MM")
+  let width = s.length() - from
+  if (width != 6 && width != 9) || at(s, from + 3) != ':' {
+    raise Malformed("an offset is +HH:MM[:SS] or -HH:MM[:SS]")
   }
   let hours = digits(s, from + 1, 2)
   let minutes = digits(s, from + 4, 2)
@@ -135,8 +140,23 @@ fn zone_of(s : String, from : Int32) -> Zone raise Refused {
   if minutes > 59 {
     raise Range(field="offset minute", got=minutes, low=0, high=59)
   }
-  let total = hours * 60 + minutes
-  Offset(if c == '-' { -total } else { total })
+  let mut seconds = 0
+  if width == 9 {
+    if at(s, from + 6) != ':' {
+      raise Malformed("an offset is +HH:MM[:SS] or -HH:MM[:SS]")
+    }
+    seconds = digits(s, from + 7, 2)
+    if seconds > 59 {
+      raise Range(field="offset second", got=seconds, low=0, high=59)
+    }
+  }
+  let total = hours * 3600 + minutes * 60 + seconds
+  let signed = if c == '-' { -total } else { total }
+  if signed % 60 != 0 {
+    Named({ name: "", offset: signed, abbrev: "", })
+  } else {
+    Offset(signed / 60)
+  }
 }
 
 ///|
@@ -232,14 +252,38 @@ fn text_of_time(t : Time) -> String {
 }
 
 ///|
+/// The offset part of a moment, in the minutes RFC 3339 has room for.
+///
+/// A named zone whose local mean time is not a whole number of minutes writes the
+/// offset rounded towards zero: the standard has no field for the remainder, and
+/// the value keeps it.
 fn text_of_zone(z : Zone) -> String {
   match z {
     Utc => "Z"
-    Offset(m) => {
-      let sign = if m < 0 { "-" } else { "+" }
-      let a = if m < 0 { -m } else { m }
-      sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
-    }
+    _ => hhmm(z.minutes())
+  }
+}
+
+///|
+/// `±HH:MM`.
+fn hhmm(minutes : Int32) -> String {
+  let sign = if minutes < 0 { "-" } else { "+" }
+  let a = if minutes < 0 { -minutes } else { minutes }
+  sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
+}
+
+///|
+/// `±HH:MM`, with `:SS` only when the offset is not a whole number of minutes.
+///
+/// Temporal's ISO grammar allows the seconds; RFC 3339 does not, so this is the
+/// one form written there.
+fn hhmmss(seconds : Int32) -> String {
+  let a = if seconds < 0 { -seconds } else { seconds }
+  let head = hhmm(seconds / 60)
+  if a % 60 == 0 {
+    head
+  } else {
+    head + ":" + pad(a % 60, 2)
   }
 }
 
@@ -279,10 +323,7 @@ pub fn Moment::http_text(self : Moment) -> String raise Refused {
   let (d, t) = match self {
     Zoned(date~, time~, zone~) => {
       // The header is always GMT, so an offset moment is moved onto it first.
-      let shift = match zone {
-        Utc => 0
-        Offset(m) => m
-      }
+      let shift = zone.minutes()
       match
         Zoned(date~, time~, zone=Utc).plus(Span::of(minute, -shift.to_int64())) {
         Zoned(date~, time~, ..) => (date, time)
