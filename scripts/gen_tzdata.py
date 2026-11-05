@@ -177,6 +177,10 @@ def main() -> int:
         action="store_true",
         help="write nothing; fail when data.mbt is not what the release gives",
     )
+    parser.add_argument(
+        "--keep",
+        help="also write the compendium to this directory, for zic to compile",
+    )
     args = parser.parse_args()
     files = read_dir(args.from_dir) if args.from_dir else fetch(args.release)
     text, version = compendium(files)
@@ -191,6 +195,12 @@ def main() -> int:
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(body)
+    if args.keep:
+        os.makedirs(args.keep, exist_ok=True)
+        with open(
+            os.path.join(args.keep, "tzdata.zi"), "w", encoding="utf-8", newline="\n"
+        ) as handle:
+            handle.write(text if text.endswith("\n") else text + "\n")
     zones = sum(1 for line in text.split("\n") if line.startswith("Z "))
     links = sum(1 for line in text.split("\n") if line.startswith("L "))
     rules = sum(1 for line in text.split("\n") if line.startswith("R "))

@@ -70,6 +70,7 @@
 <a href="#type-moondate-Span">Span</a>
 <a href="#type-moondate-Time">Time</a>
 <a href="#type-moondate-Zone">Zone</a>
+<a href="#type-moondate-ZoneName">ZoneName</a>
 <a href="#err-moondate-Refused">Refused</a>
 <a href="#fn-moondate">Functions</a>
 <a href="#const-moondate">Constants</a>
@@ -79,6 +80,22 @@
 <a href="#type-cron-Cron">Cron</a>
 <a href="#err-cron-Refused">Refused</a>
 <a href="#fn-cron">Functions</a>
+</div>
+<div class="group">
+<div class="pkg">@zone</div>
+<a href="#type-zone-ClockRule">ClockRule</a>
+<a href="#type-zone-Fold">Fold</a>
+<a href="#type-zone-Local">Local</a>
+<a href="#type-zone-Onset">Onset</a>
+<a href="#type-zone-Reading">Reading</a>
+<a href="#type-zone-Rule">Rule</a>
+<a href="#type-zone-Tz">Tz</a>
+<a href="#err-zone-Refused">Refused</a>
+</div>
+<div class="group">
+<div class="pkg">@tzdata</div>
+<a href="#fn-tzdata">Functions</a>
+<a href="#const-tzdata">Constants</a>
 </div>
 </nav>
       <div class="api-body">
@@ -285,12 +302,13 @@
 
 </article>
 <article class="api-item" id="m-moondate-Moment-isoformat">
-<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char, fraction? : Int32, offset? : Bool) -&gt; String</div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool) -&gt; String</div>
 <div class="doc"><p>The moment as ISO 8601 text, which is what [<code>Show</code>] writes.</p>
 <p><code>sep</code> is the character between the date and the time, <code>T</code> by default; any character works, and a space is what a log line wants.</p>
 <p><code>fraction</code> is the number of fractional-second digits, 0 to 9, truncated. Left out, it writes as many as the value needs and none for a whole second, which is Temporal's <code>auto</code>.</p>
-<p><code>offset</code> writes the zone the moment carries, <code>Z</code> for UTC and <code>±HH:MM</code> for an offset; <code>false</code> leaves the zone off, which is Temporal's <code>offset: "never"</code>.</p></div>
-<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
+<p><code>offset</code> writes the zone the moment carries, <code>Z</code> for UTC and <code>±HH:MM</code> for an offset; <code>false</code> leaves the zone off, which is Temporal's <code>offset: "never"</code>.</p>
+<p><code>zone_name</code> follows the offset with the name the zone is filed under, in brackets: <code>2026-11-01T01:30:00-04:00[America/New_York]</code>, which is Temporal's <code>timeZoneName: "critical"</code> and the only way the text keeps the name as well as the instant.</p></div>
+<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span><span class="p"><b>zone_name~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-moondate-Moment-of_epoch">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::of_epoch</span>(Int64, nano? : Int32, zone? : Zone) -&gt; Self</div>
@@ -576,9 +594,35 @@
 <section class="api-type" id="type-moondate-Zone">
 <div class="type-head"><h3>Zone</h3><span class="kind">enum</span></div>
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Zone</span></div>
-<div class="doc"><p>How far the clock is from UTC, in minutes east of it.</p>
-<p><code>Utc</code> and <code>Offset(0)</code> are both midnight-at-Greenwich, but they are not the same thing to write down: RFC 3339 §4.3 gives <code>-00:00</code> to a timestamp whose offset is unknown, and <code>Z</code> to one that is genuinely UTC.</p></div>
-<ul class="members"><li>Utc</li><li>Offset(Int32)</li></ul>
+<div class="doc"><p>How far the clock is from UTC.</p>
+<p><code>Utc</code> and <code>Offset(0)</code> are both midnight-at-Greenwich, but they are not the same thing to write down: RFC 3339 §4.3 gives <code>-00:00</code> to a timestamp whose offset is unknown, and <code>Z</code> to one that is genuinely UTC.</p>
+<p><code>Offset</code> counts minutes; <code>Named</code> counts seconds and carries the name the zone is filed under, so <code>VV</code> and a Go layout's <code>MST</code> have something to write.</p></div>
+<ul class="members"><li>Utc</li><li>Offset(Int32)</li><li>Named(ZoneName)</li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-Zone-abbrev">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::abbrev</span>(Self) -&gt; String</div>
+<div class="doc"><p>The abbreviation written for the zone: <code>EST</code>, <code>GMT</code>, <code>+0530</code>.</p>
+<p>A named zone read from text that carried no abbreviation falls back to the numeric spelling, which is what a fixed offset writes anyway.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Zone-minutes">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::minutes</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>How far east of UTC the zone is, in minutes, rounded towards zero.</p>
+<p>A named zone whose local mean time is not a whole number of minutes loses the remainder here, which is what the <code>%z</code> forms write and what every other implementation writes for those years.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Zone-name">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::name</span>(Self) -&gt; String</div>
+<div class="doc"><p>The name the zone is filed under: <code>EST5EDT</code> for a POSIX rule, the path in the database for a named zone.</p>
+<p>A fixed offset has no name of its own, so it is spelled the way a POSIX rule spells one — <code>UTC</code>, <code>UTC-05:00</code> — which is what <code>VV</code> writes for it.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Zone-seconds">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::seconds</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>How far east of UTC the zone is, in seconds.</p></div>
+
+</article>
+</div>
 <div class="method-list"><div class="mlabel">Trait methods</div>
 <article class="api-item" id="m-moondate-Zone-equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::equal</span>(Self, Self) -&gt; Bool</div>
@@ -597,11 +641,37 @@
 </article>
 </div>
 </section>
+<section class="api-type" id="type-moondate-ZoneName">
+<div class="type-head"><h3>ZoneName</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">ZoneName</span></div>
+<div class="doc"><p>A zone named by a database, read at one instant.</p>
+<p>The offset and the abbreviation are the ones in force at the instant the moment carries, which is what makes a <code>Zoned</code> a value: it can be compared, written and moved to another zone with no database in reach. Crossing a transition is a question for the rules, so a moment that has to survive one goes back through <a href="moonbitstack/moondate/zone"><code>@zone.Tz::moment</code></a>.</p>
+<p>The offset is in seconds east of UTC, because a zone's local mean time before standard time was adopted is not a whole number of minutes: New York ran 4:56:02 behind Greenwich. Offsets in whole minutes are what [<code>Zone::Offset</code>] carries, and [<code>Zone::seconds</code>] puts both on the same footing.</p></div>
+<ul class="members"><li><b>name</b> : <span class="pt">String</span></li><li><b>offset</b> : <span class="pt">Int32</span></li><li><b>abbrev</b> : <span class="pt">String</span></li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-ZoneName-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZoneName::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-ZoneName-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZoneName::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-ZoneName-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZoneName::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
 <div class="api-cat"><h3>Errors</h3></div>
 <section class="api-type" id="err-moondate-Refused">
 <div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
-<div class="doc"><p>Why an expression was refused.</p></div>
+<div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
+<p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
 <ul class="members"><li>Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)</li><li>Malformed(String)</li><li>Truncated(String)</li></ul>
 <div class="method-list"><div class="mlabel">Trait methods</div>
 <article class="api-item" id="m-moondate-Refused-equal">
@@ -891,7 +961,8 @@
 <section class="api-type" id="err-cron-Refused">
 <div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
-<div class="doc"><p>Why an expression was refused.</p></div>
+<div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
+<p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
 <ul class="members"><li>Fields(got~ : Int32)</li><li>Range(field~ : String, got~ : Int32, low~ : Int32, high~ : Int32)</li><li>Malformed(String)</li></ul>
 <div class="method-list"><div class="mlabel">Trait methods</div>
 <article class="api-item" id="m-cron-Refused-equal">
@@ -935,6 +1006,345 @@
 <p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is how a scheduler spells the day field it is not using.</p>
 <p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
 <div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
+</article>
+</section>
+<section class="api-pkg" id="pkg-zone">
+<header>
+<h2><span class="mono">@zone</span></h2>
+<div class="imp">import { "moonbitstack/moondate/zone" }</div>
+</header>
+<div class="api-cat"><h3>Types</h3></div>
+<section class="api-type" id="type-zone-ClockRule">
+<div class="type-head"><h3>ClockRule</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">ClockRule</span></div>
+<div class="doc"><p>When a change happens: which day, and how long after local midnight.</p>
+<p>The seconds can pass a day — Ireland's rules once changed the clocks at twenty-five hundred hours — because a rule is read as "so many hours after the start of that day", not as a time of day.</p></div>
+<ul class="members"><li><b>onset</b> : <span class="pt">Onset</span></li><li><b>seconds</b> : <span class="pt">Int32</span></li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-ClockRule-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ClockRule::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ClockRule-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ClockRule::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ClockRule-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ClockRule::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Fold">
+<div class="type-head"><h3>Fold</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Fold</span></div>
+<div class="doc"><p>Which side of a fold a wall clock lands on.</p>
+<p>Most zones move their clocks twice a year, so one hour of the year happens twice and another never happens at all. Asking a zone for an instant from a wall clock therefore has three defensible answers and one that refuses.</p>
+<p><code>Compatible</code> is what Python's <code>fold=0</code> and Temporal's <code>disambiguation: "compatible"</code> both do: the first of two repeated hours, the second of two skipped ones. <code>Earlier</code> and <code>Later</code> pick by instant. Python's <code>fold=1</code> is <code>Later</code> for a repeated clock and <code>Earlier</code> for a skipped one.</p></div>
+<ul class="members"><li>Compatible</li><li>Earlier</li><li>Later</li><li>Reject</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Fold-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Fold::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Fold-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Fold::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Fold-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Fold::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Local">
+<div class="type-head"><h3>Local</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Local</span></div>
+<div class="doc"><p>The instants a wall clock names in a zone.</p>
+<p>Zero, one or two, and the difference is not an edge case: a timestamp written by a program in a zone that observes daylight saving is ambiguous for one hour every autumn and impossible for one hour every spring, and both have to be handled rather than papered over.</p></div>
+<ul class="members"><li>Exact(instant~ : Int64)</li><li>Ambiguous(earlier~ : Int64, later~ : Int64)</li><li>Skipped(earlier~ : Int64, later~ : Int64)</li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-zone-Local-epoch">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Local::epoch</span>(Self, fold? : Fold) -&gt; Int64 <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant a wall clock names, under a policy for the two hours a year that have no single answer.</p></div>
+<div class="params"><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Local-is_exact">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Local::is_exact</span>(Self) -&gt; Bool</div>
+<div class="doc"><p>Whether the wall clock names exactly one instant.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Local-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Local::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Local-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Local::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Local-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Local::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Onset">
+<div class="type-head"><h3>Onset</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Onset</span></div>
+<div class="doc"><p>The day a daylight-saving rule changes the clocks on, as POSIX TZ strings write it.</p></div>
+<ul class="members"><li>MonthWeekDay(month~ : Int32, week~ : Int32, weekday~ : Int32)</li><li>Julian(n~ : Int32)</li><li>Days(n~ : Int32)</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Onset-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Onset::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Onset-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Onset::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Onset-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Onset::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Reading">
+<div class="type-head"><h3>Reading</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Reading</span></div>
+<div class="doc"><p>What a zone reads at one instant: the offset in force, whether daylight saving was on, and the abbreviation written for it.</p>
+<p><code>epoch</code> is when the reading began, not the instant it was asked about, so a table of readings doubles as the list of changes.</p></div>
+<ul class="members"><li><b>epoch</b> : <span class="pt">Int64</span></li><li><b>offset</b> : <span class="pt">Int32</span></li><li><b>is_dst</b> : <span class="pt">Bool</span></li><li><b>abbrev</b> : <span class="pt">String</span></li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Reading-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Reading::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Reading-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Reading::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Reading-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Reading::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Rule">
+<div class="type-head"><h3>Rule</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Rule</span></div>
+<div class="doc"><p>A POSIX TZ string: the standard offset, and either no daylight saving or the two changes that bracket it.</p>
+<p>RFC 8536 §3.3 puts one of these in every TZif footer, which is how a file that stops in 2037 still answers for 2100. The grammar is POSIX's <code>TZ</code>, extended there to allow a quoted name like <code>&lt;+0545&gt;</code> and seconds in the offsets.</p></div>
+<ul class="members"><li><b>std_offset</b> : <span class="pt">Int32</span></li><li><b>std_abbrev</b> : <span class="pt">String</span></li><li><b>dst_offset</b> : <span class="pt">Int32?</span></li><li><b>dst_abbrev</b> : <span class="pt">String</span></li><li><b>dst_start</b> : <span class="pt">ClockRule?</span></li><li><b>dst_end</b> : <span class="pt">ClockRule?</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-zone-Rule-at">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rule::at</span>(Self, Int64) -&gt; Reading</div>
+<div class="doc"><p>What the rule reads at an instant.</p>
+<p>The two changes are placed year by year rather than tabulated: a rule is a pattern, and asking it about a date a century out costs a handful of date computations, which is how a TZif footer answers past the end of its table.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Rule-parse">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rule::parse</span>(StringView) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A POSIX TZ string read.</p>
+<p><code>EST5EDT,M3.2.0,M11.1.0</code> is New York; <code>UTC0</code> is UTC; <code>&lt;+0545&gt;-5:45</code> is a fixed offset with a name that needs the angle brackets because of the sign. The offset in the string is what to *add* to local time to get UTC, so its sign is the opposite of the one a timestamp writes, which is the one trap in the whole format.</p></div>
+<div class="params"><span class="p"><b>text</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Rule-text">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rule::text</span>(Self) -&gt; String</div>
+<div class="doc"><p>The string a rule is written as, in the form [<code>Rule::parse</code>] reads.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Rule-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rule::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Rule-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rule::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Rule-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rule::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Tz">
+<div class="type-head"><h3>Tz</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">struct</span> <span class="name">Tz</span></div>
+<ul class="members"><li><b>name</b> : <span class="pt">String</span></li><li><b>readings</b> : <span class="pt">Array[Reading]</span></li><li><b>rule</b> : <span class="pt">Rule?</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-zone-Tz-abbrev">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::abbrev</span>(Self, Int64) -&gt; String</div>
+<div class="doc"><p>The abbreviation the zone writes at an instant.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-at">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::at</span>(Self, Int64) -&gt; Reading</div>
+<div class="doc"><p>What the zone reads at an instant.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-changes">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::changes</span>(Self, from~ : Int64, to~ : Int64) -&gt; Array[Reading]</div>
+<div class="doc"><p>The readings that begin between two instants, <code>from</code> included and <code>to</code> not.</p></div>
+<div class="params"><span class="p"><b>from~</b> <span class="pt">Int64</span></span><span class="p"><b>to~</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-epoch">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::epoch</span>(Self, @moondate.Date, @moondate.Time, fold? : Fold) -&gt; Int64 <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant a wall clock names, under a policy for the two hours a year that have no single answer.</p></div>
+<div class="params"><span class="p"><b>date</b> <span class="pt">@moondate.Date</span></span><span class="p"><b>time</b> <span class="pt">@moondate.Time</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-is_dst">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::is_dst</span>(Self, Int64) -&gt; Bool</div>
+<div class="doc"><p>Whether daylight saving was on at an instant.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-moment">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::moment</span>(Self, Int64, nano? : Int32) -&gt; @moondate.Moment</div>
+<div class="doc"><p>The instant <code>epoch</code> read in this zone.</p>
+<p>This is the direction that needs no policy: an instant is one instant, and the zone only says what the clock read at it.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span><span class="p"><b>nano~</b> <span class="pt">Int32</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-name">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::name</span>(Self) -&gt; String</div>
+<div class="doc"><p>The name the zone is filed under.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Tz-of">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::of</span>(name~ : String, readings~ : Array[Reading], rule? : Rule) -&gt; Self</div>
+<div class="doc"><p>A zone built from readings that were computed elsewhere.</p>
+<p>The first reading is the one in force from the beginning of time; the rest each begin at their own <code>epoch</code>. A zone database that is not a TZif file — a table of its own, a test fixture — comes in through here.</p></div>
+<div class="params"><span class="p"><b>name~</b> <span class="pt">String</span></span><span class="p"><b>readings~</b> <span class="pt">Array[Reading]</span></span><span class="p"><b>rule?</b> <span class="pt">Rule</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-offset">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::offset</span>(Self, Int64) -&gt; Int32</div>
+<div class="doc"><p>How far east of UTC the zone is at an instant, in seconds.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-parse">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::parse</span>(Bytes, name? : String) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A TZif file read (RFC 9636).</p>
+<p>Versions 1 to 4 are read. A version 2 file carries the same zone twice — once in 32-bit transition times, once in 64-bit — and the second copy is the one used, because it is the one that keeps the years past 2038.</p>
+<p>Leap-second records are checked for shape and then left alone: a zone answers for civil time, and this library already lets a <code>Time</code> hold the sixtieth second of a minute, so a leap second needs no table here.</p></div>
+<div class="params"><span class="p"><b>bytes</b> <span class="pt">Bytes</span></span><span class="p"><b>name~</b> <span class="pt">String</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-read">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::read</span>(Self, @moondate.Date, @moondate.Time) -&gt; Local</div>
+<div class="doc"><p>The instants a wall clock names in this zone.</p></div>
+<div class="params"><span class="p"><b>date</b> <span class="pt">@moondate.Date</span></span><span class="p"><b>time</b> <span class="pt">@moondate.Time</span></span></div>
+</article>
+<article class="api-item" id="m-zone-Tz-readings">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::readings</span>(Self) -&gt; Array[Reading]</div>
+<div class="doc"><p>The readings the zone has been through, oldest first.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Tz-rule">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::rule</span>(Self) -&gt; Rule?</div>
+<div class="doc"><p>The rule that carries on past the last reading, when the zone has one.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Tz-zoned">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::zoned</span>(Self, @moondate.Moment, fold? : Fold) -&gt; @moondate.Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A wall clock pinned to this zone.</p>
+<p>A moment that already names an instant is moved to this zone instead, which is what <a href="moonbitstack/moondate"><code>@moondate.Moment::astimezone</code></a> does with a fixed offset and this does with a whole database.</p></div>
+<div class="params"><span class="p"><b>moment</b> <span class="pt">@moondate.Moment</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+</div>
+</section>
+<div class="api-cat"><h3>Errors</h3></div>
+<section class="api-type" id="err-zone-Refused">
+<div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
+<div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
+<p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
+<ul class="members"><li>Malformed(kind~ : String, at~ : Int32)</li><li>Truncated(want~ : Int32, got~ : Int32)</li><li>Unsupported(version~ : Char)</li><li>Unknown(name~ : String)</li><li>Missing(text~ : String)</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Refused-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Refused-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Refused-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Refused-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Refused-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+</section>
+<section class="api-pkg" id="pkg-tzdata">
+<header>
+<h2><span class="mono">@tzdata</span></h2>
+<div class="imp">import { "moonbitstack/moondate/tzdata" }</div>
+</header>
+<div class="api-cat" id="fn-tzdata"><h3>Functions</h3></div>
+<article class="api-item" id="fn-tzdata-find">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">find</span>(StringView) -&gt; @zone.Tz?</div>
+<div class="doc"><p>The zone filed under <code>name</code>, or <code>None</code> when the database has no such name.</p></div>
+<div class="params"><span class="p"><b>name</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-tzdata-links">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">links</span>() -&gt; Array[(String, String)]</div>
+<div class="doc"><p>The aliases the database keeps, each with the zone it names: <code>(alias, zone)</code>.</p>
+<p>A link is a name a country used to be filed under, or the name of a city that shares a zone with another: <code>Asia/Calcutta</code> is <code>Asia/Kolkata</code>, and a caller that stored the old name should go on getting the right answer.</p></div>
+
+</article>
+<article class="api-item" id="fn-tzdata-load">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">load</span>(StringView) -&gt; @zone.Tz <span class="kw">raise</span> @zone.Refused</div>
+<div class="doc"><p>The zone filed under <code>name</code>, which may be an alias.</p>
+<p>The zone is compiled from the release's source the first time it is asked for, which is a table of a few hundred readings per zone; a program that needs a dozen zones pays for a dozen.</p></div>
+<div class="params"><span class="p"><b>name</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-tzdata-zones">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">zones</span>() -&gt; Array[String]</div>
+<div class="doc"><p>Every name the database knows, the aliases included, in order.</p></div>
+
+</article>
+<div class="api-cat" id="const-tzdata"><h3>Constants</h3></div>
+<article class="api-item" id="const-tzdata-release">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">release</span> : String</div>
+<div class="doc"><p>The IANA release this package carries.</p></div>
+
+</article>
+<article class="api-item" id="const-tzdata-source_digest">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">source_digest</span> : String</div>
+<div class="doc"><p>The SHA-256 of the source text below, so a release can be recognised without reading the whole of it.</p></div>
+
 </article>
 </section>
       </div>

@@ -1,0 +1,88 @@
+name: Tzdata
+
+# The IANA time zone database has a new release roughly twice a month. This looks
+# for one, rebuilds everything that comes out of it — the source text, the TZif
+# files the vectors are read from, the vectors themselves — and opens a pull
+# request with the result. Nothing is published from here: the pull request is
+# reviewed like any other change.
+
+on:
+  schedule:
+    # The first and the fifteenth, a little after the releases usually land.
+    - cron: "17 4 1,15 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: install moonbit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: install go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: read the newest release
+        run: python3 scripts/gen_tzdata.py --keep "$RUNNER_TEMP/tz"
+
+      - name: name the release
+        id: release
+        run: |
+          version="$(sed -n 's/^pub let release : String = "\(.*\)"/\1/p' src/tzdata/data.mbt)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git diff --quiet -- src/tzdata/data.mbt; then
+            echo "carried=$version" >> "$GITHUB_OUTPUT"
+          else
+            echo "carried=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: compile the tree and rebuild the vectors
+        if: steps.release.outputs.carried == ''
+        run: |
+          zic -b fat -d "$RUNNER_TEMP/tzif" "$RUNNER_TEMP/tz/tzdata.zi"
+          python3 scripts/tz_vectors/build.py --tzif "$RUNNER_TEMP/tzif"
+
+      - name: check, format and test
+        if: steps.release.outputs.carried == ''
+        run: |
+          moon update
+          moon fmt
+          moon check --target all --deny-warn
+          moon test --target native
+
+      - name: open a pull request
+        if: steps.release.outputs.carried == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          branch="tzdata/$VERSION"
+          git config user.name "moonbitstack"
+          git config user.email "moonbitstack@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -s -m "chore(moondate): the IANA database at $VERSION."
+          git push origin "$branch"
+          cat > "$RUNNER_TEMP/body.md" <<'BODY'
+          The IANA release named in the title has been published. This is what
+          `scripts/gen_tzdata.py` and `scripts/tz_vectors/build.py` make of it: the
+          compendium the package carries, and the vectors every transition of every
+          zone is replayed against.
+
+          The tests are the same ones CI runs on master.
+          BODY
+          gh pr create --base master --head "$branch" \
+            --title "chore(moondate): the IANA database at $VERSION." \
+            --body-file "$RUNNER_TEMP/body.md"

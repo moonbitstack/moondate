@@ -15,8 +15,9 @@ Dates, times, instants, durations and cron schedules.
 ---
 
 A calendar with the arithmetic that goes with it, the five ways to write a moment
-that C, Python, Rust, Go and JavaScript each speak, and a second package that
-answers when a schedule fires next.
+that C, Python, Rust, Go and JavaScript each speak, a second package that answers
+when a schedule fires next, and two more that carry the IANA time zone database
+for the callers who need it.
 
 ```bash
 moon add moonbitstack/moondate
@@ -97,9 +98,11 @@ table: `%f` is Python's six digits (chrono's nine are `%9f` or `%N`), `%Z` write
 sign and the letter — `-` drops the padding, `_` pads with spaces, `0` pads with
 zeros, a number sets the width, `^` and `#` change the case of a name — and the
 C99 selectors `E` and `O` are kept: `%Ec` is `%c`, `%Ez` is `+08:00` and `%Oz` is
-`+0800`. The Go layout and the LDML pattern work against a fixed offset rather than
-a zone database, so their zone letters fall back to the offset (`GMT±HH:MM` in
-LDML), which is what ICU and babel do for a zone they only know by its offset.
+`+0800`. A moment that carries only a fixed offset has no name to write, so the
+zone letters in a Go layout and an LDML pattern fall back to the offset
+(`GMT±HH:MM` in LDML), which is what ICU and babel do for a zone they only know by
+its offset. Give the moment a name — the next section is how — and `%Z`, LDML's
+`z` and `V`, and a Go layout's `MST` write the name the database gave it.
 
 ```moonbit
 m.strftime("%#B %10Y %-d")                     // SEPTEMBER 0000002026 22
@@ -119,6 +122,87 @@ directives, a Rust program for chrono's additions, Go for the layout, Babel for
 LDML, and Node for the ECMAScript strings — and are committed under `src/`; CI only
 replays them. The generators are in `scripts/`.
 
+## Time zones
+
+The calendar above has no database behind it, on purpose: `Zone` is a fixed offset,
+which is everything a package with no I/O can honestly carry. The database is two
+packages beside it, and they are separate because a caller that formats an HTTP
+date should not have to carry a hundred kilobytes of rules it never reads.
+
+| Package | What it is |
+|:--|:--|
+| `moonbitstack/moondate/zone` | A TZif file read (RFC 9636), the POSIX TZ strings a file's footer carries, and the question every wall clock raises in a zone |
+| `moonbitstack/moondate/tzdata` | The IANA release itself, compiled from its own source the first time a zone is asked for |
+
+```moonbit
+let tz = @tzdata.load("America/New_York")
+let moment = tz.moment(1790058605)                  // 2026-09-22T02:30:05-04:00
+moment.strftime("%H:%M %Z %z")                      // 02:30 EDT -0400
+moment.pattern("VV")                                // America/New_York
+moment.layout(@moondate.RFC1123)                    // Tue, 22 Sep 2026 02:30:05 EDT
+moment.isoformat(zone_name=true)                    // 2026-09-22T02:30:05-04:00[America/New_York]
+```
+
+A moment that carries a name carries the offset in force at that instant as well,
+so it stays a value: it can be compared, written and moved to another zone with no
+database in reach. Crossing a transition is the one thing a value cannot do, which
+is what `Tz::moment` is for.
+
+### The two hours that have no single answer
+
+Twice a year a wall clock is a bad question. In most of the world one hour of a
+spring morning never happens and one hour of an autumn night happens twice, and a
+timestamp written by a program in that zone has to be read as one of the two.
+
+| `fold` | A clock read twice | A clock never read |
+|:--|:--|:--|
+| `Compatible` (default) | the earlier instant | the later instant |
+| `Earlier` / `Later` | by instant | by instant |
+| `Reject` | refuses | refuses |
+
+```moonbit
+let tz = @tzdata.load("America/New_York")
+tz.read(@moondate.Date::new(2026, 3, 8), @moondate.Time::new(2, 30))
+// never, between 1772951400 and 1772955000
+tz.read(@moondate.Date::new(2026, 11, 1), @moondate.Time::new(1, 30))
+// twice, at 1793511000 and 1793514600
+```
+
+`Compatible` is what most callers mean and what the other implementations do by
+default; `Reject` is there for a program that would rather stop than pick.
+
+### Interface
+
+| Type | Built with | Asked |
+|:--|:--|:--|
+| `Tz` | `@zone.Tz::parse(bytes)`, `@zone.Tz::of`, `@tzdata.load(name)` | `name`, `at`, `offset`, `abbrev`, `is_dst`, `changes`, `read`, `epoch`, `moment`, `zoned`, `readings`, `rule` |
+| `Reading` | — | the fields: when it began, the offset in seconds, whether daylight saving was on, the abbreviation |
+| `Local` | `Tz::read` | `epoch(fold~)`, `is_exact` |
+| `Rule` | `Rule::parse` | `text`, `at` |
+| `Tz` from the database | `@tzdata.load`, `@tzdata.find` | the same, plus `@tzdata.zones`, `@tzdata.links`, `@tzdata.release` |
+
+Free functions in `zone`: `Tz::parse`, `Rule::parse`. In `tzdata`: `zones`,
+`links`, `load`, `find`. Constants: `@tzdata.release` names the IANA version
+carried and `@tzdata.source_digest` is the SHA-256 of the source text, so a release
+can be recognised without reading it.
+
+Errors are `zone.Refused`: `Malformed` carries what was expected and the byte it
+stopped at, `Truncated` the size it wanted and the size it got, `Unsupported` the
+TZif version it cannot read, `Unknown` a zone name no database has, and `Missing`
+a wall clock that never happens when the policy is to refuse rather than guess.
+
+### Where the data comes from
+
+The package carries `tzdata.zi`, the release's own compendium of the `Rule`,
+`Zone` and `Link` lines its editors maintain: 105 kB, a tenth the size of the
+compiled tree, and readable in a diff when a release lands. `scripts/gen_tzdata.py`
+fetches a release and rewrites `src/tzdata/data.mbt`; a workflow checks twice a
+month for a new one and opens a pull request when there is.
+
+Nothing in the database is a stub or a subset: every one of the 598 names the
+release has is compiled from the same rules, and the transitions are the ones the
+release's own `zic` writes.
+
 ## Interface
 
 Types are listed with the calls that matter most; the [API reference](https://moonbitstack.github.io/moondate/api.html)
@@ -130,7 +214,7 @@ has every method and every parameter.
 | `Time` | `Time::new`, `midnight`, `end_of_day` | `nanos`, `replace` |
 | `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
 | `Span` | `Span::new`, `of`, `nanosecond` … `day` | `add`, `sub`, `seconds`, `total_seconds`, `parts`, `neg`, `abs` |
-| `Zone` | `Utc`, `Offset(minutes)` | — |
+| `Zone` | `Utc`, `Offset(minutes)`, `Named(name, offset, abbrev)` | `seconds`, `minutes`, `name`, `abbrev` |
 | `Cron` | `@cron.parse` | `matches`, `next` |
 
 Free functions: `parse`, `of_isoformat`, `strptime`, `parse_layout`,
@@ -157,6 +241,7 @@ prints. Run one with `moon run src/examples/hello`.
 | [`wire`](src/examples/wire) | HTTP dates in three formats, ASN.1 time in two, and the refusals. |
 | [`format`](src/examples/format) | One moment through all five styles: `%` directives, Go layout, LDML pattern, ECMAScript. |
 | [`schedule`](src/examples/schedule) | Cron expressions: what they mean, the next few firings, the or-rule, the refusals. |
+| [`worldclock`](src/examples/worldclock) | Five cities at one instant, and the two hours of the year that need a decision. |
 
 ## cron
 
@@ -181,17 +266,16 @@ instead of searching forever.
 
 The calendar is `date.mbt`, the wire formats are `text.mbt`, the `%` directives
 are `strftime.mbt`, the Go layout is `layout.mbt`, the LDML pattern is
-`pattern.mbt`, the rest of the surface is `python.mbt`, and the schedule is
-`cron/`. Each public item has a doc comment saying what it does and, where there
-is a rule behind it, which specification the rule comes from.
+`pattern.mbt`, the rest of the surface is `python.mbt`, the schedule is `cron/`,
+the TZif reader and the POSIX rules are `zone/`, and the database is `tzdata/`.
+Each public item has a doc comment saying what it does and, where there is a rule
+behind it, which specification the rule comes from.
 
 There is no `now()`. Reading the clock is I/O, this package has none, so a caller
 passes what its own clock said to `Moment::of_epoch`.
 
-Named zones — daylight saving, the IANA database — are not here. `Zone` is a
-fixed offset. A zone database is a different thing with a different update
-cadence, and `%Z` writes `UTC`, or `UTC±HH:MM` for a fixed offset, rather than
-inventing a name it cannot recover.
+This package never reads a file and never reads a clock. A zone database is a file,
+and it is in `zone/` and `tzdata/` for the callers who need one.
 
 ## Licence
 

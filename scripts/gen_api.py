@@ -661,11 +661,26 @@ def main() -> None:
     root_mbti = SRC / "pkg.generated.mbti"
     cron_sources = [SRC / "cron" / "cron.mbt"]
     cron_mbti = SRC / "cron" / "pkg.generated.mbti"
+    zone_sources = [
+        SRC / "zone" / "zone.mbt",
+        SRC / "zone" / "rule.mbt",
+        SRC / "zone" / "tzif.mbt",
+    ]
+    zone_mbti = SRC / "zone" / "pkg.generated.mbti"
+    tzdata_sources = [SRC / "tzdata" / "tzdata.mbt", SRC / "tzdata" / "data.mbt"]
+    tzdata_mbti = SRC / "tzdata" / "pkg.generated.mbti"
 
     root_model = build_package(root_mbti, root_sources, docs, params)
     cron_model = build_package(cron_mbti, cron_sources, docs, params)
+    zone_model = build_package(zone_mbti, zone_sources, docs, params)
+    tzdata_model = build_package(tzdata_mbti, tzdata_sources, docs, params)
 
-    packages = [("moondate", root_model), ("cron", cron_model)]
+    packages = [
+        ("moondate", root_model),
+        ("cron", cron_model),
+        ("zone", zone_model),
+        ("tzdata", tzdata_model),
+    ]
     html_out = render(packages, docs, params)
     OUT.write_text(html_out, encoding="utf-8", newline="\n")
     print(f"wrote {OUT.relative_to(ROOT)}")

@@ -121,6 +121,22 @@ pub extend Local with Debug::{to_repr}
 pub extend Local with Eq::{not_equal, equal}
 
 ///|
+/// A `Local` as a sentence: `once, at 1793511000`, `twice, at 1793511000 and
+/// 1793514600`, `never, between 1772951400 and 1772955000`.
+pub impl Show for Local with fn output(self, logger) {
+  match self {
+    Exact(instant~) => logger.write_string("once, at \{instant}")
+    Ambiguous(earlier~, later~) =>
+      logger.write_string("twice, at \{earlier} and \{later}")
+    Skipped(earlier~, later~) =>
+      logger.write_string("never, between \{earlier} and \{later}")
+  }
+}
+
+///|
+pub extend Local with Show::{to_string, output}
+
+///|
 /// The instant a wall clock names, under a policy for the two hours a year that
 /// have no single answer.
 pub fn Local::epoch(

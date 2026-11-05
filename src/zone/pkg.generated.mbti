@@ -55,7 +55,10 @@ pub fn Local::epoch(Self, fold? : Fold) -> Int64 raise Refused
 pub fn Local::equal(Self, Self) -> Bool
 pub fn Local::is_exact(Self) -> Bool
 pub fn Local::not_equal(Self, Self) -> Bool
+pub fn Local::output(Self, &Logger) -> Unit
 pub fn Local::to_repr(Self) -> @debug.Repr
+pub fn Local::to_string(Self) -> String
+pub impl Show for Local
 
 #derive(Eq, @debug.Debug)
 pub(all) enum Onset {

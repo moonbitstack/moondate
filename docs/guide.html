@@ -92,6 +92,7 @@
           <li><a href="#writing">Five ways to write</a></li>
           <li><a href="#calendar">Calendar arithmetic</a></li>
           <li><a href="#instants">Instants and zones</a></li>
+          <li><a href="#named-zones">Named zones</a></li>
           <li><a href="#durations">Durations</a></li>
           <li><a href="#wire">HTTP and ASN.1</a></li>
           <li><a href="#cron">Schedules with cron</a></li>
@@ -302,8 +303,54 @@ None</div>
           <p>There is no <span class="mono">now()</span>: reading the clock is I/O, and this package has none. A caller that wants the current moment passes its own clock's reading to <span class="mono">Moment::of_epoch</span>.</p>
         </article>
 
+        <article class="step" id="named-zones">
+          <h2><span class="n">06</span> Named zones</h2>
+          <p>An offset is not a zone. The same <span class="mono">-04:00</span> is New York in July and nowhere in particular in January, and only a database can tell you which. It lives in <span class="mono">tzdata</span>, a package of its own so that a program which formats an HTTP date does not have to carry it.</p>
+          <div class="code">
+            <div class="bar"><span class="name">named.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let tz = @tzdata.load("America/New_York")
+  let moment = tz.moment(1790058605L)
+  println(moment)
+  println(moment.strftime("%H:%M %Z %z"))
+  println(moment.pattern("VV"))
+  println(moment.layout(@moondate.RFC1123))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22T02:30:05-04:00
+02:30 EDT -0400
+America/New_York
+Tue, 22 Sep 2026 02:30:05 EDT</div>
+          <p>The moment carries the name and the offset in force at that instant, so it goes on being a value: it compares, formats and moves to another zone with no database in reach. What it cannot do is cross a transition on its own — <span class="mono">Tz::moment</span> is how it comes back for that.</p>
+          <p>A wall clock is the harder question. Twice a year one hour never happens and one happens twice, so a zone answers with which instants the clock names, and the caller says what to do about it:</p>
+          <div class="code">
+            <div class="bar"><span class="name">fold.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let tz = @tzdata.load("America/New_York")
+  let spring = tz.read(
+    @moondate.Date::new(2026, 3, 8),
+    @moondate.Time::new(2, 30),
+  )
+  println(spring)
+  println(spring.epoch())
+  let autumn = tz.read(
+    @moondate.Date::new(2026, 11, 1),
+    @moondate.Time::new(1, 30),
+  )
+  println(autumn)
+  println(autumn.epoch(fold=Later))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>never, between 1772951400 and 1772955000
+1772955000
+twice, at 1793511000 and 1793514600
+1793514600</div>
+          <p><span class="mono">fold=Compatible</span>, the default, is the answer most callers mean: the first of two repeated hours and the second of two skipped ones. <span class="mono">Earlier</span> and <span class="mono">Later</span> pick by instant, and <span class="mono">Reject</span> refuses rather than picking.</p>
+          <p>If the zone is already a TZif file on disk, the reader is in <span class="mono">zone</span> and needs no database: <span class="mono">@zone.Tz::parse(bytes)</span> takes the file's bytes and gives back the same <span class="mono">Tz</span>. A file written before 2038 still answers for 2100, because the POSIX rule in its footer is read rather than expanded.</p>
+        </article>
+
         <article class="step" id="durations">
-          <h2><span class="n">06</span> Durations</h2>
+          <h2><span class="n">07</span> Durations</h2>
           <p>A <span class="mono">Span</span> is a length of time, to the nanosecond, with no calendar attached. Add one to a moment and it carries across midnight; add one to a bare time and it wraps within the day.</p>
           <div class="code">
             <div class="bar"><span class="name">spans.mbt</span><button class="copy" data-copy="self">Copy</button></div>
@@ -326,7 +373,7 @@ None</div>
         </article>
 
         <article class="step" id="wire">
-          <h2><span class="n">07</span> HTTP and ASN.1</h2>
+          <h2><span class="n">08</span> HTTP and ASN.1</h2>
           <p>The same instant has a different spelling on an HTTP header and inside a certificate. Both readers apply the two-digit-year window their own specification names — and those windows differ.</p>
           <div class="code">
             <div class="bar"><span class="name">wire.mbt</span><button class="copy" data-copy="self">Copy</button></div>
@@ -344,7 +391,7 @@ Sun, 06 Nov 1994 08:49:37 GMT
         </article>
 
         <article class="step" id="cron">
-          <h2><span class="n">08</span> Schedules with cron</h2>
+          <h2><span class="n">09</span> Schedules with cron</h2>
           <p><span class="mono">@cron.parse</span> takes five fields as crontab(5) defines them, or six with seconds in front. <span class="mono">next</span> answers with the first moment strictly after a given one, or <span class="mono">None</span> when the expression names no day that exists.</p>
           <div class="code">
             <div class="bar"><span class="name">schedule.mbt</span><button class="copy" data-copy="self">Copy</button></div>
