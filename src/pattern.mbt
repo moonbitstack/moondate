@@ -35,7 +35,7 @@ pub fn Moment::pattern(self : Moment, pattern : StringView) -> String {
   let toks = scan_pattern(pattern.to_owned())
   let out = StringBuilder()
   for i = 0; i < toks.length(); i = i + 1 {
-    write_ptoken(out, toks[i], d, t, off)
+    write_ptoken(out, toks[i], d, t, off, z)
   }
   out.to_string()
 }
@@ -266,6 +266,7 @@ fn write_ptoken(
   d : Date,
   t : Time,
   off : Int32,
+  z : Zone?,
 ) -> Unit {
   if tok.is_lit {
     out.write_string(tok.lit)
@@ -361,10 +362,13 @@ fn write_ptoken(
           count,
         ),
       )
-    'z' => out.write_string(zone_z(off, count))
+    'z' => out.write_string(zone_name_text(z, off, count))
     'Z' => out.write_string(zone_Z(off, count))
     'O' => out.write_string(zone_O(off, count))
-    'v' | 'V' => out.write_string(zone_z(off, count))
+    // `V` is the zone's identity and `v` its generic name; only the first has a
+    // spelling without a name to write.
+    'V' => out.write_string(zone_identity(z, off))
+    'v' => out.write_string(zone_name_text(z, off, count))
     'X' => out.write_string(zone_X(off, count, false))
     'x' => out.write_string(zone_X(off, count, true))
     other =>
@@ -509,6 +513,29 @@ fn zone_z(off : Int32, count : Int32) -> String {
     "UTC"
   } else {
     offset_plain(off, false)
+  }
+}
+
+///|
+/// `z`: the zone's name — `EST`, `+0530` — or, for a moment that carries only an
+/// offset, the offset in the spelling LDML asks for.
+///
+/// The long forms ask for a name like `Eastern Standard Time`, which lives in the
+/// locale data rather than in a zone, so a zone keeps its abbreviation there too.
+fn zone_name_text(z : Zone?, off : Int32, count : Int32) -> String {
+  match z {
+    Some(Named(zone)) => zone.abbrev
+    _ => zone_z(off, count)
+  }
+}
+
+///|
+/// `V`: where the zone is, `America/New_York` for a named one and the POSIX
+/// spelling of a fixed offset for the others.
+fn zone_identity(z : Zone?, off : Int32) -> String {
+  match z {
+    Some(zone) => zone.name()
+    None => offset_plain(off, false)
   }
 }
 

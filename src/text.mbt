@@ -44,10 +44,20 @@ pub fn parse(src : StringView) -> Moment raise Refused {
   if sep != 'T' && sep != 't' && sep != ' ' {
     raise Malformed("a date and a time are joined by T or a space")
   }
-  // The zone, if any, begins at the first Z or at a sign that is not part of the
-  // time — which is any sign at all, since the time itself carries none.
-  let mut cut = s.length()
+  // A zone may be named after the offset, the way Temporal writes one:
+  // `2026-11-01T01:30:00-04:00[America/New_York]`. The name goes to the end.
+  let mut bracket = s.length()
   for i = rest + 6; i < s.length(); i = i + 1 {
+    if at(s, i) == '[' {
+      bracket = i
+      break
+    }
+  }
+  let name = if bracket < s.length() { bracket_name_of(s, bracket) } else { "" }
+  // The offset, if any, begins at the first Z or at a sign that is not part of the
+  // time — which is any sign at all, since the time itself carries none.
+  let mut cut = bracket
+  for i = rest + 6; i < bracket; i = i + 1 {
     let c = at(s, i)
     if c == 'Z' || c == 'z' || c == '+' || c == '-' {
       cut = i
@@ -55,10 +65,33 @@ pub fn parse(src : StringView) -> Moment raise Refused {
     }
   }
   let time = time_of(s, rest + 6, cut)
-  if cut == s.length() {
-    return Plain(date~, time~)
+  if cut == bracket {
+    if name == "" {
+      return Plain(date~, time~)
+    }
+    // A name on its own is not an instant: the offset is what says when it was.
+    raise Malformed("a bracketed zone needs an offset to go with it")
   }
-  Zoned(date~, time~, zone=zone_of(s, cut))
+  Zoned(date~, time~, zone=with_name(zone_of(s, cut, bracket), name))
+}
+
+///|
+/// `[America/New_York]` at `from`, as the name inside it.
+fn bracket_name_of(s : String, from : Int32) -> String raise Refused {
+  if s.length() < from + 3 || at(s, s.length() - 1) != ']' {
+    raise Malformed("a zone name is written [America/New_York]")
+  }
+  s[from + 1:s.length() - 1].to_owned()
+}
+
+///|
+/// The zone a moment carries, with the name the text gave it.
+fn with_name(zone : Zone, name : String) -> Zone {
+  if name == "" {
+    zone
+  } else {
+    Named({ name, offset: zone.seconds(), abbrev: "", })
+  }
 }
 
 ///|
@@ -120,15 +153,15 @@ fn time_of(s : String, from : Int32, end : Int32) -> Time raise Refused {
 /// RFC 3339 §5.6 has no seconds field, so `+HH:MM:SS` is read for Temporal's sake:
 /// its grammar allows the seconds, and a zone read before standard time needs them
 /// to write an exact instant.
-fn zone_of(s : String, from : Int32) -> Zone raise Refused {
+fn zone_of(s : String, from : Int32, end : Int32) -> Zone raise Refused {
   let c = at(s, from)
   if c == 'Z' || c == 'z' {
-    if s.length() != from + 1 {
+    if end != from + 1 {
       raise Malformed("trailing characters after Z")
     }
     return Utc
   }
-  let width = s.length() - from
+  let width = end - from
   if (width != 6 && width != 9) || at(s, from + 3) != ':' {
     raise Malformed("an offset is +HH:MM[:SS] or -HH:MM[:SS]")
   }

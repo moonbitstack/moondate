@@ -367,18 +367,25 @@ pub fn Moment::ordinal(self : Moment) -> Int32? {
 ///
 /// `offset` writes the zone the moment carries, `Z` for UTC and `±HH:MM` for an
 /// offset; `false` leaves the zone off, which is Temporal's `offset: "never"`.
+///
+/// `zone_name` follows the offset with the name the zone is filed under, in
+/// brackets: `2026-11-01T01:30:00-04:00[America/New_York]`, which is Temporal's
+/// `timeZoneName: "critical"` and the only way the text keeps the name as well as
+/// the instant.
 pub fn Moment::isoformat(
   self : Moment,
   sep~ : Char = 'T',
   fraction? : Int32,
   offset~ : Bool = true,
+  zone_name~ : Bool = false,
 ) -> String {
   match self {
     Zoned(date~, time~, zone~) =>
       iso_date(date) +
       sep.to_string() +
       iso_time(time, fraction) +
-      iso_zone(Some(zone), offset)
+      iso_zone(Some(zone), offset) +
+      bracket(zone, zone_name)
     Plain(date~, time~) =>
       iso_date(date) + sep.to_string() + iso_time(time, fraction)
     Day(date~) => iso_date(date)
@@ -434,6 +441,20 @@ fn iso_zone(z : Zone?, show : Bool) -> String {
     None => ""
     Some(Utc) => "Z"
     Some(zone) => hhmmss(zone.seconds())
+  }
+}
+
+///|
+/// The name a zone is filed under, in brackets, when the text asks for it.
+fn bracket(zone : Zone, wanted : Bool) -> String {
+  match zone {
+    Named(name) =>
+      if wanted && name.name != "" {
+        "[" + name.name + "]"
+      } else {
+        ""
+      }
+    _ => ""
   }
 }
 

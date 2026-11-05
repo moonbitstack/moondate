@@ -148,7 +148,7 @@ pub fn Moment::epoch(Self) -> Int64?
 pub fn Moment::equal(Self, Self) -> Bool
 pub fn Moment::http_text(Self) -> String raise Refused
 pub fn Moment::isocalendar(Self) -> (Int32, Int32, Int32)?
-pub fn Moment::isoformat(Self, sep? : Char, fraction? : Int32, offset? : Bool) -> String
+pub fn Moment::isoformat(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool) -> String
 pub fn Moment::layout(Self, StringView) -> String
 pub fn Moment::not_equal(Self, Self) -> Bool
 pub fn Moment::of_epoch(Int64, nano? : Int32, zone? : Zone) -> Self

@@ -116,7 +116,7 @@ pub fn Moment::layout(self : Moment, layout : StringView) -> String {
   let toks = scan_layout(layout.to_owned())
   let out = StringBuilder()
   for i = 0; i < toks.length(); i = i + 1 {
-    out.write_string(render_token(toks[i], d, t, off))
+    out.write_string(render_token(toks[i], d, t, off, z))
   }
   out.to_string()
 }
@@ -311,7 +311,13 @@ pub fn parse_layout(
 ///|
 /// One field token turned into text for the moment it describes. `off` is the
 /// offset in minutes, taken as zero when the moment names no zone.
-fn render_token(tok : GToken, d : Date, t : Time, off : Int32) -> String {
+fn render_token(
+  tok : GToken,
+  d : Date,
+  t : Time,
+  off : Int32,
+  z : Zone?,
+) -> String {
   match tok.kind {
     GLit => tok.text
     GYear4 => year_field(d.year, 4)
@@ -341,13 +347,18 @@ fn render_token(tok : GToken, d : Date, t : Time, off : Int32) -> String {
     GSec1 => t.second.to_string()
     GFrac => frac_text(t.nano, tok.text)
     GTZAbbr =>
-      if off == 0 {
-        "UTC"
-      } else {
-        // No zone database: the name a fixed offset carries here is `±HH:MM`.
-        let sign = if off < 0 { "-" } else { "+" }
-        let a = if off < 0 { -off } else { off }
-        sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
+      match z {
+        // A named zone has the abbreviation the database gave it: `EST`, `+0545`.
+        Some(Named(zone)) => zone.abbrev
+        // A fixed offset has no name of its own, so it is written as the offset.
+        _ =>
+          if off == 0 {
+            "UTC"
+          } else {
+            let sign = if off < 0 { "-" } else { "+" }
+            let a = if off < 0 { -off } else { off }
+            sign + pad(a / 60, 2) + ":" + pad(a % 60, 2)
+          }
       }
     GTZColon => if off == 0 { "Z" } else { offset_pattern(off, tok.text) }
     GTZSign => offset_pattern(off, tok.text)
