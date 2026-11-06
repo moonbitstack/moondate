@@ -6,7 +6,7 @@
 // 115 need something this package does not have, and the reasons are
 // counted in the script's report.
 //
-// 105 are about a zoned reading, 133 about a plain date, 168 about
+// 103 are about a zoned reading, 133 about a plain date, 168 about
 // an instant, and 4 about one property of a reading rather than all of
 // it. 195 of the 408 are refusals.
 

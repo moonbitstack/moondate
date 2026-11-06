@@ -60,13 +60,17 @@ under a reason. Of the 535:
 | | Cases |
 |:--|--:|
 | Answered by `@moondate.parse` | 408 |
-| — zoned readings and names | 105 |
+| — zoned readings and names | 103 |
 | — plain dates | 133 |
 | — instants | 168 |
 | — one property of a reading | 4 |
 | — of which refusals | 195 |
 | Answered by `@tzdata.parse`, whose zone is a place | 12 |
 | Not transcribed | 115 |
+
+The four are counted apart so that they add up: a case that states one property is
+one of the four rather than one of the readings it would otherwise have belonged
+to, and the refusals are a count of the whole rather than a fifth part.
 
 A refusal is a weak statement — the corpus says the text must throw, and a parser
 that throws is right whatever the reason — so a refusal is transcribed as soon as

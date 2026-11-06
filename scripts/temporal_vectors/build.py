@@ -661,9 +661,12 @@ def main() -> None:
     counts = {
         "total": len(dressed),
         "transcribed": len(kept),
-        "zoned": len(kept_of(KIND_ZONED)),
+        # The four kinds are counted apart so that they add up: a case that
+        # states one property is counted there and not among the readings it
+        # would otherwise have been one of.
+        "zoned": len([c for c in kept_of(KIND_ZONED) if partial_of(c) is None]),
         "dated": len([c for c in kept_of(KIND_DATE) if partial_of(c) is None]),
-        "instant": len(kept_of(KIND_INSTANT)),
+        "instant": len([c for c in kept_of(KIND_INSTANT) if partial_of(c) is None]),
         "partial": len([c for c in kept if partial_of(c) is not None]),
         "refused": sum(1 for c in kept if "thrown" in c),
         "excluded": len(dressed) - len(kept) - len(places),
