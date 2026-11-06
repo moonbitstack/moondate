@@ -122,6 +122,12 @@ directives, a Rust program for chrono's additions, Go for the layout, Babel for
 LDML, and Node for the ECMAScript strings — and are committed under `src/`; CI only
 replays them. The generators are in `scripts/`.
 
+One corpus is not a comparison but a specification: test262's `Temporal` suite,
+pinned by commit, played against a stand-in that records what each test asserts.
+The cases this library answers are replayed from `src/temporal_vectors_wbtest.mbt`,
+and the ones it does not are counted by reason — the transcription is
+`scripts/temporal_vectors/`.
+
 ## Time zones
 
 The calendar above has no database behind it, on purpose: `Zone` is a fixed offset,
