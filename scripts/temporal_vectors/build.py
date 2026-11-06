@@ -281,8 +281,6 @@ def skip_instant(body, annotations, refused, text):
         return "a minus sign that is not the ASCII one"
     if comma_fraction(body):
         return "a comma before the fraction"
-    if sub_second_offset(body):
-        return "an offset with a fraction of a second, which this parser refuses"
     if too_precise(body):
         return "a fraction longer than nine digits, which is truncated here"
     if minus_zero_year(body):

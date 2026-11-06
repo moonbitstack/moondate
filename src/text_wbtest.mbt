@@ -256,11 +256,29 @@ test "ISO 8601's basic form is the same grammar without the separators" {
   assert_eq(round("+0019761118T152330.1-0800"), "1976-11-18T15:23:30.1-08:00")
   // A clock of one field is the hour, which is where reduced precision stops.
   assert_eq(round("1970-01-01T15Z"), "1970-01-01T15:00:00Z")
-  // An offset with seconds is kept to the second, and a fraction of one is not
-  // something a fixed zone here can hold.
+  // An offset of whole minutes is written as minutes, however it was spelled; one
+  // that is finer keeps its seconds and its fraction, because a `Precise` zone
+  // holds nanoseconds and an `Offset` holds minutes.
   assert_eq(round("1970-01-01T00:00+01:35:00"), "1970-01-01T00:00:00+01:35")
-  let too_fine = Some(parse("1970-01-01T00:00+01:35:00.5")) catch { _ => None }
-  assert_eq(too_fine is None, true)
+  assert_eq(
+    round("1970-01-01T00:00+01:35:00.5"),
+    "1970-01-01T00:00:00+01:35:00.5",
+  )
+}
+
+///|
+test "an offset finer than a second moves the instant, not just the zone" {
+  // A wall clock at a fixed offset is an instant, and a fractional offset puts the
+  // nanoseconds of that instant at odds with the nanoseconds on the clock.
+  let m = parse("1970-01-01T00:00:00+00:19:32.37")
+  assert_eq(m.instant(), Some((-1173L, 630000000)))
+  assert_eq(m.epoch(), Some(-1173L))
+  assert_eq(m.isoformat(), "1970-01-01T00:00:00+00:19:32.37")
+  // The same shape a zone read before standard time needs: New York ran 4:56:02
+  // behind Greenwich until 1883, and the seconds matter.
+  let old = parse("1880-01-01T12:00:00-04:56:02")
+  assert_eq(old.isoformat(), "1880-01-01T12:00:00-04:56:02")
+  assert_eq(old.instant(), Some((-2840079838L, 0)))
 }
 
 ///|

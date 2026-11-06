@@ -24,6 +24,8 @@ fn zone_text(zone : @moondate.Zone) -> String {
       "\{sign}0\{hh}:\{pad}\{mm}"
     }
     @moondate.Named(name) => name.name + " " + name.abbrev
+    // An offset finer than a minute has no name, so it is written as it is.
+    @moondate.Precise(_) => zone.name()
   }
 }
 

@@ -440,8 +440,46 @@ fn iso_zone(z : Zone?, show : Bool) -> String {
   match z {
     None => ""
     Some(Utc) => "Z"
+    Some(Precise(nanos)) => hhmmss_nanos(nanos)
     Some(zone) => hhmmss(zone.seconds())
   }
+}
+
+///|
+/// An offset in nanoseconds, written to the second with the fraction when there is
+/// one: `+00:19:32.37`.
+fn hhmmss_nanos(nanos : Int64) -> String {
+  let sign = if nanos < 0 { "-" } else { "+" }
+  let a = if nanos < 0 { -nanos } else { nanos }
+  let hh = (a / 3_600_000_000_000L).to_int()
+  let mm = (a % 3_600_000_000_000L / 60_000_000_000L).to_int()
+  let ss = (a % 60_000_000_000L / 1_000_000_000L).to_int()
+  let rest = a % 1_000_000_000L
+  let mut out = sign +
+    (if hh < 10 { "0" } else { "" }) +
+    hh.to_string() +
+    ":" +
+    (if mm < 10 { "0" } else { "" }) +
+    mm.to_string() +
+    ":" +
+    (if ss < 10 { "0" } else { "" }) +
+    ss.to_string()
+  if rest != 0L {
+    let mut digits = (if rest < 100_000_000L { "0" } else { "" }) +
+      rest.to_string()
+    // Nine digits, then the trailing zeros taken off: a fraction is written as
+    // short as it can be.
+    let want = 9 - digits.length()
+    for i = 0; i < want; i = i + 1 {
+      digits = "0" + digits
+    }
+    while digits.length() > 0 &&
+          digits[digits.length() - 1].unsafe_to_char() == '0' {
+      digits = digits[:digits.length() - 1].to_owned()
+    }
+    out = out + "." + digits
+  }
+  out
 }
 
 ///|

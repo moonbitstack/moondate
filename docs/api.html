@@ -297,6 +297,12 @@
 <p>This is the one form a <code>Date</code> header may take. The two obsolete forms are read by [<code>http</code>] and never written, which is what §5.6.7 asks for.</p></div>
 
 </article>
+<article class="api-item" id="m-moondate-Moment-instant">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::instant</span>(Self) -&gt; (Int64, Int32)?</div>
+<div class="doc"><p>The instant, as whole seconds past 1970 and the nanoseconds after them.</p>
+<p>The two are apart because a count of nanoseconds runs out in 2262, and because a zone whose offset is not a whole second puts the nanoseconds of the instant at odds with the nanoseconds on the clock: <code>15:23:30.123456789-00:00:00.000000100</code> is 100 nanoseconds earlier than its clock says.</p></div>
+
+</article>
 <article class="api-item" id="m-moondate-Moment-isocalendar">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isocalendar</span>(Self) -&gt; (Int32, Int32, Int32)?</div>
 <div class="doc"><p>The ISO week date of the moment's date.</p></div>
@@ -598,7 +604,7 @@
 <div class="doc"><p>How far the clock is from UTC.</p>
 <p><code>Utc</code> and <code>Offset(0)</code> are both midnight-at-Greenwich, but they are not the same thing to write down: RFC 3339 §4.3 gives <code>-00:00</code> to a timestamp whose offset is unknown, and <code>Z</code> to one that is genuinely UTC.</p>
 <p><code>Offset</code> counts minutes; <code>Named</code> counts seconds and carries the name the zone is filed under, so <code>VV</code> and a Go layout's <code>MST</code> have something to write.</p></div>
-<ul class="members"><li>Utc</li><li>Offset(Int32)</li><li>Named(ZoneName)</li></ul>
+<ul class="members"><li>Utc</li><li>Offset(Int32)</li><li>Named(ZoneName)</li><li>Precise(Int64)</li></ul>
 <div class="method-list"><div class="mlabel">Methods</div>
 <article class="api-item" id="m-moondate-Zone-abbrev">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::abbrev</span>(Self) -&gt; String</div>
@@ -618,9 +624,15 @@
 <p>A fixed offset has no name of its own, so it is spelled the way a POSIX rule spells one — <code>UTC</code>, <code>UTC-05:00</code> — which is what <code>VV</code> writes for it.</p></div>
 
 </article>
+<article class="api-item" id="m-moondate-Zone-nanos">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::nanos</span>(Self) -&gt; Int64</div>
+<div class="doc"><p>How far east of UTC the zone is, in nanoseconds.</p>
+<p>The finest of the three readers, and the one the others are built on: an instant is a count of nanoseconds, so this is what <code>epoch</code> subtracts.</p></div>
+
+</article>
 <article class="api-item" id="m-moondate-Zone-seconds">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Zone::seconds</span>(Self) -&gt; Int32</div>
-<div class="doc"><p>How far east of UTC the zone is, in seconds.</p></div>
+<div class="doc"><p>How far east of UTC the zone is, in seconds, rounded towards zero.</p></div>
 
 </article>
 </div>

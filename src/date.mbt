@@ -117,6 +117,12 @@ pub(all) enum Zone {
   Utc
   Offset(Int32)
   Named(ZoneName)
+  /// A fixed offset that is not a whole second east of UTC, in nanoseconds.
+  ///
+  /// A text can write one — `+00:19:32.37`, and 1880s local mean time was not a
+  /// whole number of seconds — and `Offset` counts minutes, so this is the case
+  /// that keeps it rather than rounding it away.
+  Precise(Int64)
 }
 
 ///|
@@ -126,13 +132,23 @@ pub extend Zone with Debug::{to_repr}
 pub extend Zone with Eq::{not_equal, equal}
 
 ///|
-/// How far east of UTC the zone is, in seconds.
-pub fn Zone::seconds(self : Zone) -> Int32 {
+/// How far east of UTC the zone is, in nanoseconds.
+///
+/// The finest of the three readers, and the one the others are built on: an
+/// instant is a count of nanoseconds, so this is what `epoch` subtracts.
+pub fn Zone::nanos(self : Zone) -> Int64 {
   match self {
-    Utc => 0
-    Offset(minutes) => minutes * 60
-    Named(zone) => zone.offset
+    Utc => 0L
+    Offset(minutes) => minutes.to_int64() * 60_000_000_000L
+    Named(zone) => zone.offset.to_int64() * 1_000_000_000L
+    Precise(nanos) => nanos
   }
+}
+
+///|
+/// How far east of UTC the zone is, in seconds, rounded towards zero.
+pub fn Zone::seconds(self : Zone) -> Int32 {
+  (self.nanos() / 1_000_000_000L).to_int()
 }
 
 ///|
@@ -161,6 +177,7 @@ pub fn Zone::name(self : Zone) -> String {
       } else {
         zone.name
       }
+    Precise(_) => where_nanos_text(self.nanos(), true)
   }
 }
 
@@ -179,6 +196,42 @@ pub fn Zone::abbrev(self : Zone) -> String {
       } else {
         zone.abbrev
       }
+    Precise(_) => where_nanos_text(self.nanos(), true)
+  }
+}
+
+///|
+/// A fixed offset in nanoseconds as `UTC+00:19:32.37`.
+///
+/// The fraction is written only when it is there, and without trailing zeros, so a
+/// whole number of seconds reads the way it always did.
+fn where_nanos_text(nanos : Int64, named : Bool) -> String {
+  let sign = if nanos < 0 { "-" } else { "+" }
+  let a = if nanos < 0 { -nanos } else { nanos }
+  let hours = (a / 3_600_000_000_000L).to_int()
+  let minutes = (a % 3_600_000_000_000L / 60_000_000_000L).to_int()
+  let seconds = (a % 60_000_000_000L / 1_000_000_000L).to_int()
+  let rest = a % 1_000_000_000L
+  let head = if named { "UTC" } else { "" }
+  if a == 0L {
+    return "UTC"
+  }
+  let body = head +
+    sign +
+    pad(hours, 2) +
+    ":" +
+    pad(minutes, 2) +
+    ":" +
+    pad(seconds, 2)
+  if rest == 0L {
+    body
+  } else {
+    let mut digits = pad(rest.to_int(), 9)
+    while digits.length() > 0 &&
+          digits[digits.length() - 1].unsafe_to_char() == '0' {
+      digits = digits[:digits.length() - 1].to_owned()
+    }
+    body + "." + digits
   }
 }
 
@@ -438,14 +491,39 @@ pub fn Time::nanos(self : Time) -> Int64 {
 /// `None` for the three shapes that do not: a wall clock, a bare date and a bare
 /// time are not instants until someone supplies the zone they are read in.
 pub fn Moment::epoch(self : Moment) -> Int64? {
+  match self.instant() {
+    Some((seconds, _)) => Some(seconds)
+    None => None
+  }
+}
+
+///|
+/// The instant, as whole seconds past 1970 and the nanoseconds after them.
+///
+/// The two are apart because a count of nanoseconds runs out in 2262, and because
+/// a zone whose offset is not a whole second puts the nanoseconds of the instant at
+/// odds with the nanoseconds on the clock: `15:23:30.123456789-00:00:00.000000100`
+/// is 100 nanoseconds earlier than its clock says.
+pub fn Moment::instant(self : Moment) -> (Int64, Int32)? {
   match self {
     Zoned(date~, time~, zone~) => {
-      let offset = zone.seconds()
-      Some(
-        date.days().to_int64() * 86400L +
+      // The seconds are counted on their own rather than as one number of
+      // nanoseconds, which would run out in 2262 and this library's years do not.
+      let offset = zone.nanos()
+      let mut offset_seconds = offset / 1_000_000_000L
+      if offset % 1_000_000_000L < 0L {
+        offset_seconds = offset_seconds - 1L
+      }
+      let offset_rest = offset - offset_seconds * 1_000_000_000L
+      let mut seconds = date.days().to_int64() * 86400L +
         time.nanos() / 1_000_000_000L -
-        offset.to_int64(),
-      )
+        offset_seconds
+      let mut nano = time.nanos() % 1_000_000_000L - offset_rest
+      if nano < 0L {
+        seconds = seconds - 1L
+        nano = nano + 1_000_000_000L
+      }
+      Some((seconds, nano.to_int()))
     }
     _ => None
   }

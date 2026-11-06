@@ -9,11 +9,11 @@
 // the corpus says must be refused.
 
 ///|
-/// A moment's instant, split into whole seconds and the nanoseconds after them,
-/// so that neither half can overflow however far out the year is.
+/// A moment's instant as the two halves the corpus writes: whole seconds past
+/// 1970 and the nanoseconds after them.
 fn instant_of(moment : Moment) -> (Int64, Int64)? {
-  match moment.epoch() {
-    Some(seconds) => Some((seconds, moment.time().nanos() % 1_000_000_000L))
+  match moment.instant() {
+    Some((seconds, nano)) => Some((seconds, nano.to_int64()))
     None => None
   }
 }
