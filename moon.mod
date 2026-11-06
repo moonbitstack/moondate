@@ -45,3 +45,7 @@ keywords = [
 description = "Dates, times, durations and cron expressions for MoonBit."
 
 source = "src"
+
+import {
+  "moonbitlang/x@0.5.7",
+}

@@ -1,0 +1,14 @@
+// The zones this machine keeps: the TZif files in a directory, and the one it
+// calls its own.
+//
+// A package of its own because reading a file is I/O and nothing else here does
+// any. `zone` reads the bytes it is handed, `tzdata` carries its database as
+// text; this is the one package that asks the operating system a question, so a
+// caller that wants none of it — a wasm module with a table of its own — does not
+// link it, and does not carry a filesystem import it cannot satisfy.
+
+import {
+  "moonbitstack/moondate/zone",
+  "moonbitlang/core/env",
+  "moonbitlang/x/fs",
+}

@@ -669,17 +669,21 @@ def main() -> None:
     zone_mbti = SRC / "zone" / "pkg.generated.mbti"
     tzdata_sources = [SRC / "tzdata" / "tzdata.mbt", SRC / "tzdata" / "data.mbt"]
     tzdata_mbti = SRC / "tzdata" / "pkg.generated.mbti"
+    zoneinfo_sources = [SRC / "zoneinfo" / "zoneinfo.mbt"]
+    zoneinfo_mbti = SRC / "zoneinfo" / "pkg.generated.mbti"
 
     root_model = build_package(root_mbti, root_sources, docs, params)
     cron_model = build_package(cron_mbti, cron_sources, docs, params)
     zone_model = build_package(zone_mbti, zone_sources, docs, params)
     tzdata_model = build_package(tzdata_mbti, tzdata_sources, docs, params)
+    zoneinfo_model = build_package(zoneinfo_mbti, zoneinfo_sources, docs, params)
 
     packages = [
         ("moondate", root_model),
         ("cron", cron_model),
         ("zone", zone_model),
         ("tzdata", tzdata_model),
+        ("zoneinfo", zoneinfo_model),
     ]
     html_out = render(packages, docs, params)
     OUT.write_text(html_out, encoding="utf-8", newline="\n")
