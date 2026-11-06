@@ -8,8 +8,8 @@
 ///|
 /// A moment's instant, split into whole seconds and the nanoseconds after them.
 fn instant_parts(moment : @moondate.Moment) -> (Int64, Int64)? {
-  match moment.epoch() {
-    Some(seconds) => Some((seconds, moment.time().nanos() % 1_000_000_000L))
+  match moment.instant() {
+    Some((seconds, nano)) => Some((seconds, nano.to_int64()))
     None => None
   }
 }

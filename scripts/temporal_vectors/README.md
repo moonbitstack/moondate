@@ -59,14 +59,18 @@ under a reason. Of the 535:
 
 | | Cases |
 |:--|--:|
-| Answered by `@moondate.parse` | 408 |
+| Answered by `@moondate.parse` | 404 |
 | — zoned readings and names | 103 |
-| — plain dates | 133 |
-| — instants | 168 |
+| — plain dates | 131 |
+| — instants | 166 |
 | — one property of a reading | 4 |
-| — of which refusals | 195 |
+| — of which refusals | 173 |
 | Answered by `@tzdata.parse`, whose zone is a place | 12 |
-| Not transcribed | 115 |
+| Not transcribed | 119 |
+
+The four are counted apart so that they add up: a case that states one property is
+one of the four rather than one of the readings it would otherwise have belonged
+to, and the refusals are a count of the whole rather than a fifth part.
 
 The four are counted apart so that they add up: a case that states one property is
 one of the four rather than one of the readings it would otherwise have belonged
@@ -80,7 +84,7 @@ shorter list and a different one from the texts it cannot read:
 | Reason | Cases | What would close it |
 |:--|--:|:--|
 | A text with no offset, which `parse` reads as a plain moment | 33 | nothing — `Instant.from` asks a different question |
-| An offset with a fraction of a second | 18 | `Zone::Precise`, on `feat/sub-second-offsets` |
+| An offset with a fraction of a second | 22 | nothing — Temporal refuses the form, and ISO 8601 has it |
 | A year outside Temporal's range | 16 | nothing — this library's years go further |
 | A year of minus zero, `-000000` | 10 | nothing — it reads as year nought here |
 | A calendar this library does not have | 10 | a calendar, which it does not have |
@@ -99,11 +103,12 @@ zone is a plain moment to `parse` because that is a different question from
 keeps the instant, and a fraction past nine digits is dropped because that is what
 the parser says it does.
 
-One exclusion names a branch. A sub-second offset has nowhere to live in `Zone` as
-it stands — `Offset` counts minutes and `ZoneName.offset` counts seconds — and
-keeping it means a fourth case, which is breaking. That work is on
-`feat/sub-second-offsets`; until it merges, those 18 are refused here rather than
-rounded, and the transcription on that branch answers more of the 535.
+This branch is the one that keeps a sub-second offset, so one line of the table
+reads the other way round from `master`'s. `Zone::Precise` holds the nanoseconds,
+so the eighteen cases spelled `+00:19:32.37` that `master` refuses are answered
+here — and the twenty-two in which Temporal refuses a form ISO 8601 writes are
+answered by this branch and not by Temporal, which is why they are excluded rather
+than transcribed. 408 on `master` less 22 plus 18 is the 404 here.
 
 ## Moving the pin
 

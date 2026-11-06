@@ -147,6 +147,7 @@ pub fn Moment::diff(Self, Self) -> Span?
 pub fn Moment::epoch(Self) -> Int64?
 pub fn Moment::equal(Self, Self) -> Bool
 pub fn Moment::http_text(Self) -> String raise Refused
+pub fn Moment::instant(Self) -> (Int64, Int32)?
 pub fn Moment::isocalendar(Self) -> (Int32, Int32, Int32)?
 pub fn Moment::isoformat(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool) -> String
 pub fn Moment::layout(Self, StringView) -> String
@@ -219,11 +220,13 @@ pub(all) enum Zone {
   Utc
   Offset(Int32)
   Named(ZoneName)
+  Precise(Int64)
 }
 pub fn Zone::abbrev(Self) -> String
 pub fn Zone::equal(Self, Self) -> Bool
 pub fn Zone::minutes(Self) -> Int32
 pub fn Zone::name(Self) -> String
+pub fn Zone::nanos(Self) -> Int64
 pub fn Zone::not_equal(Self, Self) -> Bool
 pub fn Zone::seconds(Self) -> Int32
 pub fn Zone::to_repr(Self) -> @debug.Repr

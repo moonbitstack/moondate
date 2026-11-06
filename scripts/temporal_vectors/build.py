@@ -127,7 +127,7 @@ def comma_fraction(body: str) -> bool:
 
 
 def sub_second_offset(body: str) -> bool:
-    """An offset finer than a second, which a fixed zone here cannot hold."""
+    """An offset finer than a second, which `Zone::Precise` keeps on this branch."""
     if "T" not in body:
         return False
     found = re.search(r"[+-]\d{2}:\d{2}:\d{2}[.,](\d+)$", body.split("T", 1)[1])
@@ -265,6 +265,8 @@ def reads_what_temporal_refuses(body):
         return "a year of minus zero, which this parser reads as year nought"
     if too_precise(body):
         return "a fraction longer than nine digits, which is truncated here"
+    if sub_second_offset(body):
+        return "an offset with a fraction of a second, which this parser reads"
     return None
 
 
@@ -335,8 +337,6 @@ def skip_instant(body, annotations, refused, text):
         return "a minus sign that is not the ASCII one"
     if comma_fraction(body):
         return "a comma before the fraction"
-    if sub_second_offset(body):
-        return "an offset with a fraction of a second, which this parser refuses"
     if too_precise(body):
         return "a fraction longer than nine digits, which is truncated here"
     if minus_zero_year(body):

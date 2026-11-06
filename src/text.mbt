@@ -574,6 +574,7 @@ fn zone_of(s : String, from : Int32, end : Int32) -> Zone raise Refused {
     raise Range(field="offset minute", got=minutes, low=0, high=59)
   }
   let mut seconds = 0
+  let mut fraction = 0L
   let mut k = from + 6
   if k < end {
     if at(s, k) != ':' {
@@ -596,23 +597,36 @@ fn zone_of(s : String, from : Int32, end : Int32) -> Zone raise Refused {
       if k == end {
         raise Malformed("a dot with no digits after it")
       }
-      // The value keeps seconds because a zone read before standard time needs
-      // them, and stops there: a fraction of a second is below the finest thing a
-      // fixed offset here can hold, so a non-zero one is refused rather than lost.
+      if end - k > 9 {
+        raise Malformed("a fraction of a second is nine digits at most")
+      }
+      // A fraction of a second is kept as far as nine digits, which is what a
+      // nanosecond is.
+      let mut seen = 0
       while k < end {
-        if digit(s, k) != 0 {
-          raise Malformed("an offset here is a whole second")
+        if seen < 9 {
+          fraction = fraction * 10L + digit(s, k).to_int64()
+          seen = seen + 1
         }
         k = k + 1
       }
+      for i = seen; i < 9; i = i + 1 {
+        fraction = fraction * 10L
+      }
     }
   }
-  let total = hours * 3600 + minutes * 60 + seconds
-  let signed = if c == '-' { -total } else { total }
-  if signed % 60 != 0 {
-    Named({ name: "", offset: signed, abbrev: "", })
+  let mut nanos = (hours * 3600 + minutes * 60 + seconds).to_int64() *
+    1_000_000_000L +
+    fraction
+  if c == '-' {
+    nanos = -nanos
+  }
+  // A whole number of minutes is the ordinary case and keeps the ordinary shape;
+  // everything else has a precision `Offset` cannot hold.
+  if nanos % 60_000_000_000L == 0L {
+    Offset((nanos / 60_000_000_000L).to_int())
   } else {
-    Offset(signed / 60)
+    Precise(nanos)
   }
 }
 
@@ -717,6 +731,9 @@ fn text_of_time(t : Time) -> String {
 fn text_of_zone(z : Zone) -> String {
   match z {
     Utc => "Z"
+    // A fixed offset finer than a minute keeps its seconds and its fraction; the
+    // rest are whole minutes and are written as such.
+    Precise(nanos) => hhmmss_nanos(nanos)
     _ => hhmm(z.minutes())
   }
 }

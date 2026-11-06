@@ -61,6 +61,18 @@ ahead and `…[UTC]` needs nothing else. A bracketed *name* is a different thing
 was on, so it is refused unless the offset is written beside it. A zone name also
 keeps the minute — `[+01:35]` is a name, `[+01:35:00]` is not.
 
+An offset written finer than a minute — `+00:19:32.37`, which is what a zone read
+before standard time needs — is kept as `Zone::Precise`, a count of nanoseconds,
+rather than rounded. `Moment::instant` is then the exact instant as two halves,
+because one count of nanoseconds runs out in 2262 and this library's years do not:
+
+```moonbit
+let m = @moondate.parse("1970-01-01T00:00:00+00:19:32.37")
+m.isoformat()                     // 1970-01-01T00:00:00+00:19:32.37
+m.instant()                       // Some((-1173, 630000000)) — 1172.37 s before the epoch
+m.epoch()                         // Some(-1173), the same instant floored
+```
+
 Annotations after the moment are Temporal's, and `parse` reads them: `[u-ca=iso8601]`
 is the calendar it already has, `[foo=bar]` is somebody else's business and is
 ignored, and `[!foo=bar]` says the reader *must* understand the key — which it does
@@ -273,9 +285,9 @@ has every method and every parameter.
 |:--|:--|:--|
 | `Date` | `Date::new`, `of_days`, `of_ordinal`, `of_isocalendar` | `weekday`, `yearday`, `isocalendar`, `ordinal`, `days`, `diff`, `plus_days`, `plus_months`, `replace` |
 | `Time` | `Time::new`, `midnight`, `end_of_day` | `nanos`, `replace` |
-| `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
+| `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `instant`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
 | `Span` | `Span::new`, `of`, `nanosecond` … `day` | `add`, `sub`, `seconds`, `total_seconds`, `parts`, `neg`, `abs` |
-| `Zone` | `Utc`, `Offset(minutes)`, `Named(name, offset, abbrev)` | `seconds`, `minutes`, `name`, `abbrev` |
+| `Zone` | `Utc`, `Offset(minutes)`, `Named(name, offset, abbrev)`, `Precise(nanos)` | `nanos`, `seconds`, `minutes`, `name`, `abbrev` |
 | `Cron` | `@cron.parse` | `matches`, `next` |
 
 Free functions: `parse`, `of_isoformat`, `strptime`, `parse_layout`,
