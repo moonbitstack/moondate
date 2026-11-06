@@ -28,14 +28,21 @@ what it was asked:
 | `Temporal.PlainDate.from(str)` and its two siblings | the same, with the kind noted |
 | `assert.sameValue(record.epochNanoseconds, 217207410100000000n)` | notes "that text is that instant" |
 | `assert.sameValue(record.timeZoneId, "-08:00")` | notes "that text is filed there" |
+| `assert.sameValue(record.year, 2019)` | notes "that text reads as that year" |
 | `TemporalHelpers.assertPlainDate(record, 1976, 11, "M11", 18)` | notes the day |
 | `TemporalHelpers.assertZonedDateTimesEqual(record, new Temporal.ZonedDateTime(ns, zone))` | notes the instant and the zone |
 | `assert.throws(RangeError, () => …from(str))` | notes "that text must be refused" |
 
-The output is what the corpus actually asserts — 532 distinct cases — rather than
+The output is what the corpus actually asserts — 535 distinct cases — rather than
 a reading of the source. Calls that carry an options object are skipped:
 `{ offset: "use" }` and `{ offset: "ignore" }` read the same text two ways, so
 they say nothing about reading text.
+
+A property read one at a time is recorded as the property it is, not dropped.
+`prototype/year/basic.js` asks a reading for its year and says nothing about the
+rest of it, which is a fact about the text all the same; `build.py` puts those in
+a table of their own and compares the one property. Two files that read different
+properties of the same text are gathered into one case, since both are true of it.
 
 Three suites are run, because a text answers three different questions:
 
@@ -48,35 +55,38 @@ Three suites are run, because a text answers three different questions:
 ## What is transcribed, and what is not
 
 `build.py` answers a case when this library can, and otherwise writes it down
-under a reason. Of the 532:
+under a reason. Of the 535:
 
 | | Cases |
 |:--|--:|
-| Answered by `@moondate.parse` | 321 |
-| — zoned readings and names | 103 |
-| — plain dates | 70 |
-| — instants | 148 |
-| — of which refusals | 112 |
-| Answered by `@tzdata.parse`, whose zone is a place | 14 |
-| Not transcribed | 197 |
+| Answered by `@moondate.parse` | 408 |
+| — zoned readings and names | 105 |
+| — plain dates | 133 |
+| — instants | 168 |
+| — one property of a reading | 4 |
+| — of which refusals | 195 |
+| Answered by `@tzdata.parse`, whose zone is a place | 12 |
+| Not transcribed | 115 |
 
-The refusals are the easier half: the corpus says the text must throw, and a
-parser that throws is right whatever the reason. The exclusions, in order of size:
+A refusal is a weak statement — the corpus says the text must throw, and a parser
+that throws is right whatever the reason — so a refusal is transcribed as soon as
+this library refuses it too. Only the texts it *reads* are excluded, which is a
+shorter list and a different one from the texts it cannot read:
 
 | Reason | Cases | What would close it |
 |:--|--:|:--|
-| A reading that states only part of the date | 72 | nothing — those tests assert one property, not a text |
-| An offset with a fraction of a second | 42 | `Zone::Precise`, on `feat/sub-second-offsets` |
 | A text with no offset, which `parse` reads as a plain moment | 33 | nothing — `Instant.from` asks a different question |
-| A calendar this library does not have | 14 | a calendar, which it does not have |
+| An offset with a fraction of a second | 18 | `Zone::Precise`, on `feat/sub-second-offsets` |
+| A year outside Temporal's range | 16 | nothing — this library's years go further |
+| A year of minus zero, `-000000` | 10 | nothing — it reads as year nought here |
+| A calendar this library does not have | 10 | a calendar, which it does not have |
 | A text that names no zone, which `parse` reads | 7 | nothing — same as above |
-| A year outside Temporal's range | 6 | nothing — this library's years go further |
-| A year of minus zero, `-000000` | 6 | nothing — it reads as year nought here |
-| A fraction longer than nine digits | 4 | nothing — truncation is the documented choice |
+| A fraction longer than nine digits | 6 | nothing — truncation is the documented choice |
 | A leap second | 4 | nothing — it is read as the minute it opens |
 | A minus sign that is not the ASCII one | 3 | U+2212 as a sign |
 | A text offset that disagrees with its zone | 3 | resolving the zone, which needs the database |
 | A comma before the fraction | 2 | a comma as the decimal mark |
+| A `Z` beside a time, which `PlainDate` refuses | 2 | nothing — that is a moment here, and a date is its day |
 | A text with no date, which this parser reads as a clock | 1 | nothing — a bare clock is a clock |
 
 Several lines are decisions rather than gaps and the table says so: a text with no
@@ -88,8 +98,8 @@ the parser says it does.
 One exclusion names a branch. A sub-second offset has nowhere to live in `Zone` as
 it stands — `Offset` counts minutes and `ZoneName.offset` counts seconds — and
 keeping it means a fourth case, which is breaking. That work is on
-`feat/sub-second-offsets`; until it merges, those 42 are refused here rather than
-rounded, and the transcription on that branch answers 359 of the 532.
+`feat/sub-second-offsets`; until it merges, those 18 are refused here rather than
+rounded, and the transcription on that branch answers more of the 535.
 
 ## Moving the pin
 

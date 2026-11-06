@@ -139,8 +139,9 @@ replays them. The generators are in `scripts/`.
 One corpus is not a comparison but a specification: test262's `Temporal` suites,
 pinned by commit, played against a stand-in that records what each test asserts.
 A text there answers three questions — the instant, the day, the exact time — and
-the cases this library answers for all three are replayed from
-`src/temporal_vectors_wbtest.mbt`. The ones it does not are counted by reason; the
+some tests ask only one property of a reading, which is answered as the property it
+is. The cases this library answers for all of them are replayed from
+`src/temporal_vectors_wbtest.mbt`; those it does not are counted by reason, and the
 transcription is `scripts/temporal_vectors/`.
 
 ## Time zones

@@ -29,6 +29,42 @@ fn zone_name_of(moment : Moment) -> String {
 }
 
 ///|
+/// One property of a reading, named the way test262 names it, or `None` when the
+/// moment has no such property — a date has no hour, and a clock has no year.
+///
+/// A test may state one property rather than a whole reading: `prototype/year`
+/// asks what year the text reads as and nothing else. The transcription keeps the
+/// property and the name of it, so what is compared here is only what was said.
+fn property_of(moment : Moment, name : String) -> Int32? {
+  match name {
+    "year" | "month" | "day" =>
+      match moment.date() {
+        None => None
+        Some(date) =>
+          Some(
+            match name {
+              "year" => date.year
+              "month" => date.month
+              _ => date.day
+            },
+          )
+      }
+    _ => {
+      let nanos = moment.time().nanos()
+      match name {
+        "hour" => Some((nanos / 3_600_000_000_000L).to_int())
+        "minute" => Some((nanos / 60_000_000_000L % 60L).to_int())
+        "second" => Some((nanos / 1_000_000_000L % 60L).to_int())
+        "millisecond" => Some((nanos / 1_000_000L % 1000L).to_int())
+        "microsecond" => Some((nanos / 1_000L % 1000L).to_int())
+        "nanosecond" => Some((nanos % 1000L).to_int())
+        _ => None
+      }
+    }
+  }
+}
+
+///|
 test "test262: a zoned text states an instant" {
   let wrong : Array[String] = []
   for row in readings {
@@ -84,6 +120,35 @@ test "test262: a text states a zone and nothing else" {
           wrong.push(text + ": filed under " + got + ", want " + zone)
         }
       }
+    }
+  }
+  assert_eq(wrong, [])
+}
+
+///|
+test "test262: a text states one property of a reading" {
+  let wrong : Array[String] = []
+  for row in partial_readings {
+    let (text, name, want) = row
+    let parsed = Some(parse(text)) catch { _ => None }
+    match parsed {
+      None => wrong.push("refused, want a " + name + ": " + text)
+      Some(moment) =>
+        match property_of(moment, name) {
+          None => wrong.push("no " + name + " to read: " + text)
+          Some(got) =>
+            if got != want {
+              wrong.push(
+                text +
+                ": " +
+                name +
+                " reads " +
+                got.to_string() +
+                ", want " +
+                want.to_string(),
+              )
+            }
+        }
     }
   }
   assert_eq(wrong, [])
