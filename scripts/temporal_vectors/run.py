@@ -16,7 +16,6 @@ the corpus gives, which is how CI notices that one of the two has moved.
 
 import argparse
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -67,14 +66,17 @@ def fetch(work: str) -> dict:
     return {name: os.path.join(root, path) for name, path in SUITES.items()}
 
 
-def look_alike(made: str, kept: str) -> bool:
-    """Whether two transcriptions say the same thing.
+def format_the_module() -> None:
+    """Run `moon fmt`, which owns the layout of the generated files.
 
-    `moon fmt` re-wraps a row by filling the line rather than breaking it into a
-    fixed shape, which no generator reproduces exactly. The layout is not the
-    transcription — the values are — so the comparison ignores whitespace.
+    The transcription writes each case on one line; where a line breaks is the
+    formatter's business, and CI checks that the tree is what formatting leaves.
     """
-    return re.sub(r"\s+", "", made) == re.sub(r"\s+", "", kept)
+    result = subprocess.run(["moon", "fmt"], cwd=ROOT, capture_output=True, text=True)
+    if result.returncode != 0:
+        sys.stderr.write(result.stdout)
+        sys.stderr.write(result.stderr)
+        raise SystemExit(result.returncode)
 
 
 def run(command):
@@ -111,34 +113,10 @@ def main() -> None:
         cases.append(path)
     joined = ",".join(cases)
 
-    if args.check:
-        temporary = os.path.join(args.work, "generated.mbt")
-        temporary_places = os.path.join(args.work, "generated-places.mbt")
-        run(
-            [
-                sys.executable,
-                os.path.join(HERE, "build.py"),
-                "--cases",
-                joined,
-                "--out",
-                temporary,
-                "--places-out",
-                temporary_places,
-            ]
-        )
-        for made_path, kept_path in ((temporary, OUT), (temporary_places, PLACES)):
-            with open(made_path, encoding="utf-8") as handle:
-                made = handle.read()
-            with open(kept_path, encoding="utf-8") as handle:
-                kept = handle.read()
-            if not look_alike(made, kept):
-                print(
-                    "the transcription is not what the corpus gives: " + kept_path,
-                    file=sys.stderr,
-                )
-                raise SystemExit(1)
-        print("the transcription is what the corpus gives")
-        return
+    before = {}
+    for path in (OUT, PLACES):
+        with open(path, encoding="utf-8") as handle:
+            before[path] = handle.read()
 
     sys.stdout.write(
         run(
@@ -156,6 +134,29 @@ def main() -> None:
             ]
         )
     )
+    format_the_module()
+
+    if args.check:
+        # The file is written and formatted before the comparison, because the
+        # layout is the formatter's: what has to match is what the two produce
+        # together. A mismatch puts the old file back, so a check never leaves a
+        # change behind.
+        changed = []
+        for path in (OUT, PLACES):
+            with open(path, encoding="utf-8") as handle:
+                if handle.read() != before[path]:
+                    changed.append(path)
+        if changed:
+            for path in changed:
+                with open(path, "w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(before[path])
+            for path in changed:
+                print("out of date: " + path, file=sys.stderr)
+            raise SystemExit(1)
+        print("the transcription is what the corpus gives")
+        return
+
+    print("written and formatted")
 
 
 if __name__ == "__main__":
