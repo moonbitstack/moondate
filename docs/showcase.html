@@ -75,7 +75,7 @@
     <div class="wrap">
       <span class="season-tag"><span class="dot"></span> Playground · Winter</span>
       <h1>Run it here.</h1>
-      <p class="lede">The library compiled to JavaScript and running in this page. Change an input and the answer updates — parsed and formatted, or the next firings of a schedule. Nothing is pre-computed; it is the same code the guide prints from.</p>
+      <p class="lede">The library compiled to JavaScript and running in this page. Change an input and the answer updates — parsed and formatted, the next firings of a schedule, or the local time in six cities at once. Nothing is pre-computed, and the zone data is the IANA release itself.</p>
     </div>
   </section>
 
@@ -143,6 +143,65 @@ format   Tuesday, 22 September 2026</div>
             <div class="cron-list" id="c-list" aria-live="polite"></div>
           </div>
         </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="play-grid">
+
+        <div class="panel reveal">
+          <div class="panel-head"><span class="idx">03</span><h2>Zones at one instant</h2></div>
+          <div class="panel-body">
+            <div class="field">
+              <label for="z-at">instant</label>
+              <input id="z-at" value="2026-11-01T05:30:00Z" spellcheck="false" autocomplete="off" inputmode="text">
+            </div>
+            <div class="console-foot">
+              <button class="chip" data-zone-at="2026-11-01T05:30:00Z">the repeated hour</button>
+              <button class="chip" data-zone-at="2026-03-08T07:30:00Z">the skipped hour</button>
+              <button class="chip" data-zone-at="2026-12-21T12:00:00Z">solstice noon</button>
+              <button class="chip" data-zone-at="1969-07-20T20:17:00Z">the moon landing</button>
+            </div>
+            <div class="clock-list" id="z-rows" aria-live="polite"></div>
+            <p class="muted" style="font-size:13px;margin:0">Six cities, one instant. Kathmandu is <span class="mono">+05:45</span>, Lord Howe and Chatham run their daylight saving half an hour at a time.</p>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="panel-head"><span class="idx">04</span><h2>The hour that is not there</h2></div>
+          <div class="panel-body">
+            <div class="field">
+              <label for="f-zone">zone</label>
+              <input id="f-zone" list="zone-names" value="America/New_York" spellcheck="false" autocomplete="off" inputmode="text">
+              <datalist id="zone-names"></datalist>
+            </div>
+            <div class="pair">
+              <div class="field">
+                <label for="f-date">date</label>
+                <input id="f-date" value="2026-11-01" spellcheck="false" autocomplete="off" inputmode="text">
+              </div>
+              <div class="field">
+                <label for="f-time">time</label>
+                <input id="f-time" value="01:30" spellcheck="false" autocomplete="off" inputmode="text">
+              </div>
+            </div>
+            <div class="console-foot">
+              <button class="chip" data-zone-case="America/New_York|2026-11-01|01:30">repeated</button>
+              <button class="chip" data-zone-case="America/New_York|2026-03-08|02:30">skipped</button>
+              <button class="chip" data-zone-case="Australia/Lord_Howe|2026-10-04|02:15">half an hour</button>
+              <button class="chip" data-zone-case="Asia/Kathmandu|2026-06-01|12:00">an ordinary noon</button>
+            </div>
+            <div class="fold-list" id="f-out" aria-live="polite"></div>
+            <p class="muted" style="font-size:13px;margin:0">Whether a clock reads once, twice or never is a fact about the zone; which of the two to take is the caller's. A clock that never happens is read as the instant just after the gap, which is why <span class="mono">02:30</span> in March comes back as <span class="mono">03:30</span>.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
       </div>
     </div>

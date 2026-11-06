@@ -133,8 +133,11 @@ function initCron(cfg) {
     const n = count
       ? Math.max(1, Math.min(20, parseInt(count.value, 10) || 6))
       : cfg.n || 6;
-    const list = api.demo_cron_list(expr.value, from ? from.value : "2026-09-22T14:30:00Z", n);
-    if (!Array.isArray(list) || list[0] === undefined) {
+    // The module answers with one firing per line; an empty answer is no schedule.
+    const list = String(api.demo_cron_list(expr.value, from ? from.value : "2026-09-22T14:30:00Z", n))
+      .split("\n")
+      .filter((line) => line.length > 0);
+    if (list.length === 0) {
       out.innerHTML = '<div class="empty">no schedule</div>';
       return;
     }
@@ -174,9 +177,133 @@ function initCron(cfg) {
   render();
 }
 
+// ---- zones ----------------------------------------------------------------
+// Six cities that between them cover whole hours, half hours and the two hours
+// of the year with no single answer.
+const CITIES = [
+  "America/New_York",
+  "Europe/London",
+  "Asia/Shanghai",
+  "Asia/Kathmandu",
+  "Australia/Lord_Howe",
+  "Pacific/Chatham",
+];
+
+function esc(text) {
+  return String(text).replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
+}
+
+function initZoneRows(cfg) {
+  const input = $(cfg.input);
+  const out = $(cfg.out);
+  if (!input || !out) return;
+
+  const render = () => {
+    if (!api) return unavailable(out);
+    const rows = String(api.demo_zone_rows(input.value, CITIES.join("\n")))
+      .split("\n")
+      .filter((line) => line.length > 0);
+    if (rows.length === 0) {
+      out.innerHTML = '<div class="empty">no answer</div>';
+      return;
+    }
+    if (String(rows[0]).startsWith("refused")) {
+      out.innerHTML = '<div class="empty">' + esc(rows[0]) + "</div>";
+      return;
+    }
+    out.innerHTML = rows
+      .map((row) => {
+        const f = String(row).split("\t");
+        if (f[1] === "refused") {
+          return '<div class="row"><span class="t">' + esc(f[0]) +
+            '</span><span class="c">no such zone</span></div>';
+        }
+        const daylight = f[4] === "daylight";
+        return '<div class="row' + (daylight ? " daylight" : "") + '">' +
+          '<span class="i">' + esc(f[2]) + "</span>" +
+          '<span class="t">' + esc(f[1]) + "</span>" +
+          '<span class="c">' + esc(f[0]) + "</span>" +
+          '<span class="o">' + esc(f[3]) + "</span>" +
+          "</div>";
+      })
+      .join("");
+  };
+
+  input.addEventListener("input", render);
+  document.querySelectorAll("[data-zone-at]").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      input.value = chip.getAttribute("data-zone-at");
+      render();
+    });
+  });
+  render();
+}
+
+function initZoneRead(cfg) {
+  const zone = $(cfg.zone);
+  const date = $(cfg.date);
+  const time = $(cfg.time);
+  const out = $(cfg.out);
+  if (!zone || !date || !time || !out) return;
+
+  const render = () => {
+    if (!api) return unavailable(out);
+    const rows = String(api.demo_zone_read(zone.value, date.value, time.value))
+      .split("\n")
+      .filter((line) => line.length > 0);
+    if (rows.length === 0) {
+      out.innerHTML = '<div class="line"><span class="k">read</span><span class="v bad">no answer</span></div>';
+      return;
+    }
+    out.innerHTML = rows
+      .map((row) => {
+        const f = String(row).split("\t");
+        const label = f[0] || "";
+        const value = f[1] || "";
+        const note = f[2] || "";
+        const bad = value.startsWith("refused");
+        const shown = bad ? note : value;
+        return '<div class="line"><span class="k">' + esc(label) + "</span>" +
+          '<span class="v' + (bad ? " bad" : "") + '">' + esc(shown) +
+          (bad || !note ? "" : ' <span class="n">' + esc(note) + "</span>") +
+          "</span></div>";
+      })
+      .join("");
+  };
+
+  zone.addEventListener("input", render);
+  date.addEventListener("input", render);
+  time.addEventListener("input", render);
+  document.querySelectorAll("[data-zone-case]").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const [z, d, t] = chip.getAttribute("data-zone-case").split("|");
+      zone.value = z;
+      date.value = d;
+      time.value = t;
+      render();
+    });
+  });
+  render();
+}
+
+// The zone field offers every name the release knows: 598 of them, alias included.
+if (api) {
+  const list = $("zone-names");
+  if (list) {
+    list.innerHTML = String(api.demo_zone_names())
+      .split("\n")
+      .filter((name) => name.length > 0)
+      .map((name) => '<option value="' + esc(name) + '">')
+      .join("");
+  }
+}
+
 // ---- boot -----------------------------------------------------------------
 initParse({ key: "date", input: "demo-date", format: "demo-format", out: "demo-out" });
 initCron({ key: "home", expr: "demo-cron", from: "demo-cron-from", out: "demo-cron-out", n: 4 });
 
 initParse({ key: "p", input: "p-date", format: "p-fmt", out: "p-out", style: "p-style" });
 initCron({ key: "c", expr: "c-expr", from: "c-from", count: "c-count", out: "c-list" });
+
+initZoneRows({ input: "z-at", out: "z-rows" });
+initZoneRead({ zone: "f-zone", date: "f-date", time: "f-time", out: "f-out" });
