@@ -72,6 +72,10 @@ The four are counted apart so that they add up: a case that states one property 
 one of the four rather than one of the readings it would otherwise have belonged
 to, and the refusals are a count of the whole rather than a fifth part.
 
+The four are counted apart so that they add up: a case that states one property is
+one of the four rather than one of the readings it would otherwise have belonged
+to, and the refusals are a count of the whole rather than a fifth part.
+
 A refusal is a weak statement — the corpus says the text must throw, and a parser
 that throws is right whatever the reason — so a refusal is transcribed as soon as
 this library refuses it too. Only the texts it *reads* are excluded, which is a
