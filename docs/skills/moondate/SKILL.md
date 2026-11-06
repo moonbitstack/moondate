@@ -84,8 +84,10 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
 - **A named zone is a reading, not a rule.** `Zone::Named` carries the offset in
   force at that instant, so adding a span across a transition leaves the offset
   stale. Go back through `Tz::moment` when a change has to be crossed.
-- **A bracketed name needs an offset.** `…-04:00[America/New_York]` parses;
-  `…[America/New_York]` alone is refused, because a name is not an instant.
+- **A bracketed name is an instant only when it is an offset.** `…[+09:00]` and
+  `…[UTC]` parse on their own, and `…-04:00[America/New_York]` parses because the
+  offset is there. `…[America/New_York]` alone is refused: a place does not say
+  which side of a transition the clock was on.
 - **`%Z` on a fixed offset writes `UTC±HH:MM`**, not a name: an offset cannot tell
   you which zone it came from. Load the zone if you want `EST`.
 - **RFC 3339 has no seconds in an offset**, so a zone's local mean time keeps its

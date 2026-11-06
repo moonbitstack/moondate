@@ -230,3 +230,17 @@ fn refused_strptime(text : String, format : String) -> Bool {
     _ => true
   }
 }
+
+///|
+test "a bracketed offset says when it was, all by itself" {
+  // A name that is an offset needs nothing else: `[+09:00]` is as good as a
+  // trailing `Z`, and a date with one is midnight where that offset runs.
+  assert_eq(round("2020-01-01[+09:00]"), "2020-01-01T00:00:00+09:00")
+  assert_eq(round("1970-01-01T00:00[+01:00]"), "1970-01-01T00:00:00+01:00")
+  assert_eq(round("1970-01-01T00:00[UTC]"), "1970-01-01T00:00:00+00:00")
+  assert_eq(round("1970-01-01T00:00[-0430]"), "1970-01-01T00:00:00-04:30")
+  // A name that is a place still needs the offset beside it: two in the morning
+  // in Paris is one instant in July and another in January.
+  let place = Some(parse("1970-01-01T00:00[Europe/Paris]")) catch { _ => None }
+  assert_eq(place is None, true)
+}

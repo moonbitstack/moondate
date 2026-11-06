@@ -12,6 +12,12 @@
 /// A year outside 0000 to 9999 keeps the expanded form Temporal writes for it —
 /// `+012026-01-02T03:04:05Z`, `-000001-01-02` — so what [`Moment::isoformat`]
 /// writes reads back.
+///
+/// A name in brackets is read when the name is an offset — `[UTC]`, `[+09:00]`,
+/// `[-0430]` — because then it says when the moment was by itself. A name that
+/// is a place, `[America/New_York]`, is kept when the text carries the offset
+/// beside it, and refused when it does not: the place alone does not say which
+/// side of a transition the clock was on.
 pub fn parse(src : StringView) -> Moment raise Refused {
   let s = src.to_owned()
   // A bare time has a colon where a date would have a dash.
@@ -39,6 +45,16 @@ pub fn parse(src : StringView) -> Moment raise Refused {
   }
   if s.length() == rest + 5 {
     return Day(date~)
+  }
+  // A date on its own, with the offset given in the annotation:
+  // `2020-01-01[+09:00]`, which is midnight where that offset runs.
+  if at(s, rest + 5) == '[' {
+    let name = bracket_name_of(s, rest + 5)
+    match offset_of_name(name) {
+      Some(minutes) =>
+        return Zoned(date~, time=Time::new(0, 0), zone=named(name, minutes))
+      None => raise Malformed("a bracketed zone needs an offset to go with it")
+    }
   }
   let sep = at(s, rest + 5)
   if sep != 'T' && sep != 't' && sep != ' ' {
@@ -69,8 +85,13 @@ pub fn parse(src : StringView) -> Moment raise Refused {
     if name == "" {
       return Plain(date~, time~)
     }
-    // A name on its own is not an instant: the offset is what says when it was.
-    raise Malformed("a bracketed zone needs an offset to go with it")
+    // A name that is an offset says when it was all by itself, the way a trailing
+    // `Z` does. A name that is a place does not: two in the morning in Paris is
+    // one instant in July and another in January.
+    match offset_of_name(name) {
+      Some(minutes) => return Zoned(date~, time~, zone=named(name, minutes))
+      None => raise Malformed("a bracketed zone needs an offset to go with it")
+    }
   }
   Zoned(date~, time~, zone=with_name(zone_of(s, cut, bracket), name))
 }
@@ -82,6 +103,70 @@ fn bracket_name_of(s : String, from : Int32) -> String raise Refused {
     raise Malformed("a zone name is written [America/New_York]")
   }
   s[from + 1:s.length() - 1].to_owned()
+}
+
+///|
+/// A zone known only by the name and the offset the text gave it.
+fn named(name : String, minutes : Int32) -> Zone {
+  Named({ name, offset: minutes * 60, abbrev: "", })
+}
+
+///|
+/// The offset a bracketed name carries, when the name is an offset rather than a
+/// place: `UTC`, `+01:00`, `-0430`.
+///
+/// `[Europe/Paris]` is a place, and a place is not an instant until something
+/// says which offset was running; `[+01:00]` is that something.
+fn offset_of_name(name : String) -> Int32? {
+  if name == "UTC" {
+    return Some(0)
+  }
+  let n = name.length()
+  if n < 3 {
+    return None
+  }
+  let sign = at(name, 0)
+  if sign != '+' && sign != '-' {
+    return None
+  }
+  let digit_at = fn(i : Int32) -> Int32? {
+    if i >= n {
+      return None
+    }
+    let c = at(name, i)
+    if c < '0' || c > '9' {
+      return None
+    }
+    Some(c.to_int() - '0'.to_int())
+  }
+  let hours = match (digit_at(1), digit_at(2)) {
+    (Some(a), Some(b)) => a * 10 + b
+    _ => return None
+  }
+  if hours > 23 {
+    return None
+  }
+  let mut minutes = 0
+  if n > 3 {
+    if n == 5 {
+      minutes = match (digit_at(3), digit_at(4)) {
+        (Some(a), Some(b)) => a * 10 + b
+        _ => return None
+      }
+    } else if n == 6 && at(name, 3) == ':' {
+      minutes = match (digit_at(4), digit_at(5)) {
+        (Some(a), Some(b)) => a * 10 + b
+        _ => return None
+      }
+    } else {
+      return None
+    }
+  }
+  if minutes > 59 {
+    return None
+  }
+  let total = hours * 60 + minutes
+  Some(if sign == '-' { -total } else { total })
 }
 
 ///|
