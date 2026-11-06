@@ -1448,7 +1448,7 @@
 <p>name in [<code>directory</code>].</p>
 <ul><li><code>TZ</code> a path, starting at <code>/</code>: that file, wherever it is.</li><li><code>TZ</code> anything else: a POSIX TZ rule, which is how <code>CST-8</code> and</li></ul>
 <p><code>EST5EDT,M3.2.0,M11.1.0</code> are written and how a container states a zone without carrying a database.</p>
-<p>A machine that names nothing is <code>Unset</code> rather than UTC. Guessing UTC is how a program silently writes timestamps eight hours out; a caller that knows it wants UTC can say so, and passes <code>readings</code> to [<code>@zone.Tz::of</code>] instead.</p></div>
+<p>A machine that names nothing is <code>Unset</code> rather than UTC. Guessing UTC is how a program silently writes timestamps eight hours out; a caller that wants UTC can say so, and a machine whose <code>TZ</code> is empty has said it.</p></div>
 
 </article>
 </section>
