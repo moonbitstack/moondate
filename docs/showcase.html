@@ -108,13 +108,16 @@
               <button class="chip" data-set-p="2026-09-22T14:30:00">wall clock</button>
               <button class="chip" data-set-p="2026-02-29">a date</button>
               <button class="chip" data-set-p="14:30:00">a time</button>
+              <button class="chip" data-set-p="20260922T143000+0800">basic form</button>
+              <button class="chip" data-set-p="2020-01-01[+09:00]">offset in the name</button>
+              <button class="chip" data-set-p="2021-08-19T17:30:45-12:12:59[-12:12:59]">seconds in the name</button>
               <button class="chip" data-fmt-p="%G-W%V-%u">ISO week</button>
               <button class="chip" data-fmt-p="%a %d %b %Y %H:%M %z">log line</button>
             </div>
             <div class="readout" id="p-out" aria-live="polite">shape    Zoned
 canon    2026-09-22T14:30:00+08:00
 format   Tuesday, 22 September 2026</div>
-            <p class="muted" style="font-size:13px;margin:0">The shape line is read from the text: an offset makes an instant, a date and time without one is a wall clock.</p>
+            <p class="muted" style="font-size:13px;margin:0">The shape line is read from the text: an offset makes an instant, a date and time without one is a wall clock. The basic form reads too, and a bracketed offset stands in for the one beside it — but a zone name keeps the minute, so <span class="mono">[-12:12:59]</span> is refused.</p>
           </div>
         </div>
 

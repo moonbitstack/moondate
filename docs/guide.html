@@ -138,13 +138,18 @@
   println(@moondate.parse("2026-09-22T14:30:00"))    // a wall clock
   println(@moondate.parse("2026-09-22"))             // a date
   println(@moondate.parse("14:30:00"))               // a time
+  println(@moondate.parse("20260922T143000+0800"))   // the basic form
+  println(@moondate.parse("2020-01-01[+09:00]"))     // the offset in the name
 }</code></pre>
           </div>
           <div class="output"><span class="lbl">output</span>2026-09-22T14:30:00Z
 2026-09-22T14:30:00
 2026-09-22
-14:30:00</div>
+14:30:00
+2026-09-22T14:30:00+08:00
+2020-01-01T00:00:00+09:00</div>
           <p>Only <span class="mono">Zoned</span> names an instant. The other three are deliberately incomplete: turning a wall clock into an instant needs a zone nobody has supplied, so the library will not guess one.</p>
+          <p>Two spellings of the same grammar are read as well. The basic form drops the separators — <span class="mono">20260922T143000+0800</span> — and a bracketed offset stands in for the one beside it, so <span class="mono">2020-01-01[+09:00]</span> is midnight nine hours ahead. A bracketed name that is a <em>place</em> is different: <span class="mono">[America/New_York]</span> alone says which zone but not which side of a transition the clock was on, so it is refused unless the offset is written beside it.</p>
         </article>
 
         <article class="step" id="writing">
