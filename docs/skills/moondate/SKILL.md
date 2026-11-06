@@ -19,6 +19,7 @@ moon add moonbitstack/moondate
 | schedules | `moonbitstack/moondate/cron` | `Cron`, `parse`, `next` |
 | zones | `moonbitstack/moondate/zone` | `Tz`, `Rule`, `Local`, `Fold`, `Reading` |
 | the database | `moonbitstack/moondate/tzdata` | `load`, `find`, `zones`, `links`, `release` |
+| the machine's zones | `moonbitstack/moondate/zoneinfo` | `open`, `named`, `system`, `directory` |
 
 ## Read a timestamp and write it another way
 
@@ -80,7 +81,9 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
 ## Rules that catch people out
 
 - **Nothing reads a clock.** There is no `now()`: reading the time is I/O, and
-  these packages have none. Pass what your clock said to `Moment::of_epoch`.
+  these packages have none of it. Pass what your clock said to `Moment::of_epoch`.
+  `@zoneinfo` is the one package that opens a file, which is why it is a package of
+  its own; a program that needs none of it does not link it.
 - **A named zone is a reading, not a rule.** `Zone::Named` carries the offset in
   force at that instant, so adding a span across a transition leaves the offset
   stale. Go back through `Tz::moment` when a change has to be crossed.

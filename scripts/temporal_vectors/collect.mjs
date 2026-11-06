@@ -135,6 +135,20 @@ function kindNamespace(kind) {
   return made;
 }
 
+// The properties a plain reading states. A test that reads one of them has said
+// something about the text even when it says nothing about the rest of it.
+const FIELD_NAMES = [
+  "year",
+  "month",
+  "day",
+  "hour",
+  "minute",
+  "second",
+  "millisecond",
+  "microsecond",
+  "nanosecond",
+];
+
 const Temporal = new Proxy(
   {
     ZonedDateTime: kindNamespace("ZonedDateTime"),
@@ -318,9 +332,11 @@ for (const file of files) {
       });
       continue;
     }
-    // A plain reading states its fields rather than an instant. A zoned one has
-    // those fields too, which is why the kind has to agree.
-    if (expected.year !== undefined && record.kind !== "ZonedDateTime") {
+    // A reading states its fields rather than an instant. Some tests state one
+    // field and leave the rest alone — `prototype/year/basic.js` is a test of the
+    // year — and that is still a fact about the text, so the fields are recorded
+    // as they are and the transcription compares the ones that are there.
+    if (FIELD_NAMES.some((name) => expected[name] !== undefined)) {
       cases.push({
         input: record.input,
         kind: record.kind,

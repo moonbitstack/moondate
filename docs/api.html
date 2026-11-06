@@ -98,6 +98,11 @@
 <a href="#fn-tzdata">Functions</a>
 <a href="#const-tzdata">Constants</a>
 </div>
+<div class="group">
+<div class="pkg">@zoneinfo</div>
+<a href="#err-zoneinfo-Refused">Refused</a>
+<a href="#fn-zoneinfo">Functions</a>
+</div>
 </nav>
       <div class="api-body">
 <section class="api-pkg" id="pkg-moondate">
@@ -1383,6 +1388,79 @@
 <article class="api-item" id="const-tzdata-source_digest">
 <div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">source_digest</span> : String</div>
 <div class="doc"><p>The SHA-256 of the source text below, so a release can be recognised without reading the whole of it.</p></div>
+
+</article>
+</section>
+<section class="api-pkg" id="pkg-zoneinfo">
+<header>
+<h2><span class="mono">@zoneinfo</span></h2>
+<div class="imp">import { "moonbitstack/moondate/zoneinfo" }</div>
+</header>
+<div class="api-cat"><h3>Errors</h3></div>
+<section class="api-type" id="err-zoneinfo-Refused">
+<div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">suberror</span> <span class="name">Refused</span></div>
+<div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
+<p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
+<ul class="members"><li>Missing(path~ : String)</li><li>Unreadable(path~ : String, said~ : String)</li><li>BadZone(@zone.Refused)</li><li>Unset</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zoneinfo-Refused-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zoneinfo-Refused-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zoneinfo-Refused-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zoneinfo-Refused-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zoneinfo-Refused-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<div class="api-cat" id="fn-zoneinfo"><h3>Functions</h3></div>
+<article class="api-item" id="fn-zoneinfo-directory">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">directory</span>() -&gt; String</div>
+<div class="doc"><p>The directory the zones are filed in.</p>
+<p><code>TZDIR</code> when the environment names one, and <code>/usr/share/zoneinfo</code> otherwise, which is where the IANA release is installed on every system that has one. A machine that keeps them elsewhere — a container with a copy in the image, a program that carries its own — says so with <code>TZDIR</code>.</p></div>
+
+</article>
+<article class="api-item" id="fn-zoneinfo-named">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">named</span>(StringView) -&gt; @zone.Tz <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The zone filed under <code>name</code> in [<code>directory</code>], which is what a zone name means to the system: <code>Asia/Shanghai</code>, <code>America/New_York</code>, <code>Etc/UTC</code>.</p></div>
+<div class="params"><span class="p"><b>name</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-zoneinfo-open">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">open</span>(StringView, name? : String) -&gt; @zone.Tz <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A zone read from the TZif file at <code>path</code>.</p>
+<p>let tz = @zoneinfo.open("/etc/localtime") tz.abbrev(1790058605)          // EDT, on a machine set to New York</p>
+<p><code>name</code> is what the zone is filed under, and the path is what it is filed under by default: a TZif file carries no name of its own, so the only name there is is the one it was found by. [<code>named</code>] passes the zone's name instead.</p></div>
+<div class="params"><span class="p"><b>path</b> <span class="pt">StringView</span></span><span class="p"><b>name~</b> <span class="pt">String</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="fn-zoneinfo-system">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">system</span>() -&gt; @zone.Tz <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The zone this machine is set to.</p>
+<p>What <code>TZ</code> says, and <code>/etc/localtime</code> when it says nothing — the two answers every other library's <code>localtime</code> gives, in that order:</p>
+<ul><li><code>TZ</code> unset: the file at <code>/etc/localtime</code>, which is how a system states its</li></ul>
+<p>zone to everything that asks.</p>
+<ul><li><code>TZ</code> empty: UTC, which POSIX says outright rather than by omission.</li><li><code>TZ</code> a name, with or without the leading <code>:</code> glibc allows: the file of that</li></ul>
+<p>name in [<code>directory</code>].</p>
+<ul><li><code>TZ</code> a path, starting at <code>/</code>: that file, wherever it is.</li><li><code>TZ</code> anything else: a POSIX TZ rule, which is how <code>CST-8</code> and</li></ul>
+<p><code>EST5EDT,M3.2.0,M11.1.0</code> are written and how a container states a zone without carrying a database.</p>
+<p>A machine that names nothing is <code>Unset</code> rather than UTC. Guessing UTC is how a program silently writes timestamps eight hours out; a caller that wants UTC can say so, and a machine whose <code>TZ</code> is empty has said it.</p></div>
 
 </article>
 </section>

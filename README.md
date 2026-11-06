@@ -151,21 +151,24 @@ replays them. The generators are in `scripts/`.
 One corpus is not a comparison but a specification: test262's `Temporal` suites,
 pinned by commit, played against a stand-in that records what each test asserts.
 A text there answers three questions — the instant, the day, the exact time — and
-the cases this library answers for all three are replayed from
-`src/temporal_vectors_wbtest.mbt`. The ones it does not are counted by reason; the
+some tests ask only one property of a reading, which is answered as the property it
+is. The cases this library answers for all of them are replayed from
+`src/temporal_vectors_wbtest.mbt`; those it does not are counted by reason, and the
 transcription is `scripts/temporal_vectors/`.
 
 ## Time zones
 
 The calendar above has no database behind it, on purpose: `Zone` is a fixed offset,
-which is everything a package with no I/O can honestly carry. The database is two
+which is everything a package with no I/O can honestly carry. The database is three
 packages beside it, and they are separate because a caller that formats an HTTP
-date should not have to carry a hundred kilobytes of rules it never reads.
+date should not have to carry a hundred kilobytes of rules it never reads, and a
+caller that carries its own rules should not have to ask the filesystem for them.
 
 | Package | What it is |
 |:--|:--|
 | `moonbitstack/moondate/zone` | A TZif file read (RFC 9636), the POSIX TZ strings a file's footer carries, and the question every wall clock raises in a zone |
 | `moonbitstack/moondate/tzdata` | The IANA release itself, compiled from its own source the first time a zone is asked for |
+| `moonbitstack/moondate/zoneinfo` | The zones this machine keeps: a file by path, a name from the system's directory, and the zone `TZ` and `/etc/localtime` name |
 
 ```moonbit
 let tz = @tzdata.load("America/New_York")
@@ -180,6 +183,29 @@ A moment that carries a name carries the offset in force at that instant as well
 so it stays a value: it can be compared, written and moved to another zone with no
 database in reach. Crossing a transition is the one thing a value cannot do, which
 is what `Tz::moment` is for.
+
+### The database the machine already has
+
+Carrying the release is one way to have a database; reading the one the system
+keeps is the other, and that is the only thing here that opens a file.
+
+```moonbit
+let tz = @zoneinfo.system()                          // TZ, then /etc/localtime
+let shanghai = @zoneinfo.named("Asia/Shanghai")      // from /usr/share/zoneinfo
+let same = @zoneinfo.open("/etc/localtime")          // any TZif file, by path
+```
+
+`system` reads `TZ` the way a C library does: empty is UTC, a name is a file in
+the directory, a path is that file, and anything else is a POSIX rule — which is
+how `TZ=EST5EDT,M3.2.0,M11.1.0` states a zone without carrying one. A machine that
+names no zone is an error rather than UTC: guessing UTC is how a program silently
+writes timestamps eight hours out. [`directory`](https://moonbitstack.github.io/moondate/api.html)
+is `TZDIR` when the environment has one and `/usr/share/zoneinfo` otherwise.
+
+This is the one package of the four that does I/O, and it is a package of its own
+so that the other three do not. A wasm module with a zone table compiled into it
+links `@zone` and nothing else, and does not carry a filesystem import its host
+would have to satisfy.
 
 ### The two hours that have no single answer
 
@@ -217,21 +243,26 @@ default; `Reject` is there for a program that would rather stop than pick.
 
 | Type | Built with | Asked |
 |:--|:--|:--|
-| `Tz` | `@zone.Tz::parse(bytes)`, `@zone.Tz::of`, `@tzdata.load(name)` | `name`, `at`, `offset`, `abbrev`, `is_dst`, `changes`, `read`, `epoch`, `moment`, `zoned`, `readings`, `rule` |
+| `Tz` | `@zone.Tz::parse(bytes)`, `@zone.Tz::of`, `@tzdata.load(name)`, `@zoneinfo.open`, `@zoneinfo.named`, `@zoneinfo.system` | `name`, `at`, `offset`, `abbrev`, `is_dst`, `changes`, `read`, `epoch`, `moment`, `zoned`, `readings`, `rule` |
 | `Reading` | — | the fields: when it began, the offset in seconds, whether daylight saving was on, the abbreviation |
 | `Local` | `Tz::read` | `epoch(fold~)`, `is_exact` |
 | `Rule` | `Rule::parse` | `text`, `at` |
 | `Tz` from the database | `@tzdata.load`, `@tzdata.find` | the same, plus `@tzdata.zones`, `@tzdata.links`, `@tzdata.release` |
+| `Tz` from this machine | `@zoneinfo.open`, `@zoneinfo.named`, `@zoneinfo.system` | the same, plus `@zoneinfo.directory` |
 
 Free functions in `zone`: `Tz::parse`, `Rule::parse`. In `tzdata`: `zones`,
-`links`, `load`, `find`. Constants: `@tzdata.release` names the IANA version
-carried and `@tzdata.source_digest` is the SHA-256 of the source text, so a release
-can be recognised without reading it.
+`links`, `load`, `find`. In `zoneinfo`: `open`, `named`, `system`, `directory`.
+Constants: `@tzdata.release` names the IANA version carried and
+`@tzdata.source_digest` is the SHA-256 of the source text, so a release can be
+recognised without reading it.
 
 Errors are `zone.Refused`: `Malformed` carries what was expected and the byte it
 stopped at, `Truncated` the size it wanted and the size it got, `Unsupported` the
 TZif version it cannot read, `Unknown` a zone name no database has, and `Missing`
 a wall clock that never happens when the policy is to refuse rather than guess.
+`zoneinfo` has a second one for the file it could not get to: `Missing` a path that
+is not there, `Unreadable` the path and what the filesystem said, `BadZone` the
+bytes that are not a zone, and `Unset` a machine that names none.
 
 ### Where the data comes from
 

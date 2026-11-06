@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondate/zoneinfo"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitstack/moondate/zone",
+}
+
+// Values
+pub fn directory() -> String
+
+pub fn named(StringView) -> @zone.Tz raise Refused
+
+pub fn open(StringView, name? : String) -> @zone.Tz raise Refused
+
+pub fn system() -> @zone.Tz raise Refused
+
+// Errors
+#derive(Eq, @debug.Debug)
+pub suberror Refused {
+  Missing(path~ : String)
+  Unreadable(path~ : String, said~ : String)
+  BadZone(@zone.Refused)
+  Unset
+}
+pub fn Refused::equal(Self, Self) -> Bool
+pub fn Refused::not_equal(Self, Self) -> Bool
+pub fn Refused::output(Self, &Logger) -> Unit
+pub fn Refused::to_repr(Self) -> @debug.Repr
+pub fn Refused::to_string(Self) -> String
+pub impl Show for Refused
+
+// Types and methods
+
+// Type aliases
+
+// Traits
