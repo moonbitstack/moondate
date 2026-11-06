@@ -52,13 +52,13 @@ under a reason. Of the 532:
 
 | | Cases |
 |:--|--:|
-| Answered by `@moondate.parse` | 321 |
+| Answered by `@moondate.parse` | 359 |
 | — zoned readings and names | 103 |
 | — plain dates | 70 |
-| — instants | 148 |
-| — of which refusals | 112 |
+| — instants | 186 |
+| — of which refusals | 132 |
 | Answered by `@tzdata.parse`, whose zone is a place | 14 |
-| Not transcribed | 197 |
+| Not transcribed | 159 |
 
 The refusals are the easier half: the corpus says the text must throw, and a
 parser that throws is right whatever the reason. The exclusions, in order of size:
@@ -66,7 +66,6 @@ parser that throws is right whatever the reason. The exclusions, in order of siz
 | Reason | Cases | What would close it |
 |:--|--:|:--|
 | A reading that states only part of the date | 72 | nothing — those tests assert one property, not a text |
-| An offset with a fraction of a second | 42 | `Zone::Precise`, on `feat/sub-second-offsets` |
 | A text with no offset, which `parse` reads as a plain moment | 33 | nothing — `Instant.from` asks a different question |
 | A calendar this library does not have | 14 | a calendar, which it does not have |
 | A text that names no zone, which `parse` reads | 7 | nothing — same as above |
@@ -85,11 +84,10 @@ zone is a plain moment to `parse` because that is a different question from
 keeps the instant, and a fraction past nine digits is dropped because that is what
 the parser says it does.
 
-One exclusion names a branch. A sub-second offset has nowhere to live in `Zone` as
-it stands — `Offset` counts minutes and `ZoneName.offset` counts seconds — and
-keeping it means a fourth case, which is breaking. That work is on
-`feat/sub-second-offsets`; until it merges, those 42 are refused here rather than
-rounded, and the transcription on that branch answers 359 of the 532.
+This branch is the one that answers a sub-second offset: `Zone::Precise` holds
+nanoseconds, which is why the 42 cases spelled `+00:19:32.37` are in the table
+above rather than in this one. On `master` they are refused, and the count there
+is 321.
 
 ## Moving the pin
 
