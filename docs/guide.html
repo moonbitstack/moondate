@@ -351,6 +351,16 @@ Tue, 22 Sep 2026 02:30:05 EDT</div>
 twice, at 1793511000 and 1793514600
 1793514600</div>
           <p><span class="mono">fold=Compatible</span>, the default, is the answer most callers mean: the first of two repeated hours and the second of two skipped ones. <span class="mono">Earlier</span> and <span class="mono">Later</span> pick by instant, and <span class="mono">Reject</span> refuses rather than picking.</p>
+          <p>The same two questions in one call: <span class="mono">@tzdata.parse</span> reads the place from the text, asks the database what that clock means, and takes <span class="mono">fold</span> for the hour that has none. <span class="mono">@moondate.parse</span> cannot do this on its own — it has no database — so a place name alone is the one text it refuses.</p>
+          <div class="code">
+            <div class="bar"><span class="name">text.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  println(@tzdata.parse("2026-11-01T01:30:00[America/New_York]"))
+  println(@tzdata.parse("2026-11-01T01:30:00[America/New_York]", fold=Later))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-11-01T01:30:00-04:00
+2026-11-01T01:30:00-05:00</div>
           <p>If the zone is already a TZif file on disk, the reader is in <span class="mono">zone</span> and needs no database: <span class="mono">@zone.Tz::parse(bytes)</span> takes the file's bytes and gives back the same <span class="mono">Tz</span>. A file written before 2038 still answers for 2100, because the POSIX rule in its footer is read rather than expanded.</p>
         </article>
 

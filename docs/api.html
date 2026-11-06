@@ -94,6 +94,7 @@
 </div>
 <div class="group">
 <div class="pkg">@tzdata</div>
+<a href="#err-tzdata-Refused">Refused</a>
 <a href="#fn-tzdata">Functions</a>
 <a href="#const-tzdata">Constants</a>
 </div>
@@ -732,17 +733,11 @@
 </article>
 <article class="api-item" id="fn-moondate-parse">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse</span>(StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
-<div class="doc"><p>An expression, in the five-field form crontab(5) defines or the six-field form that puts seconds in front.</p>
-<pre><code class="language-text">┌───────────── second (0-59, six-field form only)
-│ ┌───────────── minute (0-59)
-│ │ ┌───────────── hour (0-23)
-│ │ │ ┌───────────── day of month (1-31)
-│ │ │ │ ┌───────────── month (1-12 or JAN-DEC)
-│ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT, both 0 and 7 being Sunday)
-* * * * * *</code></pre>
-<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is how a scheduler spells the day field it is not using.</p>
-<p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
-<div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
+<div class="doc"><p>A moment read from text whose zone is named by a place.</p>
+<p>[<code>@moondate.parse</code>] keeps a place name when the offset is written beside it and refuses it when it is not: the place alone does not say which side of a transition the clock was on. This is the entry point that knows — it reads the place from the database and answers with <code>fold</code> for the hour that has none.</p>
+<p>let moment = @tzdata.parse("2026-11-01T01:30:00[America/New_York]") moment.strftime("%H:%M %Z")   // 01:30 EDT</p>
+<p>A text that names an offset rather than a place is answered by [<code>@moondate.parse</code>] alone, so this costs a database lookup and nothing else.</p></div>
+<div class="params"><span class="p"><b>text</b> <span class="pt">StringView</span></span><span class="p"><b>fold~</b> <span class="pt">@zone.Fold</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="fn-moondate-parse_layout">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse_layout</span>(StringView, StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
@@ -995,17 +990,11 @@
 <div class="api-cat" id="fn-cron"><h3>Functions</h3></div>
 <article class="api-item" id="fn-cron-parse">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse</span>(StringView) -&gt; Cron <span class="kw">raise</span> Refused</div>
-<div class="doc"><p>An expression, in the five-field form crontab(5) defines or the six-field form that puts seconds in front.</p>
-<pre><code class="language-text">┌───────────── second (0-59, six-field form only)
-│ ┌───────────── minute (0-59)
-│ │ ┌───────────── hour (0-23)
-│ │ │ ┌───────────── day of month (1-31)
-│ │ │ │ ┌───────────── month (1-12 or JAN-DEC)
-│ │ │ │ │ ┌───────────── day of week (0-7 or SUN-SAT, both 0 and 7 being Sunday)
-* * * * * *</code></pre>
-<p>Each field takes <code>*</code>, a number, a range <code>a-b</code>, a step <code>*/n</code> or <code>a-b/n</code>, and a comma-separated list of those. <code>?</code> reads as <code>*</code>, which is how a scheduler spells the day field it is not using.</p>
-<p>The shorthands <code>@yearly</code>, <code>@annually</code>, <code>@monthly</code>, <code>@weekly</code>, <code>@daily</code>, <code>@midnight</code> and <code>@hourly</code> are the ones crontab(5) lists. <code>@reboot</code> is not here: it names an event rather than a time, and this package answers when something fires, not why.</p></div>
-<div class="params"><span class="p"><b>expr</b> <span class="pt">StringView</span></span></div>
+<div class="doc"><p>A moment read from text whose zone is named by a place.</p>
+<p>[<code>@moondate.parse</code>] keeps a place name when the offset is written beside it and refuses it when it is not: the place alone does not say which side of a transition the clock was on. This is the entry point that knows — it reads the place from the database and answers with <code>fold</code> for the hour that has none.</p>
+<p>let moment = @tzdata.parse("2026-11-01T01:30:00[America/New_York]") moment.strftime("%H:%M %Z")   // 01:30 EDT</p>
+<p>A text that names an offset rather than a place is answered by [<code>@moondate.parse</code>] alone, so this costs a database lookup and nothing else.</p></div>
+<div class="params"><span class="p"><b>text</b> <span class="pt">StringView</span></span><span class="p"><b>fold~</b> <span class="pt">@zone.Fold</span> <span class="d">= …</span></span></div>
 </article>
 </section>
 <section class="api-pkg" id="pkg-zone">
@@ -1322,6 +1311,26 @@
 <h2><span class="mono">@tzdata</span></h2>
 <div class="imp">import { "moonbitstack/moondate/tzdata" }</div>
 </header>
+<div class="api-cat"><h3>Errors</h3></div>
+<section class="api-type" id="err-tzdata-Refused">
+<div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">suberror</span> <span class="name">Refused</span></div>
+<div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
+<p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
+<ul class="members"><li>BadText(@moondate.Refused)</li><li>BadZone(@zone.Refused)</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-tzdata-Refused-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-tzdata-Refused-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
 <div class="api-cat" id="fn-tzdata"><h3>Functions</h3></div>
 <article class="api-item" id="fn-tzdata-find">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">find</span>(StringView) -&gt; @zone.Tz?</div>
@@ -1339,6 +1348,14 @@
 <div class="doc"><p>The zone filed under <code>name</code>, which may be an alias.</p>
 <p>The zone is compiled from the release's source the first time it is asked for, which is a table of a few hundred readings per zone; a program that needs a dozen zones pays for a dozen.</p></div>
 <div class="params"><span class="p"><b>name</b> <span class="pt">StringView</span></span></div>
+</article>
+<article class="api-item" id="fn-tzdata-parse">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">parse</span>(StringView, fold? : @zone.Fold) -&gt; @moondate.Moment <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A moment read from text whose zone is named by a place.</p>
+<p>[<code>@moondate.parse</code>] keeps a place name when the offset is written beside it and refuses it when it is not: the place alone does not say which side of a transition the clock was on. This is the entry point that knows — it reads the place from the database and answers with <code>fold</code> for the hour that has none.</p>
+<p>let moment = @tzdata.parse("2026-11-01T01:30:00[America/New_York]") moment.strftime("%H:%M %Z")   // 01:30 EDT</p>
+<p>A text that names an offset rather than a place is answered by [<code>@moondate.parse</code>] alone, so this costs a database lookup and nothing else.</p></div>
+<div class="params"><span class="p"><b>text</b> <span class="pt">StringView</span></span><span class="p"><b>fold~</b> <span class="pt">@zone.Fold</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="fn-tzdata-zones">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">zones</span>() -&gt; Array[String]</div>

@@ -84,6 +84,18 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
 - **A named zone is a reading, not a rule.** `Zone::Named` carries the offset in
   force at that instant, so adding a span across a transition leaves the offset
   stale. Go back through `Tz::moment` when a change has to be crossed.
+- **A place name needs `@tzdata.parse`.** `@moondate.parse` has no database, so a
+  text like `…[America/New_York]` with no offset beside it is refused there; the
+  `tzdata` entry point resolves it and takes `fold` for the hour that has none.
+- **Annotations are read, and a `!` binds you.** `[u-ca=iso8601]` and `[foo=bar]`
+  are accepted and ignored; `[!foo=bar]` is refused, because the `!` says the
+  reader has to understand the key. A key with a capital in it is refused too.
+- **A place name needs `@tzdata.parse`.** `@moondate.parse` has no database, so a
+  text like `…[America/New_York]` with no offset beside it is refused there; the
+  `tzdata` entry point resolves it, and takes `fold` for the hour that has none.
+- **Annotations are read, and a `!` binds you.** `[u-ca=iso8601]` and `[foo=bar]`
+  are accepted and ignored; `[!foo=bar]` is refused, because the `!` says the
+  reader has to understand the key. A key with a capital in it is refused too.
 - **A bracketed name is an instant only when it is an offset.** `…[+09:00]` and
   `…[UTC]` parse on their own, and `…-04:00[America/New_York]` parses because the
   offset is there. `…[America/New_York]` alone is refused: a place does not say

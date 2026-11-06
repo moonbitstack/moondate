@@ -61,6 +61,12 @@ ahead and `…[UTC]` needs nothing else. A bracketed *name* is a different thing
 was on, so it is refused unless the offset is written beside it. A zone name also
 keeps the minute — `[+01:35]` is a name, `[+01:35:00]` is not.
 
+Annotations after the moment are Temporal's, and `parse` reads them: `[u-ca=iso8601]`
+is the calendar it already has, `[foo=bar]` is somebody else's business and is
+ignored, and `[!foo=bar]` says the reader *must* understand the key — which it does
+not, so it refuses. Two zones, two calendars, or a key with a capital in it are
+refused as well.
+
 ## What it reads and writes
 
 | Form | Where it is used |
@@ -164,6 +170,15 @@ database in reach. Crossing a transition is the one thing a value cannot do, whi
 is what `Tz::moment` is for.
 
 ### The two hours that have no single answer
+
+A place name is the one thing `parse` will not answer, because the answer depends
+on a database it does not carry. `@tzdata.parse` is that entry point: it reads the
+place from the release and takes `fold` for the hour that has none.
+
+```moonbit
+let moment = @tzdata.parse("2026-11-01T01:30:00[America/New_York]")
+moment.strftime("%H:%M %Z")                         // 01:30 EDT
+```
 
 Twice a year a wall clock is a bad question. In most of the world one hour of a
 spring morning never happens and one hour of an autumn night happens twice, and a
