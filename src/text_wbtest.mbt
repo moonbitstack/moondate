@@ -244,3 +244,21 @@ test "a bracketed offset says when it was, all by itself" {
   let place = Some(parse("1970-01-01T00:00[Europe/Paris]")) catch { _ => None }
   assert_eq(place is None, true)
 }
+
+///|
+test "ISO 8601's basic form is the same grammar without the separators" {
+  // The date, the clock and the offset each lose their marks, in any mix.
+  assert_eq(round("20260922T143000+0800"), "2026-09-22T14:30:00+08:00")
+  assert_eq(round("2026-09-22T143000+0800"), "2026-09-22T14:30:00+08:00")
+  assert_eq(round("20260922T14:30:00+0800"), "2026-09-22T14:30:00+08:00")
+  assert_eq(round("20260922"), "2026-09-22")
+  assert_eq(round("20260922T1430Z"), "2026-09-22T14:30:00Z")
+  assert_eq(round("+0019761118T152330.1-0800"), "1976-11-18T15:23:30.1-08:00")
+  // A clock of one field is the hour, which is where reduced precision stops.
+  assert_eq(round("1970-01-01T15Z"), "1970-01-01T15:00:00Z")
+  // An offset with seconds is kept to the second, and a fraction of one is not
+  // something a fixed zone here can hold.
+  assert_eq(round("1970-01-01T00:00+01:35:00"), "1970-01-01T00:00:00+01:35")
+  let too_fine = Some(parse("1970-01-01T00:00+01:35:00.5")) catch { _ => None }
+  assert_eq(too_fine is None, true)
+}

@@ -19,7 +19,7 @@
 /// beside it, and refused when it does not: the place alone does not say which
 /// side of a transition the clock was on.
 pub fn parse(src : StringView) -> Moment raise Refused {
-  let s = src.to_owned()
+  let s = spaced(src.to_owned())
   // A bare time has a colon where a date would have a dash.
   if s.length() >= 5 && at(s, 2) == ':' {
     return Clock(time=time_of(s, 0, s.length()))
@@ -70,6 +70,16 @@ pub fn parse(src : StringView) -> Moment raise Refused {
     }
   }
   let name = if bracket < s.length() { bracket_name_of(s, bracket) } else { "" }
+  // A zone is filed under a name, and a name here keeps the minute: `[+01:35]` is
+  // somewhere to file an instant, `[+01:35:00]` is not. test262 refuses the second
+  // for the same reason — a zone identifier has no seconds field in it.
+  if name.length() > 0 && (at(name, 0) == '+' || at(name, 0) == '-') {
+    match offset_of_name(name) {
+      Some(_) => ()
+      None =>
+        raise Malformed("a zone name has no seconds: [+01:35], not [+01:35:00]")
+    }
+  }
   // The offset, if any, begins at the first Z or at a sign that is not part of the
   // time — which is any sign at all, since the time itself carries none.
   let mut cut = bracket
@@ -94,6 +104,146 @@ pub fn parse(src : StringView) -> Moment raise Refused {
     }
   }
   Zoned(date~, time~, zone=with_name(zone_of(s, cut, bracket), name))
+}
+
+///|
+/// The text with the separators ISO 8601 leaves out put back.
+///
+/// The basic form is the same grammar with three separators dropped —
+/// `19761118T152330-0800` is `1976-11-18T15:23:30-08:00` — so it is rewritten here
+/// and the reader below keeps one shape in mind. A text that is already extended
+/// comes back unchanged, and so does one this does not recognise, which then fails
+/// where it always did.
+fn spaced(src : String) -> String {
+  let s = src
+  let n = s.length()
+  let mut bracket = n
+  for i = 0; i < n; i = i + 1 {
+    if at(s, i) == '[' {
+      bracket = i
+      break
+    }
+  }
+  let mut sep = -1
+  for i = 0; i < bracket; i = i + 1 {
+    let c = at(s, i)
+    if c == 'T' || c == 't' || c == ' ' {
+      sep = i
+      break
+    }
+  }
+  let date = spaced_date(s[:if sep < 0 { bracket } else { sep }].to_owned())
+  let tail = s[bracket:].to_owned()
+  if sep < 0 {
+    return date + tail
+  }
+  date + "T" + spaced_clock(s[sep + 1:bracket].to_owned()) + tail
+}
+
+///|
+/// `19761118` as `1976-11-18`, and `+0019761118` as `+001976-11-18`.
+fn spaced_date(date : String) -> String {
+  if date.contains("-") {
+    return date
+  }
+  let n = date.length()
+  let mut from = 0
+  if n > 0 && (at(date, 0) == '+' || at(date, 0) == '-') {
+    from = 1
+  }
+  let year_width = if from == 1 { 6 } else { 4 }
+  if n - from != year_width + 4 {
+    return date
+  }
+  for i = from; i < n; i = i + 1 {
+    let c = at(date, i)
+    if c < '0' || c > '9' {
+      return date
+    }
+  }
+  let cut = from + year_width
+  date[:cut].to_owned() +
+  "-" +
+  date[cut:cut + 2].to_owned() +
+  "-" +
+  date[cut + 2:].to_owned()
+}
+
+///|
+/// `152330.1` as `15:23:30.1`, `1500` as `15:00`, and the offset beside them.
+fn spaced_clock(clock : String) -> String {
+  let n = clock.length()
+  let mut cut = n
+  for i = 0; i < n; i = i + 1 {
+    let c = at(clock, i)
+    if c == 'Z' || c == 'z' || c == '+' || c == '-' {
+      cut = i
+      break
+    }
+  }
+  spaced_time(clock[:cut].to_owned()) + spaced_offset(clock[cut:].to_owned())
+}
+
+///|
+/// `152330` as `15:23:30`, and `1500` as `15:00`.
+fn spaced_time(time : String) -> String {
+  if time.contains(":") {
+    return time
+  }
+  let lead = leading_digits(time)
+  if lead == 6 {
+    time[:2].to_owned() + ":" + time[2:4].to_owned() + ":" + time[4:].to_owned()
+  } else if lead == 4 {
+    time[:2].to_owned() + ":" + time[2:].to_owned()
+  } else {
+    time
+  }
+}
+
+///|
+/// `-0800` as `-08:00`, `-08` as `-08:00`, `-080000` as `-08:00:00`.
+fn spaced_offset(offset : String) -> String {
+  let n = offset.length()
+  if n == 0 {
+    return offset
+  }
+  let c = at(offset, 0)
+  if c == 'Z' || c == 'z' || offset.contains(":") {
+    return offset
+  }
+  // The fraction, when there is one, stays as it was: only the separators between
+  // the fields are missing.
+  let mut cut = n
+  for i = 0; i < n; i = i + 1 {
+    let mark = at(offset, i)
+    if mark == '.' || mark == ',' {
+      cut = i
+      break
+    }
+  }
+  let body = offset[:cut].to_owned()
+  let fraction = offset[cut:].to_owned()
+  let spaced = if body.length() == 3 {
+    body + ":00"
+  } else if body.length() == 5 {
+    body[:3].to_owned() + ":" + body[3:].to_owned()
+  } else if body.length() == 7 {
+    body[:3].to_owned() + ":" + body[3:5].to_owned() + ":" + body[5:].to_owned()
+  } else {
+    body
+  }
+  spaced + fraction
+}
+
+///|
+/// How many digits `text` opens with.
+fn leading_digits(text : String) -> Int32 {
+  let n = text.length()
+  let mut k = 0
+  while k < n && at(text, k) >= '0' && at(text, k) <= '9' {
+    k = k + 1
+  }
+  k
 }
 
 ///|
@@ -194,6 +344,11 @@ fn date_of(s : String, from : Int32) -> Date raise Refused {
 /// RFC 3339 requires the seconds; TOML's local time allows them to be left off, and
 /// so does ISO 8601, so they are optional here.
 fn time_of(s : String, from : Int32, end : Int32) -> Time raise Refused {
+  // A clock of one field is the hour and nothing else, which is what ISO 8601
+  // calls reduced precision and what `1970-01-01T00Z` means.
+  if end - from == 2 {
+    return Time::new(digits(s, from, 2), 0)
+  }
   if end - from < 5 || at(s, from + 2) != ':' {
     raise Malformed("a time is HH:MM[:SS[.fff]]")
   }
@@ -247,8 +402,8 @@ fn zone_of(s : String, from : Int32, end : Int32) -> Zone raise Refused {
     return Utc
   }
   let width = end - from
-  if (width != 6 && width != 9) || at(s, from + 3) != ':' {
-    raise Malformed("an offset is +HH:MM[:SS] or -HH:MM[:SS]")
+  if width < 6 || at(s, from + 3) != ':' {
+    raise Malformed("an offset is ±HH:MM[:SS[:fff]]")
   }
   let hours = digits(s, from + 1, 2)
   let minutes = digits(s, from + 4, 2)
@@ -259,13 +414,37 @@ fn zone_of(s : String, from : Int32, end : Int32) -> Zone raise Refused {
     raise Range(field="offset minute", got=minutes, low=0, high=59)
   }
   let mut seconds = 0
-  if width == 9 {
-    if at(s, from + 6) != ':' {
-      raise Malformed("an offset is +HH:MM[:SS] or -HH:MM[:SS]")
+  let mut k = from + 6
+  if k < end {
+    if at(s, k) != ':' {
+      raise Malformed("an offset is ±HH:MM[:SS[:fff]]")
     }
-    seconds = digits(s, from + 7, 2)
+    if end - k < 3 {
+      raise Truncated("an offset second is two digits")
+    }
+    seconds = digits(s, k + 1, 2)
     if seconds > 59 {
       raise Range(field="offset second", got=seconds, low=0, high=59)
+    }
+    k = k + 3
+    if k < end {
+      let mark = at(s, k)
+      if mark != '.' && mark != ',' {
+        raise Malformed("an offset is ±HH:MM[:SS[:fff]]")
+      }
+      k = k + 1
+      if k == end {
+        raise Malformed("a dot with no digits after it")
+      }
+      // The value keeps seconds because a zone read before standard time needs
+      // them, and stops there: a fraction of a second is below the finest thing a
+      // fixed offset here can hold, so a non-zero one is refused rather than lost.
+      while k < end {
+        if digit(s, k) != 0 {
+          raise Malformed("an offset here is a whole second")
+        }
+        k = k + 1
+      }
     }
   }
   let total = hours * 3600 + minutes * 60 + seconds
