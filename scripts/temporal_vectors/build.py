@@ -33,11 +33,6 @@ KIND_ZONED = "ZonedDateTime"
 KIND_DATE = "PlainDate"
 KIND_INSTANT = "Instant"
 
-# `moon fmt` leaves a row alone up to this width and breaks it after it, so the
-# generator writes the same shape and the file does not change under the
-# formatter. A transcription that fmt rewrote would make `--check` useless.
-ROW_WIDTH = 81
-
 
 # ---- reading the text ------------------------------------------------------
 
@@ -308,11 +303,15 @@ def split_ns(nanoseconds: str):
     return seconds, nano
 
 
-def row(content: str):
-    single = "  (" + content + "),"
-    if len(single) <= ROW_WIDTH:
-        return [single]
-    return ["  (", "    " + content + ",", "  ),"]
+def row(items):
+    """One tuple, on one line.
+
+    The line is not wrapped here: `moon fmt` does that, with a rule about where a
+    break reads best that is not a column count, and `run.py` formats the file
+    after writing it. Guessing at the rule here would only mean two layouts to
+    keep in step.
+    """
+    return ["  (" + ", ".join(items) + "),"]
 
 
 def render(pin: str, cases, counts) -> str:
@@ -333,7 +332,7 @@ def render(pin: str, cases, counts) -> str:
         out.append("/// One line per case, in the shape the replay reads.")
         out.append("let {} : Array[{}] = [".format(name, shape))
         for entry in rows:
-            out.extend(row(entry))
+            out.extend(entry)
         out.append("]")
         out.append("")
 
@@ -341,12 +340,12 @@ def render(pin: str, cases, counts) -> str:
         "readings",
         "(String, Int64, Int64, String)",
         [
-            "{}, {}L, {}L, {}".format(
+            row([
                 quote(c["input"]),
-                split_ns(c["epochNanoseconds"])[0],
-                split_ns(c["epochNanoseconds"])[1],
+                "{}L".format(split_ns(c["epochNanoseconds"])[0]),
+                "{}L".format(split_ns(c["epochNanoseconds"])[1]),
                 quote(c["timeZoneId"] or ""),
-            )
+            ])
             for c in zoned
             if c.get("epochNanoseconds") is not None
         ],
@@ -355,7 +354,7 @@ def render(pin: str, cases, counts) -> str:
         "names",
         "(String, String)",
         [
-            "{}, {}".format(quote(c["input"]), quote(c["timeZoneId"] or ""))
+            row([quote(c["input"]), quote(c["timeZoneId"] or "")])
             for c in zoned
             if c.get("epochNanoseconds") is None and "thrown" not in c
         ],
@@ -364,12 +363,12 @@ def render(pin: str, cases, counts) -> str:
         "dates",
         "(String, Int32, Int32, Int32)",
         [
-            "{}, {}, {}, {}".format(
+            row([
                 quote(c["input"]),
-                int(c["fields"]["year"]),
-                int(c["fields"]["month"]),
-                int(c["fields"]["day"]),
-            )
+                str(int(c["fields"]["year"])),
+                str(int(c["fields"]["month"])),
+                str(int(c["fields"]["day"])),
+            ])
             for c in dates
             if "thrown" not in c
         ],
@@ -378,11 +377,11 @@ def render(pin: str, cases, counts) -> str:
         "instants",
         "(String, Int64, Int64)",
         [
-            "{}, {}L, {}L".format(
+            row([
                 quote(c["input"]),
-                split_ns(c["epochNanoseconds"])[0],
-                split_ns(c["epochNanoseconds"])[1],
-            )
+                "{}L".format(split_ns(c["epochNanoseconds"])[0]),
+                "{}L".format(split_ns(c["epochNanoseconds"])[1]),
+            ])
             for c in instants
             if c.get("epochNanoseconds") is not None
         ],
@@ -395,7 +394,7 @@ def render(pin: str, cases, counts) -> str:
         table(
             name,
             "(String, String)",
-            ["{}, {}".format(quote(c["input"]), quote(c["thrown"])) for c in rows],
+            [row([quote(c["input"]), quote(c["thrown"])]) for c in rows],
         )
     return "\n".join(out)
 
@@ -426,7 +425,7 @@ def render_places(pin: str, cases, counts) -> str:
         out.append("/// One line per case, in the shape the replay reads.")
         out.append("let {} : Array[{}] = [".format(name, shape))
         for entry in rows:
-            out.extend(row(entry))
+            out.extend(entry)
         out.append("]")
         out.append("")
 
@@ -434,12 +433,12 @@ def render_places(pin: str, cases, counts) -> str:
         "places",
         "(String, Int64, Int64, String)",
         [
-            "{}, {}L, {}L, {}".format(
+            row([
                 quote(c["input"]),
-                split_ns(c["epochNanoseconds"])[0],
-                split_ns(c["epochNanoseconds"])[1],
+                "{}L".format(split_ns(c["epochNanoseconds"])[0]),
+                "{}L".format(split_ns(c["epochNanoseconds"])[1]),
                 quote(c["timeZoneId"] or ""),
-            )
+            ])
             for c in valued
         ],
     )
@@ -447,12 +446,12 @@ def render_places(pin: str, cases, counts) -> str:
         "place_dates",
         "(String, Int32, Int32, Int32)",
         [
-            "{}, {}, {}, {}".format(
+            row([
                 quote(c["input"]),
-                int(c["fields"]["year"]),
-                int(c["fields"]["month"]),
-                int(c["fields"]["day"]),
-            )
+                str(int(c["fields"]["year"])),
+                str(int(c["fields"]["month"])),
+                str(int(c["fields"]["day"])),
+            ])
             for c in dated
             if all(k in c["fields"] for k in ("year", "month", "day"))
         ],
@@ -460,7 +459,7 @@ def render_places(pin: str, cases, counts) -> str:
     table(
         "place_refusals",
         "(String, String)",
-        ["{}, {}".format(quote(c["input"]), quote(c["thrown"])) for c in refused],
+        [row([quote(c["input"]), quote(c["thrown"])]) for c in refused],
     )
     return "\n".join(out)
 

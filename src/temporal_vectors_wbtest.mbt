@@ -47,7 +47,8 @@ let readings : Array[(String, Int64, Int64, String)] = [
   ("1970-01-01T00:00[UTC][foo=bar][u-ca=iso8601]", 0L, 0L, ""),
   ("1970-01-01T00:00[UTC][u-ca=iso8601][foo=bar]", 0L, 0L, ""),
   (
-    "1970-01-01T00:00[UTC][foo=bar][_foo-bar0=Ignore-This-999999999999]", 0L, 0L, "",
+    "1970-01-01T00:00[UTC][foo=bar][_foo-bar0=Ignore-This-999999999999]", 0L, 0L,
+    "",
   ),
   ("2001-09-09T01:46:40+00:00[UTC]", 1000000000L, 0L, ""),
   ("1970-01-01T00:00[+01:00]", -3600L, 0L, "+01:00"),
