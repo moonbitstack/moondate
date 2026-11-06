@@ -16,6 +16,7 @@ the corpus gives, which is how CI notices that one of the two has moved.
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,7 @@ SUITES = {
     "instants": "test/built-ins/Temporal/Instant",
 }
 OUT = os.path.join(ROOT, "src", "temporal_vectors_wbtest.mbt")
+PLACES = os.path.join(ROOT, "src", "tzdata", "place_vectors_wbtest.mbt")
 
 
 def fetch(work: str) -> dict:
@@ -63,6 +65,16 @@ def fetch(work: str) -> dict:
         except TypeError:
             tar.extractall(work, members=members)
     return {name: os.path.join(root, path) for name, path in SUITES.items()}
+
+
+def look_alike(made: str, kept: str) -> bool:
+    """Whether two transcriptions say the same thing.
+
+    `moon fmt` re-wraps a row by filling the line rather than breaking it into a
+    fixed shape, which no generator reproduces exactly. The layout is not the
+    transcription — the values are — so the comparison ignores whitespace.
+    """
+    return re.sub(r"\s+", "", made) == re.sub(r"\s+", "", kept)
 
 
 def run(command):
@@ -101,6 +113,7 @@ def main() -> None:
 
     if args.check:
         temporary = os.path.join(args.work, "generated.mbt")
+        temporary_places = os.path.join(args.work, "generated-places.mbt")
         run(
             [
                 sys.executable,
@@ -109,15 +122,21 @@ def main() -> None:
                 joined,
                 "--out",
                 temporary,
+                "--places-out",
+                temporary_places,
             ]
         )
-        with open(temporary, encoding="utf-8") as handle:
-            made = handle.read()
-        with open(OUT, encoding="utf-8") as handle:
-            kept = handle.read()
-        if made != kept:
-            print("the transcription is not what the corpus gives", file=sys.stderr)
-            raise SystemExit(1)
+        for made_path, kept_path in ((temporary, OUT), (temporary_places, PLACES)):
+            with open(made_path, encoding="utf-8") as handle:
+                made = handle.read()
+            with open(kept_path, encoding="utf-8") as handle:
+                kept = handle.read()
+            if not look_alike(made, kept):
+                print(
+                    "the transcription is not what the corpus gives: " + kept_path,
+                    file=sys.stderr,
+                )
+                raise SystemExit(1)
         print("the transcription is what the corpus gives")
         return
 
@@ -130,6 +149,8 @@ def main() -> None:
                 joined,
                 "--out",
                 OUT,
+                "--places-out",
+                PLACES,
                 "--report",
                 os.path.join(args.work, "report.txt"),
             ]

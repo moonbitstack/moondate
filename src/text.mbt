@@ -43,16 +43,34 @@ pub fn parse(src : StringView) -> Moment raise Refused {
     Some(y) => Date::new(y, digits(s, rest, 2), digits(s, rest + 3, 2))
     None => date_of(s, 0)
   }
-  if s.length() == rest + 5 {
-    return Day(date~)
+  // The annotations come after everything else — the zone the moment was read in
+  // and the calendar it was written in — so they are found first and set the end
+  // of the text the date and time have to fill.
+  let mut bracket = s.length()
+  for i = rest + 5; i < s.length(); i = i + 1 {
+    if at(s, i) == '[' {
+      bracket = i
+      break
+    }
   }
-  // A date on its own, with the offset given in the annotation:
-  // `2020-01-01[+09:00]`, which is midnight where that offset runs.
-  if at(s, rest + 5) == '[' {
-    let name = bracket_name_of(s, rest + 5)
-    match offset_of_name(name) {
+  let notes = if bracket < s.length() {
+    notes_of(s, bracket)
+  } else {
+    no_notes()
+  }
+  if bracket == rest + 5 {
+    if notes.zone == "" {
+      return Day(date~)
+    }
+    // A date on its own, with the offset given in the annotation:
+    // `2020-01-01[+09:00]`, which is midnight where that offset runs.
+    match offset_of_name(notes.zone) {
       Some(minutes) =>
-        return Zoned(date~, time=Time::new(0, 0), zone=named(name, minutes))
+        return Zoned(
+          date~,
+          time=Time::new(0, 0),
+          zone=named(notes.zone, minutes),
+        )
       None => raise Malformed("a bracketed zone needs an offset to go with it")
     }
   }
@@ -60,26 +78,7 @@ pub fn parse(src : StringView) -> Moment raise Refused {
   if sep != 'T' && sep != 't' && sep != ' ' {
     raise Malformed("a date and a time are joined by T or a space")
   }
-  // A zone may be named after the offset, the way Temporal writes one:
-  // `2026-11-01T01:30:00-04:00[America/New_York]`. The name goes to the end.
-  let mut bracket = s.length()
-  for i = rest + 6; i < s.length(); i = i + 1 {
-    if at(s, i) == '[' {
-      bracket = i
-      break
-    }
-  }
-  let name = if bracket < s.length() { bracket_name_of(s, bracket) } else { "" }
-  // A zone is filed under a name, and a name here keeps the minute: `[+01:35]` is
-  // somewhere to file an instant, `[+01:35:00]` is not. test262 refuses the second
-  // for the same reason — a zone identifier has no seconds field in it.
-  if name.length() > 0 && (at(name, 0) == '+' || at(name, 0) == '-') {
-    match offset_of_name(name) {
-      Some(_) => ()
-      None =>
-        raise Malformed("a zone name has no seconds: [+01:35], not [+01:35:00]")
-    }
-  }
+  let name = notes.zone
   // The offset, if any, begins at the first Z or at a sign that is not part of the
   // time — which is any sign at all, since the time itself carries none.
   let mut cut = bracket
@@ -247,12 +246,173 @@ fn leading_digits(text : String) -> Int32 {
 }
 
 ///|
-/// `[America/New_York]` at `from`, as the name inside it.
-fn bracket_name_of(s : String, from : Int32) -> String raise Refused {
-  if s.length() < from + 3 || at(s, s.length() - 1) != ']' {
-    raise Malformed("a zone name is written [America/New_York]")
+/// What the annotations say. The only calendar this library has is the ISO one, so
+/// a calendar annotation is checked and then dropped; the zone is the part that
+/// outlives the text.
+priv struct Notes {
+  /// The zone's name, or "" when the text names none.
+  zone : String
+}
+
+///|
+/// A text with no annotations at all.
+fn no_notes() -> Notes {
+  { zone: "", }
+}
+
+///|
+/// The annotations at `from`, which run to the end of the text.
+///
+/// A bracket holds either a zone — a place or an offset — or a `key=value`
+/// annotation. The zone comes first when both are there, a `!` before a key means
+/// the reader has to understand it, and a key that is not `u-ca` is someone else's
+/// business and is ignored unless it is critical. This is Temporal's grammar, and
+/// the cases it turns on are the ones that say what to do with
+/// `[u-ca=iso8601]`, `[foo=bar]` and `[!foo=bar]`.
+fn notes_of(s : String, from : Int32) -> Notes raise Refused {
+  if at(s, s.length() - 1) != ']' {
+    raise Malformed("an annotation is written [key=value]")
   }
-  s[from + 1:s.length() - 1].to_owned()
+  let mut zone = ""
+  let mut seen_calendar = false
+  let mut i = from
+  while i < s.length() {
+    if at(s, i) != '[' {
+      raise Malformed("an annotation is written [key=value]")
+    }
+    let mut end = i + 1
+    while end < s.length() && at(s, end) != ']' {
+      end = end + 1
+    }
+    if end >= s.length() {
+      raise Malformed("an annotation is written [key=value]")
+    }
+    let note = s[i + 1:end].to_owned()
+    if note.length() == 0 {
+      raise Malformed("an empty annotation")
+    }
+    // A note with an `=` in it is a key and a value; anything else is a zone.
+    let mut eq = -1
+    for k = 0; k < note.length(); k = k + 1 {
+      if at(note, k) == '=' {
+        eq = k
+        break
+      }
+    }
+    if eq >= 0 {
+      let (key, value, critical) = split_key(note, eq)
+      if key == "u-ca" {
+        if seen_calendar {
+          raise Malformed("two calendars in one text")
+        }
+        // `gregory` names the same year, month and day as ISO in Temporal — it is
+        // proleptic, with no Julian switch — so the two are one calendar here.
+        if !same_text(value, "iso8601") && !same_text(value, "gregory") {
+          raise Malformed(
+            "the calendars here are iso8601 and gregory, not " + value,
+          )
+        }
+        seen_calendar = true
+      } else if critical {
+        raise Malformed("this reader does not understand " + note)
+      }
+    } else {
+      if zone != "" {
+        raise Malformed("a text names one zone, not two")
+      }
+      if seen_calendar {
+        raise Malformed("a zone comes before the annotations that follow it")
+      }
+      // `[!UTC]` is a zone the reader has to understand, and this one does.
+      zone = if at(note, 0) == '!' { note[1:].to_owned() } else { note }
+      if zone.length() == 0 {
+        raise Malformed("an empty annotation")
+      }
+      // A zone name keeps the minute: `[+01:35]` is a name, `[+01:35:00]` is not.
+      if at(zone, 0) == '+' || at(zone, 0) == '-' {
+        match offset_of_name(zone) {
+          Some(_) => ()
+          None =>
+            raise Malformed(
+              "a zone name has no seconds: [+01:35], not [+01:35:00]",
+            )
+        }
+      }
+    }
+    i = end + 1
+  }
+  { zone, }
+}
+
+///|
+/// `key=value` split three ways at `at_eq`, with the `!` that marks it critical
+/// taken off the key. A key or a value that breaks Temporal's grammar is refused
+/// rather than read as an unknown one, which is what `[FOO=bar]` is testing.
+fn split_key(
+  note : String,
+  at_eq : Int32,
+) -> (String, String, Bool) raise Refused {
+  let mut critical = false
+  let mut start = 0
+  if at(note, 0) == '!' {
+    critical = true
+    start = 1
+  }
+  let key = note[start:at_eq].to_owned()
+  let value = note[at_eq + 1:].to_owned()
+  // Temporal's grammar for a key is lowercase letters, digits, dashes and
+  // underscores — `[_foo-bar0=…]` is a key — and for a value the same plus
+  // capitals.
+  if key.length() == 0 || value.length() == 0 {
+    raise Malformed("an annotation is key=value")
+  }
+  for i = 0; i < key.length(); i = i + 1 {
+    let c = at(key, i)
+    if !(c >= 'a' && c <= 'z') &&
+      !(c >= '0' && c <= '9') &&
+      c != '-' &&
+      c != '_' {
+      raise Malformed(
+        "an annotation key is lowercase letters, digits and dashes",
+      )
+    }
+  }
+  for i = 0; i < value.length(); i = i + 1 {
+    let c = at(value, i)
+    if !(c >= 'a' && c <= 'z') &&
+      !(c >= 'A' && c <= 'Z') &&
+      !(c >= '0' && c <= '9') &&
+      c != '-' &&
+      c != '_' {
+      raise Malformed(
+        "an annotation value is letters, digits, dashes and underscores",
+      )
+    }
+  }
+  (key, value, critical)
+}
+
+///|
+/// Whether two texts are the same but for the case of their letters.
+fn same_text(a : String, b : String) -> Bool {
+  if a.length() != b.length() {
+    return false
+  }
+  for i = 0; i < a.length(); i = i + 1 {
+    let left = at(a, i)
+    let right = at(b, i)
+    let lower = fn(c : Char) -> Char {
+      if c >= 'A' && c <= 'Z' {
+        (c.to_int() + 32).unsafe_to_char()
+      } else {
+        c
+      }
+    }
+    if lower(left) != lower(right) {
+      return false
+    }
+  }
+  true
 }
 
 ///|

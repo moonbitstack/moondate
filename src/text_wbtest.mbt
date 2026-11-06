@@ -262,3 +262,39 @@ test "ISO 8601's basic form is the same grammar without the separators" {
   let too_fine = Some(parse("1970-01-01T00:00+01:35:00.5")) catch { _ => None }
   assert_eq(too_fine is None, true)
 }
+
+///|
+/// Whether `parse` refuses a text, which is what an annotation it cannot honour
+/// has to do.
+fn refuses(text : String) -> Bool {
+  let parsed = Some(parse(text)) catch { _ => None }
+  parsed is None
+}
+
+///|
+test "the annotations after a moment are read, and most of them ignored" {
+  // The calendar is the one this library has, and an unknown key without a `!` is
+  // someone else's annotation: both read.
+  assert_eq(
+    round("1970-01-01T00:00[UTC][u-ca=iso8601]"),
+    "1970-01-01T00:00:00+00:00",
+  )
+  assert_eq(round("1970-01-01T00:00Z[foo=bar]"), "1970-01-01T00:00:00Z")
+  assert_eq(
+    round("1970-01-01T00:00Z[UTC][foo=bar][_foo-bar0=Ignore-This]"),
+    "1970-01-01T00:00:00+00:00",
+  )
+  // A zone named `UTC` writes its offset rather than `Z`: the name is what the
+  // text gave, and the writer keeps it.
+  assert_eq(round("1970-01-01T00:00Z[!UTC]"), "1970-01-01T00:00:00+00:00")
+  // A `!` is a promise the reader understands the key, so an unknown one is
+  // refused; so is a calendar that is not this one, a second calendar, a second
+  // zone, a zone after a calendar, and a key with a capital in it.
+  assert_eq(refuses("1970-01-01T00:00[UTC][!foo=bar]"), true)
+  assert_eq(refuses("1970-01-01T00:00[UTC][u-ca=hebrew]"), true)
+  assert_eq(refuses("1970-01-01T00:00[UTC][u-ca=iso8601][u-ca=iso8601]"), true)
+  assert_eq(refuses("1970-01-01T00:00[UTC][UTC]"), true)
+  assert_eq(refuses("1970-01-01T00:00[u-ca=iso8601][UTC]"), true)
+  assert_eq(refuses("1970-01-01T00:00[UTC][FOO=bar]"), true)
+  assert_eq(refuses("1970-01-01T00:00[UTC][u-ca=iso8601"), true)
+}
