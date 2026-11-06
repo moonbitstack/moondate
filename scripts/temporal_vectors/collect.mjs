@@ -54,14 +54,14 @@ function format(value) {
 // A recorded answer: every property the test reads comes back as a marker that
 // says which record it belongs to, and `assert.sameValue` turns the marker plus
 // the expected value into a fact.
-function recorded(input) {
+function recorded(input, kind) {
   if (refusing !== null) {
     const id = ++seq;
-    records.set(id, { input, thrown: refusing });
+    records.set(id, { input, kind, thrown: refusing });
     throw refusal(refusing);
   }
   const id = ++seq;
-  records.set(id, { input, expected: {} });
+  records.set(id, { input, kind, expected: {} });
   const target = { __id: id };
   return new Proxy(target, {
     get(t, prop) {
@@ -117,24 +117,31 @@ function anything() {
   return proxy;
 }
 
+// One constructor per kind. `from` is the only thing under test; `new` is there
+// for the tests that compare a reading against one they built by hand.
+function kindNamespace(kind) {
+  const made = function (...params) {
+    return new ZonedDateTimeStand(...params);
+  };
+  made.from = function (value, options) {
+    // A second argument is an options object, and `{ offset: "use" }` and
+    // `{ offset: "ignore" }` read the same text two different ways. Such a case
+    // says nothing about reading text, so it is not recorded.
+    if (options !== undefined) return anything();
+    return typeof value === "string"
+      ? recorded(value, kind)
+      : recorded("<not a string>", kind);
+  };
+  return made;
+}
+
 const Temporal = new Proxy(
   {
-    ZonedDateTime: Object.assign(
-      function ZonedDateTime(...params) {
-        return new ZonedDateTimeStand(...params);
-      },
-      {
-        // A second argument is an options object, and `{ offset: "use" }` and
-        // `{ offset: "ignore" }` read the same text two different ways. Such a
-        // case says nothing about reading text, so it is not recorded.
-        from: function (value, options) {
-          if (options !== undefined) return anything();
-          return typeof value === "string"
-            ? recorded(value)
-            : recorded("<not a string>");
-        },
-      },
-    ),
+    ZonedDateTime: kindNamespace("ZonedDateTime"),
+    PlainDate: kindNamespace("PlainDate"),
+    PlainDateTime: kindNamespace("PlainDateTime"),
+    PlainTime: kindNamespace("PlainTime"),
+    Instant: kindNamespace("Instant"),
   },
   {
     get(t, prop) {
@@ -144,8 +151,51 @@ const Temporal = new Proxy(
   },
 );
 
+// The helpers state a whole reading at once, so each one is a different sentence
+// about the same record.
+function fieldsOf(actual) {
+  const id = actual && typeof actual === "object" ? actual.__id : undefined;
+  if (typeof id !== "number" || !records.has(id)) return null;
+  return records.get(id);
+}
+
 const TemporalHelpers = new Proxy(
   {
+    // assertPlainDate(date, year, month, monthCode, day, description, era, eraYear)
+    assertPlainDate(actual, year, month, monthCode, day) {
+      const record = fieldsOf(actual);
+      if (!record) return;
+      record.expected.year = format(year);
+      record.expected.month = format(month);
+      record.expected.day = format(day);
+    },
+    // assertPlainDateTime(dt, year, month, monthCode, day, hour, minute, second,
+    //                     millisecond, microsecond, nanosecond, description, …)
+    assertPlainDateTime(actual, year, month, monthCode, day, hour, minute, second, ms, us, ns) {
+      const record = fieldsOf(actual);
+      if (!record) return;
+      record.expected.year = format(year);
+      record.expected.month = format(month);
+      record.expected.day = format(day);
+      record.expected.hour = format(hour);
+      record.expected.minute = format(minute);
+      record.expected.second = format(second);
+      record.expected.millisecond = format(ms);
+      record.expected.microsecond = format(us);
+      record.expected.nanosecond = format(ns);
+    },
+    // assertPlainTime(time, hour, minute, second, millisecond, microsecond,
+    //                 nanosecond, description)
+    assertPlainTime(actual, hour, minute, second, ms, us, ns) {
+      const record = fieldsOf(actual);
+      if (!record) return;
+      record.expected.hour = format(hour);
+      record.expected.minute = format(minute);
+      record.expected.second = format(second);
+      record.expected.millisecond = format(ms);
+      record.expected.microsecond = format(us);
+      record.expected.nanosecond = format(ns);
+    },
     assertZonedDateTimesEqual(actual, expected) {
       const id = actual && typeof actual === "object" ? actual.__id : undefined;
       if (typeof id !== "number" || !records.has(id)) return;
@@ -252,6 +302,7 @@ for (const file of files) {
     if (record.thrown) {
       cases.push({
         input: record.input,
+        kind: record.kind,
         file: relative(tests, file),
         thrown: record.thrown,
       });
@@ -260,9 +311,21 @@ for (const file of files) {
     if (expected.epochNanoseconds !== undefined) {
       cases.push({
         input: record.input,
+        kind: record.kind,
         file: relative(tests, file),
         epochNanoseconds: expected.epochNanoseconds,
         timeZoneId: expected.timeZoneId ?? null,
+      });
+      continue;
+    }
+    // A plain reading states its fields rather than an instant. A zoned one has
+    // those fields too, which is why the kind has to agree.
+    if (expected.year !== undefined && record.kind !== "ZonedDateTime") {
+      cases.push({
+        input: record.input,
+        kind: record.kind,
+        file: relative(tests, file),
+        fields: expected,
       });
       continue;
     }
@@ -270,6 +333,7 @@ for (const file of files) {
     if (expected.timeZoneId !== undefined) {
       cases.push({
         input: record.input,
+        kind: record.kind,
         file: relative(tests, file),
         epochNanoseconds: null,
         timeZoneId: expected.timeZoneId,
@@ -281,7 +345,14 @@ for (const file of files) {
 const seen = new Set();
 const unique = [];
 for (const item of cases) {
-  const key = JSON.stringify([item.input, item.thrown ?? null, item.epochNanoseconds, item.timeZoneId]);
+  const key = JSON.stringify([
+    item.input,
+    item.kind,
+    item.thrown ?? null,
+    item.epochNanoseconds,
+    item.timeZoneId,
+    item.fields ?? null,
+  ]);
   if (seen.has(key)) continue;
   seen.add(key);
   unique.push(item);

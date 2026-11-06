@@ -29,7 +29,7 @@ fn zone_name_of(moment : Moment) -> String {
 }
 
 ///|
-test "test262: a text states an instant" {
+test "test262: a zoned text states an instant" {
   let wrong : Array[String] = []
   for row in readings {
     let (text, seconds, nano, zone) = row
@@ -90,9 +90,96 @@ test "test262: a text states a zone and nothing else" {
 }
 
 ///|
-test "test262: a text is refused" {
+test "test262: a zoned text is refused" {
   let wrong : Array[String] = []
   for row in refusals {
+    let (text, want) = row
+    let parsed = Some(parse(text)) catch { _ => None }
+    if parsed is Some(moment) {
+      wrong.push(text + ": read as " + moment.to_string() + ", want " + want)
+    }
+  }
+  assert_eq(wrong, [])
+}
+
+///|
+test "test262: a text states a date" {
+  let wrong : Array[String] = []
+  for row in dates {
+    let (text, year, month, day) = row
+    let parsed = Some(parse(text)) catch { _ => None }
+    match parsed {
+      None => wrong.push("refused, want a date: " + text)
+      Some(moment) =>
+        match moment.date() {
+          None => wrong.push("no date: " + text)
+          Some(date) =>
+            if date.year != year || date.month != month || date.day != day {
+              wrong.push(
+                text +
+                ": read " +
+                date.year.to_string() +
+                "-" +
+                date.month.to_string() +
+                "-" +
+                date.day.to_string(),
+              )
+            }
+        }
+    }
+  }
+  assert_eq(wrong, [])
+}
+
+///|
+test "test262: a text states an instant" {
+  let wrong : Array[String] = []
+  for row in instants {
+    let (text, seconds, nano) = row
+    let parsed = Some(parse(text)) catch { _ => None }
+    match parsed {
+      None => wrong.push("refused, want an instant: " + text)
+      Some(moment) =>
+        match instant_of(moment) {
+          None => wrong.push("no instant: " + text)
+          Some((got_seconds, got_nano)) =>
+            if got_seconds != seconds || got_nano != nano {
+              wrong.push(
+                text +
+                ": read " +
+                got_seconds.to_string() +
+                "s " +
+                got_nano.to_string() +
+                "ns, want " +
+                seconds.to_string() +
+                "s " +
+                nano.to_string() +
+                "ns",
+              )
+            }
+        }
+    }
+  }
+  assert_eq(wrong, [])
+}
+
+///|
+test "test262: a date is refused" {
+  let wrong : Array[String] = []
+  for row in date_refusals {
+    let (text, want) = row
+    let parsed = Some(parse(text)) catch { _ => None }
+    if parsed is Some(moment) {
+      wrong.push(text + ": read as " + moment.to_string() + ", want " + want)
+    }
+  }
+  assert_eq(wrong, [])
+}
+
+///|
+test "test262: an instant is refused" {
+  let wrong : Array[String] = []
+  for row in instant_refusals {
     let (text, want) = row
     let parsed = Some(parse(text)) catch { _ => None }
     if parsed is Some(moment) {

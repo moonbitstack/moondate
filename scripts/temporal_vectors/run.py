@@ -29,15 +29,20 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 # report again and deciding what the change says.
 PIN = "d11543772591a5c24b3229e6195a74c73e56032e"
 
-SUITE = "test/built-ins/Temporal/ZonedDateTime"
+# The three questions a text can answer here, and the suite that asks each.
+SUITES = {
+    "zoned": "test/built-ins/Temporal/ZonedDateTime",
+    "dates": "test/built-ins/Temporal/PlainDate",
+    "instants": "test/built-ins/Temporal/Instant",
+}
 OUT = os.path.join(ROOT, "src", "temporal_vectors_wbtest.mbt")
 
 
-def fetch(work: str) -> str:
-    """The suite's directory, downloading the release tarball once."""
-    suite = os.path.join(work, "test262-" + PIN, SUITE)
-    if os.path.isdir(suite):
-        return suite
+def fetch(work: str) -> dict:
+    """Where each suite lives, downloading the release tarball once."""
+    root = os.path.join(work, "test262-" + PIN)
+    if all(os.path.isdir(os.path.join(root, path)) for path in SUITES.values()):
+        return {name: os.path.join(root, path) for name, path in SUITES.items()}
     os.makedirs(work, exist_ok=True)
     archive = os.path.join(work, "test262-" + PIN + ".tar.gz")
     if not os.path.exists(archive):
@@ -49,7 +54,7 @@ def fetch(work: str) -> str:
         members = [
             m
             for m in tar.getmembers()
-            if "/" + SUITE in m.name or m.name.endswith("/" + SUITE)
+            if any("/" + path in m.name or m.name.endswith("/" + path) for path in SUITES.values())
         ]
         # `filter` arrived in 3.12; older interpreters take the same call without
         # it, and the archive is our own download over https either way.
@@ -57,7 +62,7 @@ def fetch(work: str) -> str:
             tar.extractall(work, members=members, filter="data")
         except TypeError:
             tar.extractall(work, members=members)
-    return suite
+    return {name: os.path.join(root, path) for name, path in SUITES.items()}
 
 
 def run(command):
@@ -75,20 +80,24 @@ def main() -> None:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
-    suite = fetch(args.work)
-    cases = os.path.join(args.work, "cases.json")
-    run(
-        [
-            "node",
-            os.path.join(HERE, "collect.mjs"),
-            "--tests",
-            suite,
-            "--out",
-            cases,
-            "--pin",
-            PIN,
-        ]
-    )
+    suites = fetch(args.work)
+    cases = []
+    for name, suite in suites.items():
+        path = os.path.join(args.work, "cases-" + name + ".json")
+        run(
+            [
+                "node",
+                os.path.join(HERE, "collect.mjs"),
+                "--tests",
+                suite,
+                "--out",
+                path,
+                "--pin",
+                PIN,
+            ]
+        )
+        cases.append(path)
+    joined = ",".join(cases)
 
     if args.check:
         temporary = os.path.join(args.work, "generated.mbt")
@@ -97,7 +106,7 @@ def main() -> None:
                 sys.executable,
                 os.path.join(HERE, "build.py"),
                 "--cases",
-                cases,
+                joined,
                 "--out",
                 temporary,
             ]
@@ -118,11 +127,11 @@ def main() -> None:
                 sys.executable,
                 os.path.join(HERE, "build.py"),
                 "--cases",
-                cases,
+                joined,
                 "--out",
                 OUT,
                 "--report",
-                os.path.join(os.path.dirname(cases), "report.txt"),
+                os.path.join(args.work, "report.txt"),
             ]
         )
     )
