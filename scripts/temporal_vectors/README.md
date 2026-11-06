@@ -52,24 +52,23 @@ under a reason. Of the 532:
 
 | | Cases |
 |:--|--:|
-| Transcribed | 248 |
-| — zoned readings and names | 91 |
-| — plain dates | 40 |
-| — instants | 117 |
-| — of which refusals | 81 |
-| Not transcribed | 284 |
+| Answered by `@moondate.parse` | 321 |
+| — zoned readings and names | 103 |
+| — plain dates | 70 |
+| — instants | 148 |
+| — of which refusals | 112 |
+| Answered by `@tzdata.parse`, whose zone is a place | 14 |
+| Not transcribed | 197 |
 
 The refusals are the easier half: the corpus says the text must throw, and a
 parser that throws is right whatever the reason. The exclusions, in order of size:
 
 | Reason | Cases | What would close it |
 |:--|--:|:--|
-| A calendar or key-value annotation, `[u-ca=…]` | 72 | Temporal's annotation grammar |
-| A reading that states only part of the date | 61 | nothing — those tests assert one property, not a text |
-| An offset with a fraction of a second | 42 | an offset finer than the second a fixed zone here holds |
+| A reading that states only part of the date | 72 | nothing — those tests assert one property, not a text |
+| An offset with a fraction of a second | 42 | `Zone::Precise`, on `feat/sub-second-offsets` |
 | A text with no offset, which `parse` reads as a plain moment | 33 | nothing — `Instant.from` asks a different question |
-| A critical annotation, `[!UTC]` | 25 | the same grammar |
-| A zone that needs the database | 12 | `tzdata`, which the root package does not carry |
+| A calendar this library does not have | 14 | a calendar, which it does not have |
 | A text that names no zone, which `parse` reads | 7 | nothing — same as above |
 | A year outside Temporal's range | 6 | nothing — this library's years go further |
 | A year of minus zero, `-000000` | 6 | nothing — it reads as year nought here |
@@ -77,7 +76,6 @@ parser that throws is right whatever the reason. The exclusions, in order of siz
 | A leap second | 4 | nothing — it is read as the minute it opens |
 | A minus sign that is not the ASCII one | 3 | U+2212 as a sign |
 | A text offset that disagrees with its zone | 3 | resolving the zone, which needs the database |
-| More than one annotation | 3 | the same grammar |
 | A comma before the fraction | 2 | a comma as the decimal mark |
 | A text with no date, which this parser reads as a clock | 1 | nothing — a bare clock is a clock |
 
@@ -86,6 +84,12 @@ zone is a plain moment to `parse` because that is a different question from
 `ZonedDateTime.from`'s, a leap second is read as the minute it opens because that
 keeps the instant, and a fraction past nine digits is dropped because that is what
 the parser says it does.
+
+One exclusion names a branch. A sub-second offset has nowhere to live in `Zone` as
+it stands — `Offset` counts minutes and `ZoneName.offset` counts seconds — and
+keeping it means a fourth case, which is breaking. That work is on
+`feat/sub-second-offsets`; until it merges, those 42 are refused here rather than
+rounded, and the transcription on that branch answers 359 of the 532.
 
 ## Moving the pin
 
