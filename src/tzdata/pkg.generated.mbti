@@ -2,6 +2,7 @@
 package "moonbitstack/moondate/tzdata"
 
 import {
+  "moonbitstack/moondate",
   "moonbitstack/moondate/zone",
 }
 
@@ -12,6 +13,8 @@ pub fn links() -> Array[(String, String)]
 
 pub fn load(StringView) -> @zone.Tz raise @zone.Refused
 
+pub fn parse(StringView, fold? : @zone.Fold) -> @moondate.Moment raise Refused
+
 pub let release : String
 
 pub let source_digest : String
@@ -19,6 +22,13 @@ pub let source_digest : String
 pub fn zones() -> Array[String]
 
 // Errors
+pub suberror Refused {
+  BadText(@moondate.Refused)
+  BadZone(@zone.Refused)
+}
+pub fn Refused::output(Self, &Logger) -> Unit
+pub fn Refused::to_string(Self) -> String
+pub impl Show for Refused
 
 // Types and methods
 

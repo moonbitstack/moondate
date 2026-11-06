@@ -67,6 +67,93 @@ fn by_alias(a : (String, String), b : (String, String)) -> Int32 {
 }
 
 ///|
+/// The character at `i`, or a space past the end so a comparison fails rather than
+/// reading out of bounds.
+fn char_at(s : String, i : Int32) -> Char {
+  if i >= 0 && i < s.length() {
+    s[i].unsafe_to_char()
+  } else {
+    ' '
+  }
+}
+
+///|
+/// Why a text could not be read as a moment in a named zone: the text itself, or
+/// the zone it names.
+pub suberror Refused {
+  BadText(@moondate.Refused)
+  BadZone(@zone.Refused)
+}
+
+///|
+pub impl Show for Refused with fn output(self, logger) {
+  match self {
+    BadText(e) => logger.write_string(e.to_string())
+    BadZone(e) => logger.write_string(e.to_string())
+  }
+}
+
+///|
+pub extend Refused with Show::{to_string, output}
+
+///|
+/// A moment read from text whose zone is named by a place.
+///
+/// [`@moondate.parse`] keeps a place name when the offset is written beside it and
+/// refuses it when it is not: the place alone does not say which side of a
+/// transition the clock was on. This is the entry point that knows — it reads the
+/// place from the database and answers with `fold` for the hour that has none.
+///
+///     let moment = @tzdata.parse("2026-11-01T01:30:00[America/New_York]")
+///     moment.strftime("%H:%M %Z")   // 01:30 EDT
+///
+/// A text that names an offset rather than a place is answered by
+/// [`@moondate.parse`] alone, so this costs a database lookup and nothing else.
+pub fn parse(
+  text : StringView,
+  fold~ : @zone.Fold = @zone.Compatible,
+) -> @moondate.Moment raise Refused {
+  let s = text.to_owned()
+  let mut open = -1
+  for i = 0; i < s.length(); i = i + 1 {
+    if char_at(s, i) == '[' {
+      open = i
+      break
+    }
+  }
+  if open < 0 {
+    return @moondate.parse(text) catch { e => raise BadText(e) }
+  }
+  let mut close = open + 1
+  while close < s.length() && char_at(s, close) != ']' {
+    close = close + 1
+  }
+  if close >= s.length() {
+    raise BadText(@moondate.Malformed("an annotation is written [key=value]"))
+  }
+  let written = s[open + 1:close].to_owned()
+  // `[!UTC]` marks a zone the reader has to understand; the `!` is not its name.
+  let name = if written.length() > 0 && char_at(written, 0) == '!' {
+    written[1:].to_owned()
+  } else {
+    written
+  }
+  let tz = match find(name) {
+    Some(tz) => tz
+    // Not a place: an offset, a calendar annotation, or something malformed. The
+    // root reader knows all three and says what is wrong with the last.
+    None => return @moondate.parse(text) catch { e => raise BadText(e) }
+  }
+  // Drop the zone annotation and keep whatever follows it, so a calendar beside
+  // the zone still reaches the reader that understands it.
+  let body = s[:open].to_owned() + s[close + 1:].to_owned()
+  let moment = @moondate.parse(body) catch { e => raise BadText(e) }
+  tz.zoned(moment, fold~) catch {
+    e => raise BadZone(e)
+  }
+}
+
+///|
 /// The zone filed under `name`, which may be an alias.
 ///
 /// The zone is compiled from the release's source the first time it is asked for,
