@@ -45,6 +45,9 @@ jobs:
       - name: moon test (all backends)
         run: moon test --target all
 
+      - name: the code in the docs compiles
+        run: python3 scripts/check_snippets.py
+
       - name: examples run
         if: runner.os == 'Linux'
         run: |

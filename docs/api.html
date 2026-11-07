@@ -86,10 +86,12 @@
 <a href="#type-zone-ClockRule">ClockRule</a>
 <a href="#type-zone-Fold">Fold</a>
 <a href="#type-zone-Local">Local</a>
+<a href="#type-zone-OffsetPolicy">OffsetPolicy</a>
 <a href="#type-zone-Onset">Onset</a>
 <a href="#type-zone-Reading">Reading</a>
 <a href="#type-zone-Rule">Rule</a>
 <a href="#type-zone-Tz">Tz</a>
+<a href="#type-zone-ZonedDateTime">ZonedDateTime</a>
 <a href="#err-zone-Refused">Refused</a>
 </div>
 <div class="group">
@@ -1115,6 +1117,30 @@
 </article>
 </div>
 </section>
+<section class="api-type" id="type-zone-OffsetPolicy">
+<div class="type-head"><h3>OffsetPolicy</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">OffsetPolicy</span></div>
+<div class="doc"><p>How a field edit keeps the offset that was in force before the edit.</p>
+<p><code>Prefer</code> is the default: the instant the old offset named is kept when that offset is still the one the zone has at the new reading, and when it is not, [<code>Fold</code>] decides. <code>Ignore</code> goes straight to the zone's rules. <code>Use</code> keeps the old offset whatever the zone says, so a change that fell in between moves the reading — the instant does not move, but the date and time and the offset in force do. <code>Reject</code> is the offset that refuses: a reading the old offset no longer covers is an error, even when the zone would have answered it, which is the one case the disambiguation is not the one to decide.</p></div>
+<ul class="members"><li>Prefer</li><li>Ignore</li><li>Use</li><li>Reject</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-OffsetPolicy-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">OffsetPolicy::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-OffsetPolicy-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">OffsetPolicy::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-OffsetPolicy-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">OffsetPolicy::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
 <section class="api-type" id="type-zone-Onset">
 <div class="type-head"><h3>Onset</h3><span class="kind">enum</span></div>
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Onset</span></div>
@@ -1287,13 +1313,214 @@
 </article>
 </div>
 </section>
+<section class="api-type" id="type-zone-ZonedDateTime">
+<div class="type-head"><h3>ZonedDateTime</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">ZonedDateTime</span></div>
+<div class="doc"><p>A date and a time that already names an instant, carried in a zone.</p>
+<p>The instant is the point on the line — <code>epoch</code> seconds and <code>nano</code> nanoseconds past 1970 — and the zone is what the clocks read at it. The two together are the value Temporal calls a <code>ZonedDateTime</code>: move it to another zone and the instant does not move, only the reading does; add a duration and the instant moves by it, whatever a day happens to be here.</p>
+<p>What [<code>@moondate.Moment</code>] carries is a <code>Zone</code> — a name with the offset in force at that instant beside it. That is a value that can be written and compared with no database in reach, but it cannot cross a change, because a change is a question for the rules. This type is for that: it keeps a <code>Tz</code>, the readings and the rule that carries on past them, so a step that lands on the other side of a change reads the new offset back from the rules rather than carrying a stale one forward.</p>
+<p>let zone = @tzdata.load("America/New_York") let zoned = ZonedDateTime::of(2026, 3, 8, hour=2, minute=30, zone~) // 02:30 never happens, so the compatible answer is the later instant zoned.isoformat()            // 2026-03-08T03:30:00-04:00[America/New_York]</p>
+<p>The zone it is built in is what it is filed under. A wall clock that is <code>Ambiguous</code> or <code>Skipped</code> is answered by [<code>Fold</code>]; under <code>Reject</code> it raises rather than guessing. A field that is out of range is refused as [<code>Refused::BadDate</code>], the calendar and the clock's own refusal carried here.</p></div>
+<ul class="members"><li><b>epoch</b> : <span class="pt">Int64</span></li><li><b>nano</b> : <span class="pt">Int32</span></li><li><b>tz</b> : <span class="pt">Tz</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-zone-ZonedDateTime-abbrev">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::abbrev</span>(Self) -&gt; String</div>
+<div class="doc"><p>The abbreviation the zone writes at the instant: <code>EST</code>, <code>EDT</code>, <code>UTC</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-date">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::date</span>(Self) -&gt; @moondate.Date</div>
+<div class="doc"><p>The date the clocks read at the instant, in the zone.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-day">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::day</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The day the clocks read at the instant, in the zone.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-epoch">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::epoch</span>(Self) -&gt; Int64</div>
+<div class="doc"><p>Seconds since 1970-01-01T00:00:00Z, the point on the line.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-from_unix">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::from_unix</span>(Int64, nano? : Int32, zone~ : Tz) -&gt; Self</div>
+<div class="doc"><p>An instant in a zone, the direction that needs no policy.</p>
+<p>An instant is one instant, and the zone only says what the clocks read at it. This is what an arithmetic step lands on, and what a value is moved to with [<code>into</code>].</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span><span class="p"><b>nano~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>zone~</b> <span class="pt">Tz</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-hour">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::hour</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The hour the clocks read at the instant, in the zone, 0 to 23.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-into">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::into</span>(Self, Tz) -&gt; Self</div>
+<div class="doc"><p>The same instant carried in another zone.</p>
+<p>The instant does not move; only the reading does. This is what <a href="moonbitstack/moondate"><code>@moondate.Moment::astimezone</code></a> is, with a whole database in place of a fixed offset.</p></div>
+<div class="params"><span class="p"><b>zone</b> <span class="pt">Tz</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-is_dst">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::is_dst</span>(Self) -&gt; Bool</div>
+<div class="doc"><p>Whether daylight saving was on at the instant.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-isoformat">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::isoformat</span>(Self, fraction? : Int32, zone_name? : Bool) -&gt; String</div>
+<div class="doc"><p>The instant as the ISO 8601 text it reads in the zone: the date and time the clocks show, the offset in force beside it, and the name in brackets.</p>
+<p>2026-09-22T14:30:00+08:00[Asia/Shanghai]</p>
+<p><code>fraction</code> is the number of fractional-second digits, 0 to 9; left out, as many as the value needs. <code>zone_name</code> leaves the name off when <code>false</code>.</p></div>
+<div class="params"><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>zone_name~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-minute">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::minute</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The minute the clocks read at the instant, in the zone, 0 to 59.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-moment">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::moment</span>(Self) -&gt; @moondate.Moment</div>
+<div class="doc"><p>The <code>Moment</code> the zone writes for the instant: a <code>Zoned</code> that carries the name and the offset in force, so it can be written back with no database in reach.</p>
+<p>This is the round trip that makes [<code>of</code>] and the writers agree: read the value back as a moment, and the offset beside it is the one in force.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-month">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::month</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The month the clocks read at the instant, in the zone, 1 to 12.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-nanos">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::nanos</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The nanoseconds of the instant, 0 to 999_999_999.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-of">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::of</span>(Int32, Int32, Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, zone~ : Tz, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A date and a time in a zone.</p>
+<p>The two hours a year that have no single answer are decided by [<code>Fold</code>]: for a wall clock read twice, <code>Compatible</code> (the default) takes the earlier instant and <code>Later</code> the later; for one that never reads, <code>Compatible</code> takes the later instant and <code>Earlier</code> the earlier. <code>Reject</code> raises for either. A field that is not a date and time the calendar has is refused as [<code>Refused::BadDate</code>].</p></div>
+<div class="params"><span class="p"><b>year</b> <span class="pt">Int32</span></span><span class="p"><b>month</b> <span class="pt">Int32</span></span><span class="p"><b>day</b> <span class="pt">Int32</span></span><span class="p"><b>hour~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>minute~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>second~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>nano~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>zone~</b> <span class="pt">Tz</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-of_moment">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::of_moment</span>(@moondate.Moment, zone~ : Tz, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A moment the caller already has, placed in a zone.</p>
+<p>A moment that names an instant is put in the zone; one that does not — a <code>Plain</code> wall clock — is answered by [<code>Fold</code>], and <code>Reject</code> raises for the hours that have none.</p></div>
+<div class="params"><span class="p"><b>moment</b> <span class="pt">@moondate.Moment</span></span><span class="p"><b>zone~</b> <span class="pt">Tz</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-offset">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::offset</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>How far east of UTC the zone is at the instant, in seconds.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-offset_minutes">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::offset_minutes</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>How far east of UTC the zone is at the instant, in whole minutes.</p>
+<p>A local mean time that is not a whole number of minutes loses the remainder, which is what an offset written <code>±HH:MM</code> says.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-plus">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::plus</span>(Self, @moondate.Span) -&gt; Self</div>
+<div class="doc"><p>The instant <code>span</code> later, in the same zone.</p>
+<p>The span is added to the point on the line, not to the reading: a day added here is the instant a day later, and if a change falls in between, the reading moves across it. That is what a duration means for an instant, and the one thing that keeps a span added the same however it is split.</p></div>
+<div class="params"><span class="p"><b>span</b> <span class="pt">@moondate.Span</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-plus_days">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::plus_days</span>(Self, Int64) -&gt; Self</div>
+<div class="doc"><p>The instant <code>days</code> later, in the same zone.</p></div>
+<div class="params"><span class="p"><b>days</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-plus_months">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::plus_months</span>(Self, Int64, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant <code>months</code> later, in the same zone.</p>
+<p>A month is a calendar step, so the reading is moved rather than the instant: the same day of the month, clamped to one that exists, is read in the month <code>months</code> later, and the offset that was in force is kept if it still is. Across a change the result is not the old instant plus a fixed number of days, because that is not what a month is.</p></div>
+<div class="params"><span class="p"><b>months</b> <span class="pt">Int64</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-reading">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::reading</span>(Self) -&gt; Reading</div>
+<div class="doc"><p>What the zone read at the instant: the offset, the abbreviation, and whether daylight saving was on.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-second">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::second</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The second the clocks read at the instant, in the zone, 0 to 59.</p>
+<p>A leap second is kept as the sixtieth second of its minute, the way the clock here does; it is not projected to the next minute.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-time">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::time</span>(Self) -&gt; @moondate.Time</div>
+<div class="doc"><p>The time the clocks read at the instant, in the zone.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The instant as a sentence: <code>2026-09-22T14:30:00+08:00 Asia/Shanghai</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_day">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_day</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant with the day changed, the rest of the reading kept. A day the month does not have is refused as [<code>Refused::BadDate</code>].</p></div>
+<div class="params"><span class="p"><b>day</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_hour">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_hour</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant with the hour changed, the rest of the reading kept.</p></div>
+<div class="params"><span class="p"><b>hour</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_minute">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_minute</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant with the minute changed, the rest of the reading kept.</p></div>
+<div class="params"><span class="p"><b>minute</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_month">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_month</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant with the month changed, the rest of the reading kept. A month that leaves no such day — the thirty-first into February — is refused as [<code>Refused::BadDate</code>].</p></div>
+<div class="params"><span class="p"><b>month</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_nanos">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_nanos</span>(Self, Int32) -&gt; Self</div>
+<div class="doc"><p>The instant with the nanoseconds changed, the rest of the reading kept.</p>
+<p>The offset is in seconds, so the seconds the instant names are not moved: only the fraction is replaced, and the reading is read back from the zone.</p></div>
+<div class="params"><span class="p"><b>nanos</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_second">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_second</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant with the second changed, the rest of the reading kept.</p></div>
+<div class="params"><span class="p"><b>second</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_year">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_year</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant with the year changed, the rest of the reading kept.</p></div>
+<div class="params"><span class="p"><b>year</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-year">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::year</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The year the clocks read at the instant, in the zone.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-zone">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::zone</span>(Self) -&gt; Tz</div>
+<div class="doc"><p>The zone the instant is carried in.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-zone_name">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::zone_name</span>(Self) -&gt; String</div>
+<div class="doc"><p>The name the zone is filed under.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-ZonedDateTime-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
 <div class="api-cat"><h3>Errors</h3></div>
 <section class="api-type" id="err-zone-Refused">
 <div class="type-head"><h3>Refused</h3><span class="kind">suberror</span></div>
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
 <div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
 <p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
-<ul class="members"><li>Malformed(kind~ : String, at~ : Int32)</li><li>Truncated(want~ : Int32, got~ : Int32)</li><li>Unsupported(version~ : Char)</li><li>Unknown(name~ : String)</li><li>Missing(text~ : String)</li></ul>
+<ul class="members"><li>Malformed(kind~ : String, at~ : Int32)</li><li>Truncated(want~ : Int32, got~ : Int32)</li><li>Unsupported(version~ : Char)</li><li>Unknown(name~ : String)</li><li>Missing(text~ : String)</li><li>BadDate(@moondate.Refused)</li></ul>
 <div class="method-list"><div class="mlabel">Trait methods</div>
 <article class="api-item" id="m-zone-Refused-equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::equal</span>(Self, Self) -&gt; Bool</div>

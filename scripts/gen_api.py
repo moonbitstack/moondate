@@ -665,6 +665,7 @@ def main() -> None:
         SRC / "zone" / "zone.mbt",
         SRC / "zone" / "rule.mbt",
         SRC / "zone" / "tzif.mbt",
+        SRC / "zone" / "zoned_date_time.mbt",
     ]
     zone_mbti = SRC / "zone" / "pkg.generated.mbti"
     tzdata_sources = [SRC / "tzdata" / "tzdata.mbt", SRC / "tzdata" / "data.mbt"]

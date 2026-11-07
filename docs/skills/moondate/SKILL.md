@@ -17,7 +17,7 @@ moon add moonbitstack/moondate
 |:--|:--|:--|
 | calendar and text | `moonbitstack/moondate` | `Date`, `Time`, `Moment`, `Span`, `Zone`, `parse`, `strftime`, `layout`, `pattern`, `http`, `asn1` |
 | schedules | `moonbitstack/moondate/cron` | `Cron`, `parse`, `next` |
-| zones | `moonbitstack/moondate/zone` | `Tz`, `Rule`, `Local`, `Fold`, `Reading` |
+| zones | `moonbitstack/moondate/zone` | `Tz`, `ZonedDateTime`, `Rule`, `Local`, `Fold`, `Reading` |
 | the database | `moonbitstack/moondate/tzdata` | `load`, `find`, `zones`, `links`, `release` |
 | the machine's zones | `moonbitstack/moondate/zoneinfo` | `open`, `named`, `system`, `directory` |
 
@@ -45,16 +45,14 @@ becomes an instant only when someone says which zone it was read in.
 turns a wall clock into one.
 
 ```moonbit
-fn main raise {
-  let tz = @tzdata.load("America/New_York")
-  let moment = tz.moment(1790058605L)
-  println(moment.strftime("%H:%M %Z %z"))
-  println(moment.pattern("VV"))
-  let date = @moondate.Date::new(2026, 11, 1)
-  let time = @moondate.Time::new(1, 30)
-  println(tz.epoch(date, time))              // the first of the two
-  println(tz.epoch(date, time, fold=Later))  // the second
-}
+let tz = @tzdata.load("America/New_York")
+let moment = tz.moment(1790058605L)
+println(moment.strftime("%H:%M %Z %z"))
+println(moment.pattern("VV"))
+let date = @moondate.Date::new(2026, 11, 1)
+let time = @moondate.Time::new(1, 30)
+println(tz.epoch(date, time))                    // the first of the two
+println(tz.epoch(date, time, fold=@zone.Later))  // the second
 ```
 
 Twice a year a wall clock names two instants or none. `tz.read(date, time)`
@@ -65,13 +63,11 @@ or `Reject`, which raises rather than guessing.
 ## When a cron expression fires next
 
 ```moonbit
-fn main raise {
-  let every_quarter = @cron.parse("*/15 9-17 * * MON-FRI")
-  let now = @moondate.Moment::of_epoch(1790058605L)
-  match every_quarter.next(now) {
-    Some(fire) => println(fire.to_string())
-    None => println("this one never fires")
-  }
+let every_quarter = @cron.parse("*/15 9-17 * * MON-FRI")
+let now = @moondate.Moment::of_epoch(1790058605L)
+match every_quarter.next(now) {
+  Some(fire) => println(fire.to_string())
+  None => println("this one never fires")
 }
 ```
 

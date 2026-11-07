@@ -68,9 +68,9 @@ because one count of nanoseconds runs out in 2262 and this library's years do no
 
 ```moonbit
 let m = @moondate.parse("1970-01-01T00:00:00+00:19:32.37")
-m.isoformat()                     // 1970-01-01T00:00:00+00:19:32.37
-m.instant()                       // Some((-1173, 630000000)) — 1172.37 s before the epoch
-m.epoch()                         // Some(-1173), the same instant floored
+assert_eq(m.isoformat(), "1970-01-01T00:00:00+00:19:32.37")
+assert_eq(m.instant(), Some((-1173, 630000000)))  // 1172.37 s before the epoch
+assert_eq(m.epoch(), Some(-1173))                 // the same instant floored
 ```
 
 Annotations after the moment are Temporal's, and `parse` reads them: `[u-ca=iso8601]`
@@ -110,12 +110,11 @@ back to the same moment.
 
 ```moonbit
 let m = @moondate.parse("2026-09-22T14:30:05.123456+08:00")
-
-m.strftime("%A %d %B %Y, %I:%M %p")           // Tuesday 22 September 2026, 02:30 PM
-m.layout(@moondate.RFC1123)                    // Tue, 22 Sep 2026 14:30:05 +08:00
-m.pattern("EEEE, MMMM d, yyyy 'at' HH:mm")     // Tuesday, September 22, 2026 at 14:30
-m.to_iso_string()                              // 2026-09-22T06:30:05.123Z
-m.isoformat(fraction=3, offset=false)          // 2026-09-22T14:30:05.123
+assert_eq(m.strftime("%A %d %B %Y, %I:%M %p"), "Tuesday 22 September 2026, 02:30 PM")
+assert_eq(m.layout(@moondate.RFC1123), "Tue, 22 Sep 2026 14:30:05 +08:00")
+assert_eq(m.pattern("EEEE, MMMM d, yyyy 'at' HH:mm"), "Tuesday, September 22, 2026 at 14:30")
+assert_eq(m.to_iso_string(), "2026-09-22T06:30:05.123Z")
+assert_eq(m.isoformat(fraction=3, offset=false), "2026-09-22T14:30:05.123")
 ```
 
 The `%` set is the union of the six lineages, with the conflicts settled in the
@@ -131,10 +130,10 @@ its offset. Give the moment a name — the next section is how — and `%Z`, LDM
 `z` and `V`, and a Go layout's `MST` write the name the database gave it.
 
 ```moonbit
-m.strftime("%#B %10Y %-d")                     // SEPTEMBER 0000002026 22
-m.strftime("%Ez %Oz")                          // +08:00 +0800
-m.pattern("Y-'W'ww c B")                       // 2026-W39 2 in the afternoon
-m.isoformat()                                  // 2026-09-22T14:30:05.123456+08:00
+assert_eq(m.strftime("%#B %10Y %-d"), "SEPTEMBER 0000002026 22")
+assert_eq(m.strftime("%Ez %Oz"), "+08:00 +0800")
+assert_eq(m.pattern("Y-'W'ww c B"), "2026-W39 2 in the afternoon")
+assert_eq(m.isoformat(), "2026-09-22T14:30:05.123456+08:00")
 ```
 
 LDML answers in every width UTS #35 names, including the narrow era, quarter and
@@ -172,11 +171,11 @@ caller that carries its own rules should not have to ask the filesystem for them
 
 ```moonbit
 let tz = @tzdata.load("America/New_York")
-let moment = tz.moment(1790058605)                  // 2026-09-22T02:30:05-04:00
-moment.strftime("%H:%M %Z %z")                      // 02:30 EDT -0400
-moment.pattern("VV")                                // America/New_York
-moment.layout(@moondate.RFC1123)                    // Tue, 22 Sep 2026 02:30:05 EDT
-moment.isoformat(zone_name=true)                    // 2026-09-22T02:30:05-04:00[America/New_York]
+let moment = tz.moment(1790058605)
+assert_eq(moment.strftime("%H:%M %Z %z"), "02:30 EDT -0400")
+assert_eq(moment.pattern("VV"), "America/New_York")
+assert_eq(moment.layout(@moondate.RFC1123), "Tue, 22 Sep 2026 02:30:05 EDT")
+assert_eq(moment.isoformat(zone_name=true), "2026-09-22T02:30:05-04:00[America/New_York]")
 ```
 
 A moment that carries a name carries the offset in force at that instant as well,
@@ -215,7 +214,7 @@ place from the release and takes `fold` for the hour that has none.
 
 ```moonbit
 let moment = @tzdata.parse("2026-11-01T01:30:00[America/New_York]")
-moment.strftime("%H:%M %Z")                         // 01:30 EDT
+assert_eq(moment.strftime("%H:%M %Z"), "01:30 EDT")
 ```
 
 Twice a year a wall clock is a bad question. In most of the world one hour of a
@@ -230,20 +229,53 @@ timestamp written by a program in that zone has to be read as one of the two.
 
 ```moonbit
 let tz = @tzdata.load("America/New_York")
-tz.read(@moondate.Date::new(2026, 3, 8), @moondate.Time::new(2, 30))
-// never, between 1772951400 and 1772955000
-tz.read(@moondate.Date::new(2026, 11, 1), @moondate.Time::new(1, 30))
-// twice, at 1793511000 and 1793514600
+assert_eq(
+  tz.read(@moondate.Date::new(2026, 3, 8), @moondate.Time::new(2, 30)).to_string(),
+  "never, between 1772951400 and 1772955000",
+)
+assert_eq(
+  tz.read(@moondate.Date::new(2026, 11, 1), @moondate.Time::new(1, 30)).to_string(),
+  "twice, at 1793511000 and 1793514600",
+)
 ```
 
 `Compatible` is what most callers mean and what the other implementations do by
 default; `Reject` is there for a program that would rather stop than pick.
+
+### A zoned date and time
+
+A `moment` carries a zone it can write but not cross, because a transition is a
+question only the rules can answer. `ZonedDateTime`, in `zone`, keeps the `Tz`
+itself, so it can. Move it to another zone and the instant does not move, only
+the reading; add a duration and the instant moves by it, whatever a day happens
+to be. It is built from a wall clock, with `fold` deciding the two hours a year
+that have no single answer, or from an instant it already names.
+
+```moonbit
+let ny = @tzdata.load("America/New_York")
+let sh = @tzdata.load("Asia/Shanghai")
+let now = @zone.ZonedDateTime::from_unix(1790058605, zone=ny)
+assert_eq(now.isoformat(), "2026-09-22T02:30:05-04:00[America/New_York]")
+assert_eq(now.into(sh).isoformat(), "2026-09-22T14:30:05+08:00[Asia/Shanghai]")
+let spring = @zone.ZonedDateTime::of(2026, 3, 8, hour=2, minute=30, zone=ny)
+assert_eq(spring.isoformat(), "2026-03-08T03:30:00-04:00[America/New_York]")
+```
+
+`spring` is the hour that never happens: `02:30` is not on the line, so the
+`Compatible` answer is the instant the clocks actually show, `03:30`. Reading the
+wall clock back through the zone is the round trip — `now.moment()` is the
+`moment` the zone writes for the instant, the offset in force beside the name, so
+the value and the text agree. A field edit takes an `offset` policy: `Prefer`
+keeps the instant the old offset named when it still is, `Ignore` goes straight to
+the rules, and `Use` keeps the old offset whether or not the zone still has it; a
+field out of range is refused as `Refused::BadDate`.
 
 ### Interface
 
 | Type | Built with | Asked |
 |:--|:--|:--|
 | `Tz` | `@zone.Tz::parse(bytes)`, `@zone.Tz::of`, `@tzdata.load(name)`, `@zoneinfo.open`, `@zoneinfo.named`, `@zoneinfo.system` | `name`, `at`, `offset`, `abbrev`, `is_dst`, `changes`, `read`, `epoch`, `moment`, `zoned`, `readings`, `rule` |
+| `ZonedDateTime` | `ZonedDateTime::of(year, month, day, zone~)`, `::from_unix(epoch, zone~)`, `::of_moment(moment, zone~)` | `into(zone)`, `moment`, `epoch`, `offset`, `offset_minutes`, `abbrev`, `is_dst`, `reading`, `plus`, `plus_days`, `plus_months`, `with_year` … `with_second`, `isoformat`, `zone_name`, `year` … `second` |
 | `Reading` | — | the fields: when it began, the offset in seconds, whether daylight saving was on, the abbreviation |
 | `Local` | `Tz::read` | `epoch(fold~)`, `is_exact` |
 | `Rule` | `Rule::parse` | `text`, `at` |
@@ -258,11 +290,13 @@ recognised without reading it.
 
 Errors are `zone.Refused`: `Malformed` carries what was expected and the byte it
 stopped at, `Truncated` the size it wanted and the size it got, `Unsupported` the
-TZif version it cannot read, `Unknown` a zone name no database has, and `Missing`
-a wall clock that never happens when the policy is to refuse rather than guess.
-`zoneinfo` has a second one for the file it could not get to: `Missing` a path that
-is not there, `Unreadable` the path and what the filesystem said, `BadZone` the
-bytes that are not a zone, and `Unset` a machine that names none.
+TZif version it cannot read, `Unknown` a zone name no database has, `Missing` a
+wall clock that has no answer when the policy is to refuse rather than guess, and
+`BadDate` the calendar's or the clock's own refusal, carried over when a
+`ZonedDateTime` is built from a field that is out of range. `zoneinfo` has a
+second one for the file it could not get to: `Missing` a path that is not there,
+`Unreadable` the path and what the filesystem said, `BadZone` the bytes that are
+not a zone, and `Unset` a machine that names none.
 
 ### Where the data comes from
 
@@ -275,6 +309,30 @@ month for a new one and opens a pull request when there is.
 Nothing in the database is a stub or a subset: every one of the 598 names the
 release has is compiled from the same rules, and the transitions are the ones the
 release's own `zic` writes.
+
+## Consistency
+
+The calendar is held to two external corpora, both pinned and both replayed in CI,
+so a change that moves the answer is a failing build rather than a quiet drift.
+
+test262's `Temporal` suites, pinned by commit, are transcribed into the repo by
+`scripts/temporal_vectors/` and replayed from `src/temporal_vectors_wbtest.mbt` and
+`src/temporal_replay_wbtest.mbt`. Of the 535 cases the corpus states about reading a
+text into a zoned date and time, a plain date, or an instant, 404 are answered here
+and the other 119 need something this package does not carry, counted by reason in
+the script's report. The 404 break down as 103 a zoned reading, 131 a plain date,
+166 an instant, and 4 one property of a reading; 173 of them are refusals. There is
+no case the corpus asserts that this library gets wrong: the ones it does not answer
+are the ones it has no way to, and each is named for the reason.
+
+The zone database is checked two ways at the same time. Against the release: the
+transitions a `Tz` reads are the ones `zic` writes for the same source. And against
+a second implementation, `moonbitlang/x`'s `time`: `src/tzif_diff/` reads the same
+seven TZif files — UTC, Kathmandu, Kolkata, New York, Sydney, Chatham, Berlin —
+through this library's reader and through `Zone::from_tzif`, at 673 instants chosen
+across 1800 to 2100, each anchored to Python's `zoneinfo` reading the same bytes.
+The two readers agree on every instant, and so does the library; the comparison is
+build code, so it runs on every target, and the test replays it.
 
 ## Interface
 
@@ -320,7 +378,8 @@ prints. Run one with `moon run src/examples/hello`.
 
 ```moonbit
 let every_quarter = @cron.parse("*/15 9-17 * * MON-FRI")
-let next = every_quarter.next(now)
+let now = @moondate.Moment::of_epoch(1790058605)  // what the caller's clock said
+let next = every_quarter.next(now)                // the next firing after it
 ```
 
 Five fields as crontab(5) defines them, or six with seconds in front. `*`, `n`,

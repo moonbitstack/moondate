@@ -374,6 +374,29 @@ twice, at 1793511000 and 1793514600
 }</code></pre>
           </div>
           <p><span class="mono">TZ</span> is read the way a C library reads it: empty is UTC, a name is a file in the directory, a path is that file, and anything else is a POSIX rule, which is how a container states a zone without carrying one. A machine that names none of those is an error rather than UTC — guessing UTC is how a program silently writes timestamps eight hours out.</p>
+          <p>A <span class="mono">moment</span> carries a zone it can write but not cross, because a transition is a question only the rules can answer. <span class="mono">ZonedDateTime</span>, in <span class="mono">zone</span>, keeps the <span class="mono">Tz</span> itself, so it can: move it to another zone and the instant does not move, only the reading; add a duration and the instant moves by it, whatever a day happens to be. It is built from a wall clock with <span class="mono">fold</span> deciding the two hours, or from an instant it already names.</p>
+          <div class="code">
+            <div class="bar"><span class="name">zoned.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let ny = @tzdata.load("America/New_York")
+  let sh = @tzdata.load("Asia/Shanghai")
+  let now = @zone.ZonedDateTime::from_unix(1790058605L, zone=ny)
+  println(now.isoformat())
+  println(now.into(sh).isoformat())
+  let spring = @zone.ZonedDateTime::of(2026, 3, 8, hour=2, minute=30, zone=ny)
+  println(spring.isoformat())
+  let autumn = @zone.ZonedDateTime::of(2026, 11, 1, hour=1, minute=30, zone=ny, fold=@zone.Later)
+  println(autumn.isoformat())
+  let step = now.plus(@moondate.Span::new(days=1))
+  println(step.isoformat())
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2026-09-22T02:30:05-04:00[America/New_York]
+2026-09-22T14:30:05+08:00[Asia/Shanghai]
+2026-03-08T03:30:00-04:00[America/New_York]
+2026-11-01T01:30:00-05:00[America/New_York]
+2026-09-23T02:30:05-04:00[America/New_York]</div>
+          <p>Reading a wall clock back through the zone is the round trip: <span class="mono">now.moment()</span> gives the <span class="mono">moment</span> the zone writes for the instant, the offset in force beside the name, so the value and the text agree. A field edit takes an <span class="mono">offset</span> policy — <span class="mono">Prefer</span> keeps the instant the old offset named when it still is, <span class="mono">Ignore</span> goes straight to the rules, and <span class="mono">Use</span> keeps the old offset whether or not the zone still has it.</p>
         </article>
 
         <article class="step" id="durations">

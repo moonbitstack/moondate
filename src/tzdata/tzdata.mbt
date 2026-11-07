@@ -185,7 +185,8 @@ pub fn find(name : StringView) -> @zone.Tz? {
     | @zone.Truncated(..)
     | @zone.Unsupported(_)
     | @zone.Unknown(_)
-    | @zone.Missing(_) => None
+    | @zone.Missing(_)
+    | @zone.BadDate(_) => None
   }
 }
 

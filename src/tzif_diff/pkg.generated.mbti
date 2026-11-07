@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondate/tzif_diff"
+
+import {
+  "moonbitlang/x/time",
+  "moonbitstack/moondate/zone",
+}
+
+// Values
+pub fn diff_against_release() -> Array[String]
+
+pub fn diff_between_readers() -> Array[String]
+
+pub fn diff_compared() -> Int32
+
+pub fn diff_index_of(String) -> Int32
+
+pub fn diff_tz_of(Int32) -> @zone.Tz?
+
+pub fn diff_x_of(Int32) -> @time.Zone?
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

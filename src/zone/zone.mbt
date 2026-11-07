@@ -22,6 +22,13 @@ pub(all) suberror Refused {
   Unknown(name~ : String)
   /// A wall clock that names no instant, refused by [`Fold::Reject`].
   Missing(text~ : String)
+  /// A field of a date and time that is out of range, the refusal the calendar
+  /// and the clock give: the day the month does not have, the second that is not
+  /// a clock reading. It is carried here rather than raised by the package that
+  /// does not have a calendar of its own, so a `ZonedDateTime` built from fields
+  /// refuses with one type for both what is out of range and what the zone would
+  /// not place.
+  BadDate(@moondate.Refused)
 }
 
 ///|
@@ -37,6 +44,7 @@ pub impl Show for Refused with fn output(self, logger) {
       )
     Unknown(name~) => logger.write_string("no such zone: \{name}")
     Missing(text~) => logger.write_string("this clock never happens: \{text}")
+    BadDate(e) => logger.write_string(e.to_string())
   }
 }
 

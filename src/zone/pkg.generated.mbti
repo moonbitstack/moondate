@@ -16,6 +16,7 @@ pub(all) suberror Refused {
   Unsupported(version~ : Char)
   Unknown(name~ : String)
   Missing(text~ : String)
+  BadDate(@moondate.Refused)
 }
 pub fn Refused::equal(Self, Self) -> Bool
 pub fn Refused::not_equal(Self, Self) -> Bool
@@ -59,6 +60,17 @@ pub fn Local::output(Self, &Logger) -> Unit
 pub fn Local::to_repr(Self) -> @debug.Repr
 pub fn Local::to_string(Self) -> String
 pub impl Show for Local
+
+#derive(Eq, @debug.Debug)
+pub(all) enum OffsetPolicy {
+  Prefer
+  Ignore
+  Use
+  Reject
+}
+pub fn OffsetPolicy::equal(Self, Self) -> Bool
+pub fn OffsetPolicy::not_equal(Self, Self) -> Bool
+pub fn OffsetPolicy::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) enum Onset {
@@ -116,6 +128,48 @@ pub fn Tz::read(Self, @moondate.Date, @moondate.Time) -> Local
 pub fn Tz::readings(Self) -> Array[Reading]
 pub fn Tz::rule(Self) -> Rule?
 pub fn Tz::zoned(Self, @moondate.Moment, fold? : Fold) -> @moondate.Moment raise Refused
+
+pub(all) struct ZonedDateTime {
+  epoch : Int64
+  nano : Int32
+  tz : Tz
+}
+pub fn ZonedDateTime::abbrev(Self) -> String
+pub fn ZonedDateTime::date(Self) -> @moondate.Date
+pub fn ZonedDateTime::day(Self) -> Int32
+pub fn ZonedDateTime::epoch(Self) -> Int64
+pub fn ZonedDateTime::from_unix(Int64, nano? : Int32, zone~ : Tz) -> Self
+pub fn ZonedDateTime::hour(Self) -> Int32
+pub fn ZonedDateTime::into(Self, Tz) -> Self
+pub fn ZonedDateTime::is_dst(Self) -> Bool
+pub fn ZonedDateTime::isoformat(Self, fraction? : Int32, zone_name? : Bool) -> String
+pub fn ZonedDateTime::minute(Self) -> Int32
+pub fn ZonedDateTime::moment(Self) -> @moondate.Moment
+pub fn ZonedDateTime::month(Self) -> Int32
+pub fn ZonedDateTime::nanos(Self) -> Int32
+pub fn ZonedDateTime::of(Int32, Int32, Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, zone~ : Tz, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::of_moment(@moondate.Moment, zone~ : Tz, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::offset(Self) -> Int32
+pub fn ZonedDateTime::offset_minutes(Self) -> Int32
+pub fn ZonedDateTime::output(Self, &Logger) -> Unit
+pub fn ZonedDateTime::plus(Self, @moondate.Span) -> Self
+pub fn ZonedDateTime::plus_days(Self, Int64) -> Self
+pub fn ZonedDateTime::plus_months(Self, Int64, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::reading(Self) -> Reading
+pub fn ZonedDateTime::second(Self) -> Int32
+pub fn ZonedDateTime::time(Self) -> @moondate.Time
+pub fn ZonedDateTime::to_string(Self) -> String
+pub fn ZonedDateTime::with_day(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::with_hour(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::with_minute(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::with_month(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::with_nanos(Self, Int32) -> Self
+pub fn ZonedDateTime::with_second(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::with_year(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::year(Self) -> Int32
+pub fn ZonedDateTime::zone(Self) -> Tz
+pub fn ZonedDateTime::zone_name(Self) -> String
+pub impl Show for ZonedDateTime
 
 // Type aliases
 
