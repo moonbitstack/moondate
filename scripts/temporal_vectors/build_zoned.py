@@ -30,7 +30,11 @@ FIELDS = ["year", "month", "day", "hour", "minute", "second", "nano"]
 
 # Cases where this library's answer and the corpus's differ, named one by one so
 # that the report says which and why rather than losing them among the reasons.
-# They are differences, not gaps: the README's consistency section counts them.
+# They are differences, not gaps: the README's consistency section counts them,
+# and the build refuses to run when an entry stops being reached or when one of
+# them finds its way into the tables — a case cannot be both listed here and
+# answered there. `prototype/until/largestunit.js`, the twin of the `since` case
+# below, is not listed: it does not run under the reference at all.
 DIFFERENCES = {
     "prototype/until/round-cross-unit-boundary.js":
         "a rounded step that fills the unit above is not carried into it",
@@ -47,8 +51,6 @@ DIFFERENCES = {
     "prototype/until/largestunit-plurals-accepted.js":
         "the corpus's expected value is the one a double holds, which is coarser than the instant",
     "prototype/since/largestunit-plurals-accepted.js":
-        "the corpus's expected value is the one a double holds, which is coarser than the instant",
-    "prototype/until/largestunit.js":
         "the corpus's expected value is the one a double holds, which is coarser than the instant",
     "prototype/since/largestunit.js":
         "the corpus's expected value is the one a double holds, which is coarser than the instant",
@@ -225,6 +227,7 @@ class Tables:
         self.seen = {}
         self.reasons = {}
         self.excluded = []
+        self.differed = set()
 
     def add(self, family, row):
         self.answered.add(row[0])
@@ -246,6 +249,7 @@ class Tables:
 def read(case, record, tables):
     op = record["op"]
     if case in DIFFERENCES:
+        tables.differed.add(case)
         tables.skip(case, op, DIFFERENCES[case])
         return
     out = record["out"]
@@ -712,8 +716,21 @@ def main():
         for record in entry["records"]:
             cases += 1
             read(entry["path"], record, tables)
+    operations = sum(len(entry["records"]) for entry in data["cases"])
     for entry in data["left"]:
         tables.skip(entry["path"], "-", entry["reason"] + " — " + entry["detail"])
+
+    # The one case where a difference is written down and the case still answers:
+    # a case listed in DIFFERENCES that reached the tables would be a case this
+    # library gets wrong while the report says it is not put, so the build stops.
+    answered_anyway = sorted(tables.differed & tables.answered)
+    if answered_anyway:
+        raise SystemExit("a difference in the tables: " + ", ".join(answered_anyway))
+    # And the other way: an entry the corpus never reaches says nothing about a
+    # case, and would inflate the count the README quotes.
+    never_reached = sorted(set(DIFFERENCES) - tables.differed)
+    if never_reached:
+        raise SystemExit("a difference never reached: " + ", ".join(never_reached))
 
     emit(tables, data.get("pin") or args.pin, args.out)
     total = sum(len(rows) for rows in tables.rows.values())
@@ -741,17 +758,28 @@ def main():
         for entry in tables.excluded:
             if entry["reason"] in general:
                 continue
-            reasons, operations = counted.get(entry["case"], (set(), 0))
+            reasons, count = counted.get(entry["case"], (set(), 0))
             reasons.add(entry["reason"])
-            counted[entry["case"]] = (reasons, operations + 1)
+            counted[entry["case"]] = (reasons, count + 1)
         lines = [
-            {"case": case, "reasons": sorted(reasons), "operations": operations}
-            for case, (reasons, operations) in sorted(counted.items())
+            {"case": case, "reasons": sorted(reasons), "operations": count}
+            for case, (reasons, count) in sorted(counted.items())
         ]
         with open(args.report, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(
                 {
                     "pin": args.pin,
+                    # What the corpus states, so that a number in the README can
+                    # be checked against this file instead of against a run.
+                    "corpus": {
+                        "cases": len(data["cases"]) + len(data["left"]),
+                        "run": len(data["cases"]),
+                        "operations": operations,
+                    },
+                    "answered": {"rows": total, "cases": len(tables.answered)},
+                    "differences": {
+                        case: DIFFERENCES[case] for case in sorted(tables.differed)
+                    },
                     "counts": dict(sorted(tables.reasons.items())),
                     "cases": lines,
                 },

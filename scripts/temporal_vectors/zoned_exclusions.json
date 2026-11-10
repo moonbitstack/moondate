@@ -1,5 +1,33 @@
 {
  "pin": "d11543772591a5c24b3229e6195a74c73e56032e",
+ "corpus": {
+  "cases": 902,
+  "run": 691,
+  "operations": 9551
+ },
+ "answered": {
+  "rows": 3113,
+  "cases": 236
+ },
+ "differences": {
+  "prototype/equals/argument-object.js": "the other value is a bag with an offset, a form this library does not convert",
+  "prototype/equals/argument-valid.js": "the other value is written as a text, which this library reads before asking",
+  "prototype/since/largestunit-plurals-accepted.js": "the corpus's expected value is the one a double holds, which is coarser than the instant",
+  "prototype/since/largestunit.js": "the corpus's expected value is the one a double holds, which is coarser than the instant",
+  "prototype/since/round-cross-unit-boundary.js": "a rounded step that fills the unit above is not carried into it",
+  "prototype/since/roundingmode-half-boundary.js": "an exact half of a negative difference is rounded the wrong way",
+  "prototype/since/roundingmode-halfEven.js": "an exact half at the nanosecond is broken by parity this library does not track",
+  "prototype/until/largestunit-plurals-accepted.js": "the corpus's expected value is the one a double holds, which is coarser than the instant",
+  "prototype/until/round-cross-unit-boundary.js": "a rounded step that fills the unit above is not carried into it",
+  "prototype/until/roundingmode-half-boundary.js": "an exact half of a negative difference is rounded the wrong way",
+  "prototype/until/roundingmode-halfEven.js": "an exact half at the nanosecond is broken by parity this library does not track",
+  "prototype/with/overflow-options.js": "a field edit that neither fits nor refuses leaves a reading this library places differently",
+  "prototype/with/overflow-reject-throws.js": "the three sub-second fields are one number here, so a field past its own range reads as a carry",
+  "prototype/withTimeZone/timezone-case-insensitive.js": "the zone name is matched whatever its case, which this library does not",
+  "prototype/withTimeZone/timezone-string-datetime.js": "the zone is written as a date and time, a form this library does not read as a zone",
+  "prototype/withTimeZone/timezone-string-leap-second.js": "the zone is written as a date and time with a leap second, which this library does not read as a zone",
+  "prototype/withTimeZone/timezone-string-multiple-offsets.js": "the zone is written as a date and time, a form this library does not read as a zone"
+ },
  "counts": {
   "a calendar in the text is not this library's shape": 9,
   "a difference in range is not refused": 142,

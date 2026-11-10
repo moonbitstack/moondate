@@ -16,6 +16,7 @@ corpus gives, which is how CI notices that one of the two has moved.
 """
 
 import argparse
+import http.client
 import json
 import os
 import shutil
@@ -37,6 +38,29 @@ OUT = os.path.join(ROOT, "src", "tzdata", "zoned_cases_wbtest.mbt")
 REPORT = os.path.join(HERE, "zoned_exclusions.json")
 
 
+def download(url: str, archive: str, attempts: int = 3) -> None:
+    """Fetch a file, and fetch it whole.
+
+    A download that stops in the middle leaves a file that looks like the
+    corpus and is not one, so the bytes land beside it and only a complete
+    transfer is given the name: a second run then either skips the work or
+    starts it again, never unpacks half a suite.
+    """
+    partial = archive + ".part"
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(url) as response, open(partial, "wb") as handle:
+                shutil.copyfileobj(response, handle)
+            os.replace(partial, archive)
+            return
+        except (OSError, http.client.HTTPException) as error:
+            if os.path.exists(partial):
+                os.remove(partial)
+            if attempt == attempts:
+                raise
+            print("  the transfer stopped (%s), trying again" % error, file=sys.stderr)
+
+
 def fetch(work: str) -> str:
     """The corpus, downloading the release tarball once."""
     root = os.path.join(work, "test262-" + PIN)
@@ -47,8 +71,7 @@ def fetch(work: str) -> str:
     if not os.path.exists(archive):
         url = "https://codeload.github.com/tc39/test262/tar.gz/" + PIN
         print("fetching " + url, file=sys.stderr)
-        with urllib.request.urlopen(url) as response, open(archive, "wb") as handle:
-            shutil.copyfileobj(response, handle)
+        download(url, archive)
     with tarfile.open(archive) as tar:
         members = [
             m for m in tar.getmembers()
