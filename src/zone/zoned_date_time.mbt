@@ -238,13 +238,65 @@ pub fn ZonedDateTime::moment(self : ZonedDateTime) -> @moondate.Moment {
 ///     2026-09-22T14:30:00+08:00[Asia/Shanghai]
 ///
 /// `fraction` is the number of fractional-second digits, 0 to 9; left out, as
-/// many as the value needs. `zone_name` leaves the name off when `false`.
+/// many as the value needs. A number of digits is a granularity as well: the
+/// value is rounded to it first, truncated unless `rounding` says otherwise.
+/// `zone_name` leaves the name off when `false`, and `offset` leaves the
+/// `±HH:MM` off, which is what a reader that already knows the zone wants.
+///
+/// `smallest_unit` says the granularity by unit instead: a minute has no seconds
+/// to write and a millisecond three digits of a second.
 pub fn ZonedDateTime::isoformat(
   self : ZonedDateTime,
   fraction? : Int32,
   zone_name~ : Bool = true,
+  offset~ : Bool = true,
+  smallest_unit? : @moondate.TimeUnit,
+  rounding~ : @moondate.Rounding = Trunc,
+  critical~ : Bool = false,
 ) -> String {
-  self.moment().isoformat(fraction?, offset=true, zone_name~)
+  match smallest_unit {
+    Some(unit) => {
+      let digits = match unit {
+        Millis => 3
+        Micros => 6
+        Nanos => 9
+        _ => 0
+      }
+      self
+      .rounded(smallest_unit=unit, increment=1L, rounding~)
+      .moment()
+      .isoformat(
+        fraction=digits,
+        offset~,
+        zone_name~,
+        smallest_unit=unit,
+        critical~,
+      )
+    }
+    None =>
+      match fraction {
+        None =>
+          self.moment().isoformat(fraction?, offset~, zone_name~, critical~)
+        Some(count) => {
+          let count = if count > 9 { 9 } else if count < 0 { 0 } else { count }
+          let step = ten_to(9 - count)
+          self
+          .snap(step, rounding~)
+          .moment()
+          .isoformat(fraction=count, offset~, zone_name~, critical~)
+        }
+      }
+  }
+}
+
+///|
+/// Ten to the power `n`, for the digits of a second.
+fn ten_to(n : Int32) -> Int64 {
+  let mut out = 1L
+  for _ in 0..<n {
+    out = out * 10L
+  }
+  out
 }
 
 ///|

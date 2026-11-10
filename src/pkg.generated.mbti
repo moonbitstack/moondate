@@ -80,9 +80,13 @@ pub fn parse_pattern(StringView, StringView) -> Moment raise Refused
 
 pub let resolution : Span
 
+pub fn round_increment(Int64, Int64, Rounding) -> Int64
+
 pub let second : Span
 
 pub fn strptime(StringView, StringView) -> Moment raise Refused
+
+pub let zero : Period
 
 // Errors
 #derive(Eq, @debug.Debug)
@@ -149,7 +153,7 @@ pub fn Moment::equal(Self, Self) -> Bool
 pub fn Moment::http_text(Self) -> String raise Refused
 pub fn Moment::instant(Self) -> (Int64, Int32)?
 pub fn Moment::isocalendar(Self) -> (Int32, Int32, Int32)?
-pub fn Moment::isoformat(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool) -> String
+pub fn Moment::isoformat(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool, smallest_unit? : TimeUnit, critical? : Bool) -> String
 pub fn Moment::layout(Self, StringView) -> String
 pub fn Moment::not_equal(Self, Self) -> Bool
 pub fn Moment::of_epoch(Int64, nano? : Int32, zone? : Zone) -> Self
@@ -170,6 +174,49 @@ pub fn Moment::utcoffset(Self) -> Span?
 pub fn Moment::weekday(Self) -> Int32?
 pub fn Moment::zone(Self) -> Zone?
 pub impl Show for Moment
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Period {
+  years : Int64
+  months : Int64
+  weeks : Int64
+  days : Int64
+  hours : Int64
+  minutes : Int64
+  seconds : Int64
+  nanos : Int64
+}
+pub fn Period::add(Self, Self) -> Self
+pub fn Period::equal(Self, Self) -> Bool
+pub fn Period::has_date(Self) -> Bool
+pub fn Period::has_mixed_sign(Self) -> Bool
+pub fn Period::is_zero(Self) -> Bool
+pub fn Period::neg(Self) -> Self
+pub fn Period::new(years? : Int64, months? : Int64, weeks? : Int64, days? : Int64, hours? : Int64, minutes? : Int64, seconds? : Int64, millis? : Int64, micros? : Int64, nanos? : Int64) -> Self
+pub fn Period::not_equal(Self, Self) -> Bool
+pub fn Period::of(TimeUnit, Int64) -> Self
+pub fn Period::output(Self, &Logger) -> Unit
+pub fn Period::sign(Self) -> Int32
+pub fn Period::span(Self) -> Span
+pub fn Period::to_repr(Self) -> @debug.Repr
+pub fn Period::to_string(Self) -> String
+pub impl Show for Period
+
+#derive(Eq, @debug.Debug)
+pub(all) enum Rounding {
+  Ceil
+  Floor
+  Expand
+  Trunc
+  HalfCeil
+  HalfFloor
+  HalfExpand
+  HalfTrunc
+  HalfEven
+}
+pub fn Rounding::equal(Self, Self) -> Bool
+pub fn Rounding::not_equal(Self, Self) -> Bool
+pub fn Rounding::to_repr(Self) -> @debug.Repr
 
 #derive(Compare, Eq, @debug.Debug)
 pub(all) struct Span {
@@ -214,6 +261,25 @@ pub fn Time::replace(Self, hour? : Int32, minute? : Int32, second? : Int32, nano
 pub fn Time::to_repr(Self) -> @debug.Repr
 pub fn Time::to_string(Self) -> String
 pub impl Show for Time
+
+#derive(Eq, @debug.Debug)
+pub(all) enum TimeUnit {
+  Years
+  Months
+  Weeks
+  Days
+  Hours
+  Minutes
+  Seconds
+  Millis
+  Micros
+  Nanos
+}
+pub fn TimeUnit::equal(Self, Self) -> Bool
+pub fn TimeUnit::is_exact(Self) -> Bool
+pub fn TimeUnit::nanos(Self) -> Int64?
+pub fn TimeUnit::not_equal(Self, Self) -> Bool
+pub fn TimeUnit::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) enum Zone {

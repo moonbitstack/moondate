@@ -36,6 +36,15 @@ pub fn ClockRule::not_equal(Self, Self) -> Bool
 pub fn ClockRule::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
+pub(all) enum Direction {
+  Next
+  Previous
+}
+pub fn Direction::equal(Self, Self) -> Bool
+pub fn Direction::not_equal(Self, Self) -> Bool
+pub fn Direction::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
 pub(all) enum Fold {
   Compatible
   Earlier
@@ -127,6 +136,7 @@ pub fn Tz::parse(Bytes, name? : String) -> Self raise Refused
 pub fn Tz::read(Self, @moondate.Date, @moondate.Time) -> Local
 pub fn Tz::readings(Self) -> Array[Reading]
 pub fn Tz::rule(Self) -> Rule?
+pub fn Tz::transition(Self, Int64, direction~ : Direction) -> Int64?
 pub fn Tz::zoned(Self, @moondate.Moment, fold? : Fold) -> @moondate.Moment raise Refused
 
 pub(all) struct ZonedDateTime {
@@ -135,14 +145,19 @@ pub(all) struct ZonedDateTime {
   tz : Tz
 }
 pub fn ZonedDateTime::abbrev(Self) -> String
+pub fn ZonedDateTime::add(Self, @moondate.Period, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::compare(Self, Self) -> Int32
 pub fn ZonedDateTime::date(Self) -> @moondate.Date
 pub fn ZonedDateTime::day(Self) -> Int32
 pub fn ZonedDateTime::epoch(Self) -> Int64
+pub fn ZonedDateTime::equals(Self, Self) -> Bool
 pub fn ZonedDateTime::from_unix(Int64, nano? : Int32, zone~ : Tz) -> Self
+pub fn ZonedDateTime::get_time_zone_transition(Self, direction~ : Direction) -> Self?
 pub fn ZonedDateTime::hour(Self) -> Int32
+pub fn ZonedDateTime::hours_in_day(Self) -> Int32
 pub fn ZonedDateTime::into(Self, Tz) -> Self
 pub fn ZonedDateTime::is_dst(Self) -> Bool
-pub fn ZonedDateTime::isoformat(Self, fraction? : Int32, zone_name? : Bool) -> String
+pub fn ZonedDateTime::isoformat(Self, fraction? : Int32, zone_name? : Bool, offset? : Bool, smallest_unit? : @moondate.TimeUnit, rounding? : @moondate.Rounding, critical? : Bool) -> String
 pub fn ZonedDateTime::minute(Self) -> Int32
 pub fn ZonedDateTime::moment(Self) -> @moondate.Moment
 pub fn ZonedDateTime::month(Self) -> Int32
@@ -156,14 +171,21 @@ pub fn ZonedDateTime::plus(Self, @moondate.Span) -> Self
 pub fn ZonedDateTime::plus_days(Self, Int64) -> Self
 pub fn ZonedDateTime::plus_months(Self, Int64, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::reading(Self) -> Reading
+pub fn ZonedDateTime::round(Self, smallest_unit~ : @moondate.TimeUnit, increment? : Int64, rounding? : @moondate.Rounding) -> Self raise Refused
 pub fn ZonedDateTime::second(Self) -> Int32
+pub fn ZonedDateTime::since(Self, Self, largest_unit? : @moondate.TimeUnit, smallest_unit? : @moondate.TimeUnit, rounding? : @moondate.Rounding, increment? : Int64) -> @moondate.Period raise Refused
+pub fn ZonedDateTime::start_of_day(Self) -> Self
+pub fn ZonedDateTime::subtract(Self, @moondate.Period, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::time(Self) -> @moondate.Time
 pub fn ZonedDateTime::to_string(Self) -> String
+pub fn ZonedDateTime::until(Self, Self, largest_unit? : @moondate.TimeUnit, smallest_unit? : @moondate.TimeUnit, rounding? : @moondate.Rounding, increment? : Int64) -> @moondate.Period raise Refused
 pub fn ZonedDateTime::with_day(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
+pub fn ZonedDateTime::with_fields(Self, year? : Int32, month? : Int32, day? : Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, offset? : OffsetPolicy, fold? : Fold, strict? : Bool) -> Self raise Refused
 pub fn ZonedDateTime::with_hour(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::with_minute(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::with_month(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::with_nanos(Self, Int32) -> Self
+pub fn ZonedDateTime::with_plain_time(Self, @moondate.Time, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::with_second(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::with_year(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -> Self raise Refused
 pub fn ZonedDateTime::year(Self) -> Int32

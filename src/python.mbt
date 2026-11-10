@@ -378,18 +378,20 @@ pub fn Moment::isoformat(
   fraction? : Int32,
   offset~ : Bool = true,
   zone_name~ : Bool = false,
+  smallest_unit? : TimeUnit,
+  critical~ : Bool = false,
 ) -> String {
   match self {
     Zoned(date~, time~, zone~) =>
       iso_date(date) +
       sep.to_string() +
-      iso_time(time, fraction) +
+      iso_time(time, fraction, smallest_unit) +
       iso_zone(Some(zone), offset) +
-      bracket(zone, zone_name)
+      bracket(zone, zone_name, critical)
     Plain(date~, time~) =>
-      iso_date(date) + sep.to_string() + iso_time(time, fraction)
+      iso_date(date) + sep.to_string() + iso_time(time, fraction, smallest_unit)
     Day(date~) => iso_date(date)
-    Clock(time~) => iso_time(time, fraction)
+    Clock(time~) => iso_time(time, fraction, smallest_unit)
   }
 }
 
@@ -410,8 +412,16 @@ fn iso_date(d : Date) -> String {
 
 ///|
 /// The time part with the fractional-second digits `fraction` asks for.
-fn iso_time(t : Time, fraction : Int32?) -> String {
-  let head = pad(t.hour, 2) + ":" + pad(t.minute, 2) + ":" + pad(t.second, 2)
+fn iso_time(t : Time, fraction : Int32?, smallest : TimeUnit?) -> String {
+  let head = match smallest {
+    // A text that stops at an hour or a minute does not write the fields below.
+    Some(Hours) => pad(t.hour, 2)
+    Some(Minutes) => pad(t.hour, 2) + ":" + pad(t.minute, 2)
+    _ => pad(t.hour, 2) + ":" + pad(t.minute, 2) + ":" + pad(t.second, 2)
+  }
+  if smallest is Some(Hours) || smallest is Some(Minutes) {
+    return head
+  }
   match fraction {
     Some(n) if n <= 0 => head
     Some(n) => {
@@ -484,11 +494,13 @@ fn hhmmss_nanos(nanos : Int64) -> String {
 
 ///|
 /// The name a zone is filed under, in brackets, when the text asks for it.
-fn bracket(zone : Zone, wanted : Bool) -> String {
+fn bracket(zone : Zone, wanted : Bool, critical : Bool) -> String {
   match zone {
     Named(name) =>
       if wanted && name.name != "" {
-        "[" + name.name + "]"
+        // A leading `!` marks the name as one a reader must understand, which is
+        // how an annotation that changes the meaning of the text is written.
+        (if critical { "[!" } else { "[" }) + name.name + "]"
       } else {
         ""
       }
