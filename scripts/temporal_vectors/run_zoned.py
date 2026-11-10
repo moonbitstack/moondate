@@ -69,7 +69,10 @@ def installed(work: str) -> str:
         return os.path.join(target, "node_modules", "temporal-polyfill")
     os.makedirs(target, exist_ok=True)
     print("installing " + REFERENCE, file=sys.stderr)
-    run(["npm", "install", "--prefix", target, "--no-audit", "--no-fund", REFERENCE])
+    # `npm` is a shell script on Unix and a `.cmd` on Windows, and only one of the
+    # two is found by name.
+    npm = shutil.which("npm") or "npm"
+    run([npm, "install", "--prefix", target, "--no-audit", "--no-fund", REFERENCE])
     return os.path.join(target, "node_modules", "temporal-polyfill")
 
 
