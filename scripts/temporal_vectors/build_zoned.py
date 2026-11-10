@@ -750,7 +750,11 @@ def main():
         ]
         with open(args.report, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(
-                {"pin": args.pin, "counts": tables.reasons, "cases": lines},
+                {
+                    "pin": args.pin,
+                    "counts": dict(sorted(tables.reasons.items())),
+                    "cases": lines,
+                },
                 handle,
                 indent=1,
             )
