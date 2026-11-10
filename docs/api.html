@@ -67,8 +67,11 @@
 <div class="pkg">@moondate</div>
 <a href="#type-moondate-Date">Date</a>
 <a href="#type-moondate-Moment">Moment</a>
+<a href="#type-moondate-Period">Period</a>
+<a href="#type-moondate-Rounding">Rounding</a>
 <a href="#type-moondate-Span">Span</a>
 <a href="#type-moondate-Time">Time</a>
+<a href="#type-moondate-TimeUnit">TimeUnit</a>
 <a href="#type-moondate-Zone">Zone</a>
 <a href="#type-moondate-ZoneName">ZoneName</a>
 <a href="#err-moondate-Refused">Refused</a>
@@ -84,6 +87,7 @@
 <div class="group">
 <div class="pkg">@zone</div>
 <a href="#type-zone-ClockRule">ClockRule</a>
+<a href="#type-zone-Direction">Direction</a>
 <a href="#type-zone-Fold">Fold</a>
 <a href="#type-zone-Local">Local</a>
 <a href="#type-zone-OffsetPolicy">OffsetPolicy</a>
@@ -316,13 +320,13 @@
 
 </article>
 <article class="api-item" id="m-moondate-Moment-isoformat">
-<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool) -&gt; String</div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::isoformat</span>(Self, sep? : Char, fraction? : Int32, offset? : Bool, zone_name? : Bool, smallest_unit? : TimeUnit, critical? : Bool) -&gt; String</div>
 <div class="doc"><p>The moment as ISO 8601 text, which is what [<code>Show</code>] writes.</p>
 <p><code>sep</code> is the character between the date and the time, <code>T</code> by default; any character works, and a space is what a log line wants.</p>
 <p><code>fraction</code> is the number of fractional-second digits, 0 to 9, truncated. Left out, it writes as many as the value needs and none for a whole second, which is Temporal's <code>auto</code>.</p>
 <p><code>offset</code> writes the zone the moment carries, <code>Z</code> for UTC and <code>±HH:MM</code> for an offset; <code>false</code> leaves the zone off, which is Temporal's <code>offset: "never"</code>.</p>
 <p><code>zone_name</code> follows the offset with the name the zone is filed under, in brackets: <code>2026-11-01T01:30:00-04:00[America/New_York]</code>, which is Temporal's <code>timeZoneName: "critical"</code> and the only way the text keeps the name as well as the instant.</p></div>
-<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span><span class="p"><b>zone_name~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
+<div class="params"><span class="p"><b>sep~</b> <span class="pt">Char</span> <span class="d">= …</span></span><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span><span class="p"><b>zone_name~</b> <span class="pt">Bool</span> <span class="d">= …</span></span><span class="p"><b>smallest_unit?</b> <span class="pt">TimeUnit</span></span><span class="p"><b>critical~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-moondate-Moment-of_epoch">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::of_epoch</span>(Int64, nano? : Int32, zone? : Zone) -&gt; Self</div>
@@ -429,6 +433,114 @@
 <article class="api-item" id="m-moondate-Moment-to_string">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Moment::to_string</span>(Self) -&gt; String</div>
 <div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-moondate-Period">
+<div class="type-head"><h3>Period</h3><span class="kind">struct</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">struct</span> <span class="name">Period</span></div>
+<div class="doc"><p>A length of time written in calendar units as well as clock units.</p>
+<p>[<code>Span</code>] is a number of nanoseconds: an hour is sixty minutes and nothing else. A period is what a calendar adds — a month is the same day of the next month, a day is the same clock reading tomorrow, and both are a different number of nanoseconds depending on where and when they are added. That is why adding one needs a zone and a starting point, and why the answer to "how far apart are these two dates" depends on the units it is asked for.</p>
+<p>The fields are not normalized against each other: <code>Period::new(months=25)</code> is twenty-five months and not two years and a month, because that is what was asked for and what a round trip has to give back.</p></div>
+<ul class="members"><li><b>years</b> : <span class="pt">Int64</span></li><li><b>months</b> : <span class="pt">Int64</span></li><li><b>weeks</b> : <span class="pt">Int64</span></li><li><b>days</b> : <span class="pt">Int64</span></li><li><b>hours</b> : <span class="pt">Int64</span></li><li><b>minutes</b> : <span class="pt">Int64</span></li><li><b>seconds</b> : <span class="pt">Int64</span></li><li><b>nanos</b> : <span class="pt">Int64</span></li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-Period-new">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::new</span>(years? : Int64, months? : Int64, weeks? : Int64, days? : Int64, hours? : Int64, minutes? : Int64, seconds? : Int64, millis? : Int64, micros? : Int64, nanos? : Int64) -&gt; Self</div>
+<div class="doc"><p>A period of each named field.</p></div>
+<div class="params"><span class="p"><b>years~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>months~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>weeks~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>days~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>hours~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>minutes~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>seconds~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>millis~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>micros~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>nanos~</b> <span class="pt">Int64</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Period-add">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::add</span>(Self, Self) -&gt; Self</div>
+<div class="doc"><p>One period added to another, field by field.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">Period</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Period-has_date">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::has_date</span>(Self) -&gt; Bool</div>
+<div class="doc"><p>Whether the period has a part a calendar has to place: years, months, weeks or days.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-has_mixed_sign">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::has_mixed_sign</span>(Self) -&gt; Bool</div>
+<div class="doc"><p>Whether the fields disagree about which way the period runs.</p>
+<p>A period is a thing to add, and a calendar cannot add one that both goes forward and back: the answer would depend on the order the fields were taken in, which is not a length. A difference between two values never has this shape; a period written by hand can.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-is_zero">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::is_zero</span>(Self) -&gt; Bool</div>
+<div class="doc"><p>Whether every field is zero.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-neg">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::neg</span>(Self) -&gt; Self</div>
+<div class="doc"><p>The same period the other way round.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-of">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::of</span>(TimeUnit, Int64) -&gt; Self</div>
+<div class="doc"><p><code>n</code> of one unit.</p></div>
+<div class="params"><span class="p"><b>unit</b> <span class="pt">TimeUnit</span></span><span class="p"><b>n</b> <span class="pt">Int64</span></span></div>
+</article>
+<article class="api-item" id="m-moondate-Period-sign">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::sign</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>The sign of the whole period: 1, -1, or 0 when it is empty. A period whose fields disagree has no single sign, and the largest field that is not zero is what a difference between two values gives.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-span">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::span</span>(Self) -&gt; Span</div>
+<div class="doc"><p>The clock part as a span: the fields from hours down, which are exact.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-to_string">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::to_string</span>(Self) -&gt; String</div>
+<div class="doc"><p>The period as the ISO 8601 text for a duration: <code>P1Y2M3DT4H5M6.007S</code>.</p>
+<p>A period whose fields all run the same way is written with one sign in front and the fields in absolute value, which is how a reader expects a duration to look; a period that mixes them — <code>until</code> never gives one, a caller can — is written with each field signed, which is the only way to say it in the grammar.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Period-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-output">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::output</span>(Self, &amp;Logger) -&gt; Unit</div>
+<div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-moondate-Rounding">
+<div class="type-head"><h3>Rounding</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Rounding</span></div>
+<div class="doc"><p>Which way a value that falls between two others is moved.</p>
+<p><code>Trunc</code> is towards zero, <code>Expand</code> away from it, which is what a negative value needs to be rounded "up" the way <code>Ceil</code> rounds a positive one. The <code>Half</code> forms differ only in what they do with an exact half, and <code>HalfEven</code> is the banker's rounding that keeps a long sum from drifting.</p></div>
+<ul class="members"><li>Ceil</li><li>Floor</li><li>Expand</li><li>Trunc</li><li>HalfCeil</li><li>HalfFloor</li><li>HalfExpand</li><li>HalfTrunc</li><li>HalfEven</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Rounding-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rounding::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Rounding-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rounding::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Rounding-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Rounding::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
 
 </article>
 </div>
@@ -605,6 +717,42 @@
 </article>
 </div>
 </section>
+<section class="api-type" id="type-moondate-TimeUnit">
+<div class="type-head"><h3>TimeUnit</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">TimeUnit</span></div>
+<div class="doc"><p>A unit of time, from a year down to a nanosecond.</p>
+<p>The first four have no fixed length — a month is not a number of days and a day is not a number of hours wherever the clocks change — so they are the units a [<code>Period</code>] is counted in rather than a [<code>Span</code>]. The rest are exact, and are what a span's nanoseconds are read back as.</p></div>
+<ul class="members"><li>Years</li><li>Months</li><li>Weeks</li><li>Days</li><li>Hours</li><li>Minutes</li><li>Seconds</li><li>Millis</li><li>Micros</li><li>Nanos</li></ul>
+<div class="method-list"><div class="mlabel">Methods</div>
+<article class="api-item" id="m-moondate-TimeUnit-is_exact">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::is_exact</span>(Self) -&gt; Bool</div>
+<div class="doc"><p>Whether the unit has a fixed length: everything below a day.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-TimeUnit-nanos">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::nanos</span>(Self) -&gt; Int64?</div>
+<div class="doc"><p>How many nanoseconds the exact units hold. <code>None</code> for the four that have no fixed length.</p></div>
+
+</article>
+</div>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-TimeUnit-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-TimeUnit-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-TimeUnit-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
 <section class="api-type" id="type-moondate-Zone">
 <div class="type-head"><h3>Zone</h3><span class="kind">enum</span></div>
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Zone</span></div>
@@ -768,6 +916,12 @@
 
 
 </article>
+<article class="api-item" id="fn-moondate-round_increment">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">round_increment</span>(Int64, Int64, Rounding) -&gt; Int64</div>
+<div class="doc"><p><code>value</code> moved to the nearest multiple of <code>increment</code>.</p>
+<p>The remainder is taken towards zero, so the sign is the value's own and the direction words mean what they say for either sign: <code>Ceil</code> is towards positive infinity, <code>Expand</code> away from zero.</p></div>
+<div class="params"><span class="p"><b>value</b> <span class="pt">Int64</span></span><span class="p"><b>increment</b> <span class="pt">Int64</span></span><span class="p"><b>rounding</b> <span class="pt">Rounding</span></span></div>
+</article>
 <article class="api-item" id="fn-moondate-strptime">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">strptime</span>(StringView, StringView) -&gt; Moment <span class="kw">raise</span> Refused</div>
 
@@ -926,6 +1080,11 @@
 
 
 </article>
+<article class="api-item" id="const-moondate-zero">
+<div class="sig"><span class="kw">pub</span> <span class="kw">let</span> <span class="name">zero</span> : Period</div>
+<div class="doc"><p>The period of no length at all.</p></div>
+
+</article>
 </section>
 <section class="api-pkg" id="pkg-cron">
 <header>
@@ -1041,6 +1200,29 @@
 </article>
 <article class="api-item" id="m-zone-ClockRule-to_repr">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ClockRule::to_repr</span>(Self) -&gt; @debug.Repr</div>
+<div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+</div>
+</section>
+<section class="api-type" id="type-zone-Direction">
+<div class="type-head"><h3>Direction</h3><span class="kind">enum</span></div>
+<div class="sig"><span class="kw">pub</span>(all) <span class="kw">enum</span> <span class="name">Direction</span></div>
+<div class="doc"><p>Which way along the line of changes a zone is asked about.</p></div>
+<ul class="members"><li>Next</li><li>Previous</li></ul>
+<div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-Direction-equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Direction::equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Direction-not_equal">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Direction::not_equal</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-Direction-to_repr">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Direction::to_repr</span>(Self) -&gt; @debug.Repr</div>
 <div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
 
 </article>
@@ -1305,6 +1487,12 @@
 <div class="doc"><p>The rule that carries on past the last reading, when the zone has one.</p></div>
 
 </article>
+<article class="api-item" id="m-zone-Tz-transition">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::transition</span>(Self, Int64, direction~ : Direction) -&gt; Int64?</div>
+<div class="doc"><p>The next or the previous instant the zone's offset changed.</p>
+<p>The table of readings a file carries answers up to its last entry; after that the footer's rule does, and a rule is a pattern rather than a list, so the changes it holds are placed year by year. A zone with neither — a fixed offset — has none, which is <code>None</code>.</p></div>
+<div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span><span class="p"><b>direction~</b> <span class="pt">Direction</span></span></div>
+</article>
 <article class="api-item" id="m-zone-Tz-zoned">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Tz::zoned</span>(Self, @moondate.Moment, fold? : Fold) -&gt; @moondate.Moment <span class="kw">raise</span> Refused</div>
 <div class="doc"><p>A wall clock pinned to this zone.</p>
@@ -1328,6 +1516,17 @@
 <div class="doc"><p>The abbreviation the zone writes at the instant: <code>EST</code>, <code>EDT</code>, <code>UTC</code>.</p></div>
 
 </article>
+<article class="api-item" id="m-zone-ZonedDateTime-add">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::add</span>(Self, @moondate.Period, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A period added to an instant, the way a calendar adds one.</p>
+<p>The date part is added to the wall clock and read back in the zone, so a day added across a change is a day on the calendar and not twenty-four hours; the clock part is added to the instant, because an hour is an hour wherever it falls. That split is what makes <code>add(day)</code> and <code>add(24 hours)</code> different answers in most of the world, and both of them right.</p></div>
+<div class="params"><span class="p"><b>period</b> <span class="pt">@moondate.Period</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-compare">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::compare</span>(Self, Self) -&gt; Int32</div>
+<div class="doc"><p>The instants ordered: negative when this one is earlier.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">ZonedDateTime</span></span></div>
+</article>
 <article class="api-item" id="m-zone-ZonedDateTime-date">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::date</span>(Self) -&gt; @moondate.Date</div>
 <div class="doc"><p>The date the clocks read at the instant, in the zone.</p></div>
@@ -1343,15 +1542,33 @@
 <div class="doc"><p>Seconds since 1970-01-01T00:00:00Z, the point on the line.</p></div>
 
 </article>
+<article class="api-item" id="m-zone-ZonedDateTime-equals">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::equals</span>(Self, Self) -&gt; Bool</div>
+<div class="doc"><p>The same instant in the same zone: two values are equal when they name one instant and are filed under one name.</p>
+<p>A fixed offset and a named zone that happens to have that offset at that instant are not equal, because the values are not interchangeable: one can answer for tomorrow and the other cannot.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">ZonedDateTime</span></span></div>
+</article>
 <article class="api-item" id="m-zone-ZonedDateTime-from_unix">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::from_unix</span>(Int64, nano? : Int32, zone~ : Tz) -&gt; Self</div>
 <div class="doc"><p>An instant in a zone, the direction that needs no policy.</p>
 <p>An instant is one instant, and the zone only says what the clocks read at it. This is what an arithmetic step lands on, and what a value is moved to with [<code>into</code>].</p></div>
 <div class="params"><span class="p"><b>epoch</b> <span class="pt">Int64</span></span><span class="p"><b>nano~</b> <span class="pt">Int32</span> <span class="d">= …</span></span><span class="p"><b>zone~</b> <span class="pt">Tz</span></span></div>
 </article>
+<article class="api-item" id="m-zone-ZonedDateTime-get_time_zone_transition">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::get_time_zone_transition</span>(Self, direction~ : Direction) -&gt; Self?</div>
+<div class="doc"><p>The next or the previous moment the zone's offset changed, as a value in the same zone, or <code>None</code> when the zone has no such change left.</p>
+<p>The search runs past the end of the file's table into the rule that carries on after it, so a zone whose table stops in 2037 still answers for a century after that.</p></div>
+<div class="params"><span class="p"><b>direction~</b> <span class="pt">Direction</span></span></div>
+</article>
 <article class="api-item" id="m-zone-ZonedDateTime-hour">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::hour</span>(Self) -&gt; Int32</div>
 <div class="doc"><p>The hour the clocks read at the instant, in the zone, 0 to 23.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-hours_in_day">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::hours_in_day</span>(Self) -&gt; Int32</div>
+<div class="doc"><p>How many hours the day the clocks read at this instant holds.</p>
+<p>Twenty-four, except on the two days a year the clocks change: the day they go forward is short and the day they go back is long, by the size of the change.</p></div>
 
 </article>
 <article class="api-item" id="m-zone-ZonedDateTime-into">
@@ -1366,11 +1583,12 @@
 
 </article>
 <article class="api-item" id="m-zone-ZonedDateTime-isoformat">
-<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::isoformat</span>(Self, fraction? : Int32, zone_name? : Bool) -&gt; String</div>
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::isoformat</span>(Self, fraction? : Int32, zone_name? : Bool, offset? : Bool, smallest_unit? : @moondate.TimeUnit, rounding? : @moondate.Rounding, critical? : Bool) -&gt; String</div>
 <div class="doc"><p>The instant as the ISO 8601 text it reads in the zone: the date and time the clocks show, the offset in force beside it, and the name in brackets.</p>
 <p>2026-09-22T14:30:00+08:00[Asia/Shanghai]</p>
-<p><code>fraction</code> is the number of fractional-second digits, 0 to 9; left out, as many as the value needs. <code>zone_name</code> leaves the name off when <code>false</code>.</p></div>
-<div class="params"><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>zone_name~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
+<p><code>fraction</code> is the number of fractional-second digits, 0 to 9; left out, as many as the value needs. A number of digits is a granularity as well: the value is rounded to it first, truncated unless <code>rounding</code> says otherwise. <code>zone_name</code> leaves the name off when <code>false</code>, and <code>offset</code> leaves the <code>±HH:MM</code> off, which is what a reader that already knows the zone wants.</p>
+<p><code>smallest_unit</code> says the granularity by unit instead: a minute has no seconds to write and a millisecond three digits of a second.</p></div>
+<div class="params"><span class="p"><b>fraction?</b> <span class="pt">Int32</span></span><span class="p"><b>zone_name~</b> <span class="pt">Bool</span> <span class="d">= …</span></span><span class="p"><b>offset~</b> <span class="pt">Bool</span> <span class="d">= …</span></span><span class="p"><b>smallest_unit?</b> <span class="pt">@moondate.TimeUnit</span></span><span class="p"><b>rounding~</b> <span class="pt">@moondate.Rounding</span> <span class="d">= …</span></span><span class="p"><b>critical~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-zone-ZonedDateTime-minute">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::minute</span>(Self) -&gt; Int32</div>
@@ -1438,11 +1656,33 @@
 <div class="doc"><p>What the zone read at the instant: the offset, the abbreviation, and whether daylight saving was on.</p></div>
 
 </article>
+<article class="api-item" id="m-zone-ZonedDateTime-round">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::round</span>(Self, smallest_unit~ : @moondate.TimeUnit, increment? : Int64, rounding? : @moondate.Rounding) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The instant moved to the nearest multiple of a unit, in this zone.</p>
+<p>A day is the one unit whose length is not fixed: on the day the clocks change it is short or long, and rounding to it means the day the zone is having, so the two boundaries are the start of that day and the start of the next one. Every other unit is a count of time, and rounds the instant itself.</p></div>
+<div class="params"><span class="p"><b>smallest_unit~</b> <span class="pt">@moondate.TimeUnit</span></span><span class="p"><b>increment~</b> <span class="pt">Int64</span> <span class="d">= …</span></span><span class="p"><b>rounding~</b> <span class="pt">@moondate.Rounding</span> <span class="d">= …</span></span></div>
+</article>
 <article class="api-item" id="m-zone-ZonedDateTime-second">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::second</span>(Self) -&gt; Int32</div>
 <div class="doc"><p>The second the clocks read at the instant, in the zone, 0 to 59.</p>
 <p>A leap second is kept as the sixtieth second of its minute, the way the clock here does; it is not projected to the next minute.</p></div>
 
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-since">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::since</span>(Self, Self, largest_unit? : @moondate.TimeUnit, smallest_unit? : @moondate.TimeUnit, rounding? : @moondate.Rounding, increment? : Int64) -&gt; @moondate.Period <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>How far behind this value another one is.</p>
+<p>The reading is [<code>until</code>]'s, negated: a difference is not symmetric in a calendar — a month forward from the thirty-first of January lands on the twenty-eighth of February, and the way back is thirty-one days — so the count is taken from this value's side and then turned round, which is what makes <code>a.since(b)</code> the negative of <code>a.until(b)</code>.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">ZonedDateTime</span></span><span class="p"><b>largest_unit?</b> <span class="pt">@moondate.TimeUnit</span></span><span class="p"><b>smallest_unit?</b> <span class="pt">@moondate.TimeUnit</span></span><span class="p"><b>rounding~</b> <span class="pt">@moondate.Rounding</span> <span class="d">= …</span></span><span class="p"><b>increment~</b> <span class="pt">Int64</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-start_of_day">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::start_of_day</span>(Self) -&gt; Self</div>
+<div class="doc"><p>The first instant of the day the clocks read at this one: midnight, or the moment the clocks jumped to midnight when they skipped it.</p></div>
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-subtract">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::subtract</span>(Self, @moondate.Period, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>A period taken away: the same as [<code>add</code>] with every field negated, which is not the same as taking the instant back by the span the period holds.</p></div>
+<div class="params"><span class="p"><b>period</b> <span class="pt">@moondate.Period</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-zone-ZonedDateTime-time">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::time</span>(Self) -&gt; @moondate.Time</div>
@@ -1454,10 +1694,24 @@
 <div class="doc"><p>The instant as a sentence: <code>2026-09-22T14:30:00+08:00 Asia/Shanghai</code>.</p></div>
 
 </article>
+<article class="api-item" id="m-zone-ZonedDateTime-until">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::until</span>(Self, Self, largest_unit? : @moondate.TimeUnit, smallest_unit? : @moondate.TimeUnit, rounding? : @moondate.Rounding, increment? : Int64) -&gt; @moondate.Period <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>How far ahead of this value another one is, in the units asked for.</p>
+<p><code>largest_unit</code> is the biggest field the answer may use — a difference of thirty days is <code>P1M</code> or <code>P30D</code> depending on it, and only the calendar can tell which — and is an hour when left out, since an instant is a count of time first. <code>smallest_unit</code> with <code>rounding</code> is how finely it is measured: a difference of 25 hours is 1 day when asked for in days, and 2 when rounded up.</p>
+<p>The answer's sign is the direction from this value to the other one.</p></div>
+<div class="params"><span class="p"><b>other</b> <span class="pt">ZonedDateTime</span></span><span class="p"><b>largest_unit?</b> <span class="pt">@moondate.TimeUnit</span></span><span class="p"><b>smallest_unit?</b> <span class="pt">@moondate.TimeUnit</span></span><span class="p"><b>rounding~</b> <span class="pt">@moondate.Rounding</span> <span class="d">= …</span></span><span class="p"><b>increment~</b> <span class="pt">Int64</span> <span class="d">= …</span></span></div>
+</article>
 <article class="api-item" id="m-zone-ZonedDateTime-with_day">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_day</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
 <div class="doc"><p>The instant with the day changed, the rest of the reading kept. A day the month does not have is refused as [<code>Refused::BadDate</code>].</p></div>
 <div class="params"><span class="p"><b>day</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_fields">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_fields</span>(Self, year? : Int32, month? : Int32, day? : Int32, hour? : Int32, minute? : Int32, second? : Int32, nano? : Int32, offset? : OffsetPolicy, fold? : Fold, strict? : Bool) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The value with some of its fields replaced, the rest of the reading kept.</p>
+<p>The fields are the ones a wall clock has: a field left out keeps the reading it had. A day the month does not have is clamped to the last one it has, unless <code>strict</code> is set, which refuses it instead — the calendar's own choice for a field edit is to fit the value into the month rather than to lose it.</p>
+<p>Whether the new reading names one instant, two or none is decided by [<code>OffsetPolicy</code>]: the offset in force is kept when the zone still has it at the new reading, and the zone's rules answer when it does not.</p></div>
+<div class="params"><span class="p"><b>year?</b> <span class="pt">Int32</span></span><span class="p"><b>month?</b> <span class="pt">Int32</span></span><span class="p"><b>day?</b> <span class="pt">Int32</span></span><span class="p"><b>hour?</b> <span class="pt">Int32</span></span><span class="p"><b>minute?</b> <span class="pt">Int32</span></span><span class="p"><b>second?</b> <span class="pt">Int32</span></span><span class="p"><b>nano?</b> <span class="pt">Int32</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span><span class="p"><b>strict~</b> <span class="pt">Bool</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-zone-ZonedDateTime-with_hour">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_hour</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
@@ -1479,6 +1733,12 @@
 <div class="doc"><p>The instant with the nanoseconds changed, the rest of the reading kept.</p>
 <p>The offset is in seconds, so the seconds the instant names are not moved: only the fraction is replaced, and the reading is read back from the zone.</p></div>
 <div class="params"><span class="p"><b>nanos</b> <span class="pt">Int32</span></span></div>
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-with_plain_time">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_plain_time</span>(Self, @moondate.Time, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>The value with its time of day replaced, the date kept.</p>
+<p>A new reading can fall in an hour the clocks skip or repeat, and [<code>Fold</code>] is what decides which instant it names.</p></div>
+<div class="params"><span class="p"><b>time</b> <span class="pt">@moondate.Time</span></span><span class="p"><b>offset~</b> <span class="pt">OffsetPolicy</span> <span class="d">= …</span></span><span class="p"><b>fold~</b> <span class="pt">Fold</span> <span class="d">= …</span></span></div>
 </article>
 <article class="api-item" id="m-zone-ZonedDateTime-with_second">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::with_second</span>(Self, Int32, offset? : OffsetPolicy, fold? : Fold) -&gt; Self <span class="kw">raise</span> Refused</div>

@@ -270,19 +270,66 @@ keeps the instant the old offset named when it still is, `Ignore` goes straight 
 the rules, and `Use` keeps the old offset whether or not the zone still has it; a
 field out of range is refused as `Refused::BadDate`.
 
+#### Periods, which a calendar adds
+
+A `Span` is a number of nanoseconds, and an hour is sixty minutes in it. A
+`Period` is the other kind of length: years, months, weeks, days, hours, minutes,
+seconds and the fraction of one, each field kept as it was written. Adding one
+needs a zone and a starting point, because a day is not twenty-four hours on the
+two days a year the clocks change and a month is not a number of days at all.
+
+```moonbit
+let ny = @tzdata.load("America/New_York")
+let noon = @zone.ZonedDateTime::of(2024, 3, 9, hour=12, zone=ny)
+let tomorrow = noon.add(@moondate.Period::new(days=1))
+assert_eq(tomorrow.isoformat(), "2024-03-10T12:00:00-04:00[America/New_York]")
+assert_eq(noon.add(@moondate.Period::new(hours=24)).isoformat(), "2024-03-10T13:00:00-04:00[America/New_York]")
+assert_eq(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Days).to_string(), "P1D")
+assert_eq(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Hours).to_string(), "PT23H")
+```
+
+The same two instants are a day apart or twenty-three hours apart depending on
+the unit they are asked for, and both answers are right. `until` takes the largest
+field the answer may use and, with `smallest_unit` and `rounding`, how finely it is
+measured; `since` is the same reading the other way round. A period whose fields
+run both ways is refused, because a calendar cannot add one.
+
+A value also edits itself with `with_fields` and `with_plain_time`, rounds with
+`round` to a unit from a day down (`hours`, `minutes`, the three below a second)
+in any of the nine directions, and answers `start_of_day`, `hours_in_day` and
+`get_time_zone_transition`. `equals` and `compare` ask whether two values name one
+instant in one zone and which of two comes first.
+
+```moonbit
+let ny = @tzdata.load("America/New_York")
+let dusk = @zone.ZonedDateTime::of(2024, 3, 10, hour=12, minute=31, zone=ny)
+assert_eq(dusk.round(smallest_unit=@moondate.TimeUnit::Hours).isoformat(), "2024-03-10T13:00:00-04:00[America/New_York]")
+assert_eq(dusk.hours_in_day(), 23)
+assert_eq(dusk.get_time_zone_transition(direction=@zone.Direction::Next).unwrap().isoformat(), "2024-11-03T01:00:00-05:00[America/New_York]")
+```
+
+`isoformat` takes the offset, the name in brackets and the number of fractional
+digits, and a `smallest_unit` to round the reading to before writing it.
+
 ### Interface
 
 | Type | Built with | Asked |
 |:--|:--|:--|
 | `Tz` | `@zone.Tz::parse(bytes)`, `@zone.Tz::of`, `@tzdata.load(name)`, `@zoneinfo.open`, `@zoneinfo.named`, `@zoneinfo.system` | `name`, `at`, `offset`, `abbrev`, `is_dst`, `changes`, `read`, `epoch`, `moment`, `zoned`, `readings`, `rule` |
-| `ZonedDateTime` | `ZonedDateTime::of(year, month, day, zone~)`, `::from_unix(epoch, zone~)`, `::of_moment(moment, zone~)` | `into(zone)`, `moment`, `epoch`, `offset`, `offset_minutes`, `abbrev`, `is_dst`, `reading`, `plus`, `plus_days`, `plus_months`, `with_year` … `with_second`, `isoformat`, `zone_name`, `year` … `second` |
+| `ZonedDateTime` | `ZonedDateTime::of(year, month, day, zone~)`, `::from_unix(epoch, zone~)`, `::of_moment(moment, zone~)` | `into(zone)`, `moment`, `epoch`, `nanos`, `offset`, `offset_minutes`, `abbrev`, `is_dst`, `reading`, `plus`, `plus_days`, `plus_months`, `add`, `subtract`, `until`, `since`, `round`, `with_fields`, `with_plain_time`, `with_year` … `with_second`, `start_of_day`, `hours_in_day`, `get_time_zone_transition`, `equals`, `compare`, `isoformat`, `to_string`, `zone_name`, `year` … `second` |
 | `Reading` | — | the fields: when it began, the offset in seconds, whether daylight saving was on, the abbreviation |
+| `Period` | `Period::new`, `Period::of(unit, n)`, `zero` | `years` … `nanos`, `add`, `neg`, `span`, `sign`, `is_zero`, `has_date`, `has_mixed_sign`, `to_string` |
+| `TimeUnit` | `Years` … `Nanos` | `nanos`, `is_exact` |
+| `Rounding` | `Ceil`, `Floor`, `Expand`, `Trunc`, the four halves, `HalfEven` | — |
 | `Local` | `Tz::read` | `epoch(fold~)`, `is_exact` |
 | `Rule` | `Rule::parse` | `text`, `at` |
 | `Tz` from the database | `@tzdata.load`, `@tzdata.find` | the same, plus `@tzdata.zones`, `@tzdata.links`, `@tzdata.release` |
 | `Tz` from this machine | `@zoneinfo.open`, `@zoneinfo.named`, `@zoneinfo.system` | the same, plus `@zoneinfo.directory` |
 
-Free functions in `zone`: `Tz::parse`, `Rule::parse`. In `tzdata`: `zones`,
+Free functions in `zone`: `Tz::parse`, `Rule::parse`. In the root package:
+`round_increment`, which moves a number to the nearest multiple of a step in one
+of the nine directions. `Duration`-like lengths are `Span` (a count of
+nanoseconds) and `Period` (calendar fields as well). In `tzdata`: `zones`,
 `links`, `load`, `find`. In `zoneinfo`: `open`, `named`, `system`, `directory`.
 Constants: `@tzdata.release` names the IANA version carried and
 `@tzdata.source_digest` is the SHA-256 of the source text, so a release can be
@@ -325,6 +372,24 @@ the script's report. The 404 break down as 103 a zoned reading, 131 a plain date
 no case the corpus asserts that this library gets wrong: the ones it does not answer
 are the ones it has no way to, and each is named for the reason.
 
+`built-ins/Temporal/ZonedDateTime` is the suite about this library's own
+`ZonedDateTime`: 902 cases at that commit. 691 of them run under the reference
+implementation — `temporal-polyfill` 1.0.8, pinned like the corpus — and the
+recorder writes down what each asked: 9551 operations in all. 3113 of those are
+questions this library can be asked, spread over 236 cases; the rest are about the
+object rather than the value — a property descriptor, a coercion of an argument, a
+calendar. Every case is either answered or named with its reason in
+`scripts/temporal_vectors/zoned_exclusions.json`, and `run_zoned.py --check` in CI
+fails when the transcription and the corpus disagree.
+
+Sixteen of the 236 are cases where the answer differs rather than a case that could
+not be put: a rounded step that fills the unit above (`PT1H60M` for `PT2H`), an
+exact half at the nanosecond, a half of a negative difference, two cases whose
+expected value is the one a JavaScript number holds exactly, and the zone written
+as a date and time. They are listed in the builder under `DIFFERENCES` with the
+reason each, and they are the only cases in the suite whose answer and this
+library's differ.
+
 The zone database is checked two ways at the same time. Against the release: the
 transitions a `Tz` reads are the ones `zic` writes for the same source. And against
 a second implementation, `moonbitlang/x`'s `time`: `src/tzif_diff/` reads the same
@@ -345,6 +410,9 @@ has every method and every parameter.
 | `Time` | `Time::new`, `midnight`, `end_of_day` | `nanos`, `replace` |
 | `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `instant`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
 | `Span` | `Span::new`, `of`, `nanosecond` … `day` | `add`, `sub`, `seconds`, `total_seconds`, `parts`, `neg`, `abs` |
+| `Period` | `Period::new`, `of(unit, n)`, `zero` | `years` … `nanos`, `add`, `neg`, `span`, `sign`, `is_zero`, `has_date`, `has_mixed_sign`, `to_string` |
+| `TimeUnit` | `Years` … `Nanos` | `nanos`, `is_exact` |
+| `Rounding` | `Ceil`, `Floor`, `Expand`, `Trunc`, `HalfCeil`, `HalfFloor`, `HalfExpand`, `HalfTrunc`, `HalfEven` | — |
 | `Zone` | `Utc`, `Offset(minutes)`, `Named(name, offset, abbrev)`, `Precise(nanos)` | `nanos`, `seconds`, `minutes`, `name`, `abbrev` |
 | `Cron` | `@cron.parse` | `matches`, `next` |
 

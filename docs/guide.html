@@ -397,6 +397,40 @@ twice, at 1793511000 and 1793514600
 2026-11-01T01:30:00-05:00[America/New_York]
 2026-09-23T02:30:05-04:00[America/New_York]</div>
           <p>Reading a wall clock back through the zone is the round trip: <span class="mono">now.moment()</span> gives the <span class="mono">moment</span> the zone writes for the instant, the offset in force beside the name, so the value and the text agree. A field edit takes an <span class="mono">offset</span> policy — <span class="mono">Prefer</span> keeps the instant the old offset named when it still is, <span class="mono">Ignore</span> goes straight to the rules, and <span class="mono">Use</span> keeps the old offset whether or not the zone still has it.</p>
+          <p>A step in calendar units is not the same as a step in hours. <span class="mono">add</span> takes a <span class="mono">Period</span> — years, months, weeks, days and the clock fields — and puts the date part on the wall clock and the clock part on the instant. Across the day the clocks go forward, a day and twenty-four hours are different answers, and both are right.</p>
+          <div class="code">
+            <div class="bar"><span class="name">period.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let ny = @tzdata.load("America/New_York")
+  let noon = @zone.ZonedDateTime::of(2024, 3, 9, hour=12, zone=ny)
+  let tomorrow = noon.add(@moondate.Period::new(days=1))
+  println(tomorrow.isoformat())
+  println(noon.add(@moondate.Period::new(hours=24)).isoformat())
+  println(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Days))
+  println(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Hours))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2024-03-10T12:00:00-04:00[America/New_York]
+2024-03-10T13:00:00-04:00[America/New_York]
+P1D
+PT23H</div>
+          <p>The same two instants are a day apart or twenty-three hours apart, depending on the largest unit the answer may use. <span class="mono">smallest_unit</span> and <span class="mono">rounding</span> say how finely the rest is measured, and <span class="mono">since</span> is the same reading the other way round. A period whose fields run both ways is refused: a calendar cannot add one.</p>
+          <p>The value also rounds itself and answers the questions a zone can be asked. A day is rounded to on the length the day actually has, and the change a zone makes next is a value like any other.</p>
+          <div class="code">
+            <div class="bar"><span class="name">rounding.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let ny = @tzdata.load("America/New_York")
+  let dusk = @zone.ZonedDateTime::of(2024, 3, 10, hour=12, minute=31, zone=ny)
+  println(dusk.round(smallest_unit=@moondate.Hours).isoformat())
+  println(dusk.hours_in_day())
+  let next = dusk.get_time_zone_transition(direction=@zone.Direction::Next)
+  println(next.unwrap().isoformat())
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>2024-03-10T13:00:00-04:00[America/New_York]
+23
+2024-11-03T01:00:00-05:00[America/New_York]</div>
+          <p><span class="mono">with_fields</span> and <span class="mono">with_plain_time</span> edit a reading, <span class="mono">start_of_day</span> is the first instant of the day the clocks show, and <span class="mono">equals</span> and <span class="mono">compare</span> ask whether two values name one instant in one zone.</p>
         </article>
 
         <article class="step" id="durations">
@@ -419,7 +453,20 @@ twice, at 1793511000 and 1793514600
 2026-09-23T00:30:00
 2026-09-21T23:30:00
 00:30:00</div>
-          <p>A span is not a number of months. A month is not a fixed length, so adding one is a calendar operation (<span class="mono">Date::plus_months</span>) rather than arithmetic.</p>
+          <p>A span is not a number of months. A month is not a fixed length, so adding one is a calendar operation (<span class="mono">Date::plus_months</span>) rather than arithmetic. The other kind of length is a <span class="mono">Period</span>: the calendar fields kept as they were written beside the clock ones, written and read the way ISO 8601 writes a duration.</p>
+          <div class="code">
+            <div class="bar"><span class="name">periods.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main {
+  let period = @moondate.Period::new(years=1, months=2, days=3)
+  println(period.to_string())
+  println(@moondate.Period::of(@moondate.TimeUnit::Weeks, 40).to_string())
+  println(@moondate.Period::new(hours=4, minutes=5, seconds=6, millis=7).to_string())
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>P1Y2M3D
+P40W
+PT4H5M6.007S</div>
+          <p>Adding one needs a zone and a starting point, which is why <span class="mono">ZonedDateTime</span> carries the <span class="mono">add</span>, <span class="mono">until</span> and <span class="mono">round</span> that take one.</p>
         </article>
 
         <article class="step" id="wire">

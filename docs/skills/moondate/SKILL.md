@@ -21,6 +21,9 @@ moon add moonbitstack/moondate
 | the database | `moonbitstack/moondate/tzdata` | `load`, `find`, `zones`, `links`, `release` |
 | the machine's zones | `moonbitstack/moondate/zoneinfo` | `open`, `named`, `system`, `directory` |
 
+`ZonedDateTime` is the value that keeps a `Tz` rather than one reading of it, and
+`Period` is a length in calendar units. Both are in `zone` and the root package.
+
 ## Read a timestamp and write it another way
 
 `parse` keeps the shape the text had — an instant, a wall clock, a date, or a
@@ -60,6 +63,29 @@ answers with `Ambiguous`, `Skipped` or `Exact`; `Local::epoch(fold~)` picks:
 `Compatible` (the default, first of two and second of none), `Earlier`, `Later`,
 or `Reject`, which raises rather than guessing.
 
+## Add a period, or ask how far apart two values are
+
+A `Span` is a number of nanoseconds. A `Period` is a length a calendar has to
+place — years, months, weeks, days — plus the clock fields, and adding one needs
+the zone the value is in.
+
+```moonbit
+let ny = @tzdata.load("America/New_York")
+let noon = @zone.ZonedDateTime::of(2024, 3, 9, hour=12, zone=ny)
+let tomorrow = noon.add(@moondate.Period::new(days=1))
+println(tomorrow.isoformat())                        // 2024-03-10T12:00:00-04:00[America/New_York]
+println(noon.add(@moondate.Period::new(hours=24)).isoformat())
+println(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Days).to_string())
+println(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Hours).to_string())
+```
+
+The same two instants are a day apart or twenty-three hours apart, depending on the
+unit asked for; both answers are right. `since` is the same reading the other way
+round. `round(smallest_unit~, increment~, rounding~)` moves the reading to the
+nearest unit — a day is as long as the clocks make it — and `with_fields`,
+`with_plain_time`, `start_of_day`, `hours_in_day` and `get_time_zone_transition`
+answer the rest of the questions Temporal's `ZonedDateTime` does.
+
 ## When a cron expression fires next
 
 ```moonbit
@@ -82,16 +108,15 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
   its own; a program that needs none of it does not link it.
 - **A named zone is a reading, not a rule.** `Zone::Named` carries the offset in
   force at that instant, so adding a span across a transition leaves the offset
-  stale. Go back through `Tz::moment` when a change has to be crossed.
+  stale. Go back through `Tz::moment` when a change has to be crossed, or keep a
+  `ZonedDateTime`, which reads the rules itself.
+- **A `Span` crosses a change by counting time, a `Period` by reading the clock.**
+  `plus(day)` is exactly twenty-four hours; `add(Period::new(days=1))` is the same
+  reading tomorrow, which is twenty-three or twenty-five hours on the days the
+  clocks move.
 - **A place name needs `@tzdata.parse`.** `@moondate.parse` has no database, so a
   text like `…[America/New_York]` with no offset beside it is refused there; the
   `tzdata` entry point resolves it and takes `fold` for the hour that has none.
-- **Annotations are read, and a `!` binds you.** `[u-ca=iso8601]` and `[foo=bar]`
-  are accepted and ignored; `[!foo=bar]` is refused, because the `!` says the
-  reader has to understand the key. A key with a capital in it is refused too.
-- **A place name needs `@tzdata.parse`.** `@moondate.parse` has no database, so a
-  text like `…[America/New_York]` with no offset beside it is refused there; the
-  `tzdata` entry point resolves it, and takes `fold` for the hour that has none.
 - **Annotations are read, and a `!` binds you.** `[u-ca=iso8601]` and `[foo=bar]`
   are accepted and ignored; `[!foo=bar]` is refused, because the `!` says the
   reader has to understand the key. A key with a capital in it is refused too.

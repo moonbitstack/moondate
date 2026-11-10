@@ -655,6 +655,7 @@ def main() -> None:
 
     root_sources = [
         SRC / "date.mbt",
+        SRC / "period.mbt",
         SRC / "text.mbt",
         SRC / "python.mbt",
     ]
@@ -666,6 +667,9 @@ def main() -> None:
         SRC / "zone" / "rule.mbt",
         SRC / "zone" / "tzif.mbt",
         SRC / "zone" / "zoned_date_time.mbt",
+        SRC / "zone" / "zoned_edit.mbt",
+        SRC / "zone" / "zoned_arithmetic.mbt",
+        SRC / "zone" / "transition.mbt",
     ]
     zone_mbti = SRC / "zone" / "pkg.generated.mbti"
     tzdata_sources = [SRC / "tzdata" / "tzdata.mbt", SRC / "tzdata" / "data.mbt"]
