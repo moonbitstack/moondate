@@ -291,8 +291,16 @@ assert_eq(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Hours).to_string
 The same two instants are a day apart or twenty-three hours apart depending on
 the unit they are asked for, and both answers are right. `until` takes the largest
 field the answer may use and, with `smallest_unit` and `rounding`, how finely it is
-measured; `since` is the same reading the other way round. A period whose fields
-run both ways is refused, because a calendar cannot add one.
+measured; `since` asks from this value's side and turns the answer round, with the
+rounding direction mirrored, because a difference in a calendar is not symmetric —
+a month on from the thirty-first of January is the twenty-eighth of February, and
+the way back is thirty-one days. A period whose fields run both ways is refused,
+because a calendar cannot add one.
+
+A `Period` is a length, not a text: it writes ISO 8601 (`to_string`, and `Show`)
+but does not read one back. Nothing in the two corpora asks for a parser, and a
+length with a calendar field in it needs a zone to mean anything, so the reading
+belongs where the zone is, in `until`.
 
 A value also edits itself with `with_fields` and `with_plain_time`, rounds with
 `round` to a unit from a day down (`hours`, `minutes`, the three below a second)
@@ -308,8 +316,11 @@ assert_eq(dusk.hours_in_day(), 23)
 assert_eq(dusk.get_time_zone_transition(direction=@zone.Direction::Next).unwrap().isoformat(), "2024-11-03T01:00:00-05:00[America/New_York]")
 ```
 
-`isoformat` takes the offset, the name in brackets and the number of fractional
-digits, and a `smallest_unit` to round the reading to before writing it.
+`isoformat` takes the offset, the name in brackets, the number of fractional
+digits, and a `smallest_unit` to round the reading to before writing it. A number
+of digits is a granularity as well: the value is rounded to it first, truncated
+unless `rounding` says otherwise.
+
 
 ### Interface
 
@@ -373,22 +384,32 @@ no case the corpus asserts that this library gets wrong: the ones it does not an
 are the ones it has no way to, and each is named for the reason.
 
 `built-ins/Temporal/ZonedDateTime` is the suite about this library's own
-`ZonedDateTime`: 902 cases at that commit. 691 of them run under the reference
-implementation — `temporal-polyfill` 1.0.8, pinned like the corpus — and the
-recorder writes down what each asked: 9551 operations in all. 3113 of those are
-questions this library can be asked, spread over 236 cases; the rest are about the
+`ZonedDateTime`: 902 cases at that commit, of which 691 run under the reference
+implementation — `temporal-polyfill` 1.0.8, pinned like the corpus — and state
+9551 operations between them. 3113 of those operations are questions this library
+can be asked, and they land as 3113 rows over 236 cases; the rest are about the
 object rather than the value — a property descriptor, a coercion of an argument, a
-calendar. Every case is either answered or named with its reason in
-`scripts/temporal_vectors/zoned_exclusions.json`, and `run_zoned.py --check` in CI
-fails when the transcription and the corpus disagree.
+calendar.
 
-Sixteen of the 236 are cases where the answer differs rather than a case that could
-not be put: a rounded step that fills the unit above (`PT1H60M` for `PT2H`), an
-exact half at the nanosecond, a half of a negative difference, two cases whose
-expected value is the one a JavaScript number holds exactly, and the zone written
-as a date and time. They are listed in the builder under `DIFFERENCES` with the
-reason each, and they are the only cases in the suite whose answer and this
-library's differ.
+Every one of the 902 is accounted for in
+`scripts/temporal_vectors/zoned_exclusions.json`, whose figures are written by the
+build: 236 cases contribute rows, 640 are named one by one with the reason their
+operations were left out, and 66 do both, because part of a case can be answered
+while the rest of it cannot. The remaining 92 contribute no row and no reason of
+their own: everything they state is about the object — a coercion, a descriptor,
+the value's own identifier — and the file counts that per operation rather than
+per case. `run_zoned.py --check` in CI fails when the transcription and the
+corpus disagree.
+
+Seventeen cases are ones where the answer would differ rather than cases this
+library cannot be asked: a rounded step that fills the unit above (`PT1H60M` for
+`PT2H`), an exact half at the nanosecond, a half of a negative difference, cases
+whose expected value is the one a JavaScript number holds exactly, the zone written
+as a date and time — or in another case, or with a leap second — the other value of
+`equals` given as a text or a bag, and the three sub-second fields that are one
+number here. They are listed under `DIFFERENCES` in the builder with the reason
+each, and in the report in the same words. None of them is in the tables: the build
+stops if one ever is, so no case in the suite is answered and wrong.
 
 The zone database is checked two ways at the same time. Against the release: the
 transitions a `Tz` reads are the ones `zic` writes for the same source. And against
