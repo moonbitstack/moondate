@@ -48,6 +48,10 @@ jobs:
       - name: the code in the docs compiles
         run: python3 scripts/check_snippets.py
 
+      - name: the zoned transcription is what test262 gives
+        if: runner.os == 'Linux'
+        run: python3 scripts/temporal_vectors/run_zoned.py --check
+
       - name: examples run
         if: runner.os == 'Linux'
         run: |

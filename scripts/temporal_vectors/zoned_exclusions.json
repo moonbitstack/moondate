@@ -1,0 +1,4689 @@
+{
+ "pin": "d11543772591a5c24b3229e6195a74c73e56032e",
+ "counts": {
+  "the operation is about the host object, not the value": 1460,
+  "the identifier is the value's own, not a computation": 1009,
+  "the comparison converts its arguments from another shape": 406,
+  "the answer is not an instant": 2,
+  "the calendar field is not one an ISO calendar has": 120,
+  "the calendar count is not what this library computes": 56,
+  "the field is not a number": 51,
+  "the offset is written as text, which the text cases cover": 4,
+  "the instant is outside the range a count of nanoseconds holds": 162,
+  "the sum passes what a JavaScript number holds exactly": 458,
+  "the duration is not a plain duration": 124,
+  "the duration has a field this library does not": 4,
+  "the value is not a zoned date and time": 503,
+  "the other value is a bag with an offset, a form this library does not convert": 8,
+  "the other value is not a zoned date and time": 245,
+  "the other value is written as a text, which this library reads before asking": 55,
+  "an equality is not refused": 9,
+  "a search is not refused": 9,
+  "the direction is not given": 2,
+  "the direction is not a plain value": 9,
+  "the direction is not one this library has": 12,
+  "the round is asked without a unit": 5,
+  "the options are not a plain bag": 46,
+  "the unit is not one this library has": 13,
+  "the increment is not a whole number": 15,
+  "the increment is not a number": 24,
+  "the rounding mode is not one this library has": 40,
+  "the rounding mode is not a plain value": 32,
+  "the smallestUnit is not a unit this library has": 57,
+  "the smallestUnit is not a plain value": 24,
+  "a difference in range is not refused": 142,
+  "the largestUnit is not a unit this library has": 28,
+  "the corpus's expected value is the one a double holds, which is coarser than the instant": 66,
+  "the largestUnit is not a plain value": 12,
+  "a rounded step that fills the unit above is not carried into it": 34,
+  "an exact half of a negative difference is rounded the wrong way": 456,
+  "an exact half at the nanosecond is broken by parity this library does not track": 56,
+  "the start of a day is not refused": 11,
+  "a reading is not refused": 46,
+  "a text is not refused for a value in range": 25,
+  "a calendar in the text is not this library's shape": 9,
+  "the calendar option is not a plain value": 6,
+  "the digits are not a number": 10,
+  "the digits is not a plain value": 9,
+  "the offset option is not one this library has": 4,
+  "the offset option is not a plain value": 6,
+  "a text rounds to a minute at the largest, as the reference does": 12,
+  "the zone name option is not one this library has": 7,
+  "the zone name is not a plain value": 6,
+  "the time is not a text": 6,
+  "the time carries an offset or a calendar": 181,
+  "the time is not a text of a time of day": 26,
+  "a time of day in range is not refused": 18,
+  "the time is not one this library has": 6,
+  "the field is not a time of day": 3,
+  "a zone the database has is not refused": 25,
+  "the zone name is matched whatever its case, which this library does not": 3,
+  "the zone is written as a date and time, a form this library does not read as a zone": 32,
+  "the zone is written as a date and time with a leap second, which this library does not read as a zone": 4,
+  "the zone is not a name": 5,
+  "a field bag in range is not refused": 37,
+  "the field is not one an ISO calendar has": 31,
+  "a field is not a number": 18,
+  "the overflow option is not one this library has": 9,
+  "a field edit that neither fits nor refuses leaves a reading this library places differently": 20,
+  "the three sub-second fields are one number here, so a field past its own range reads as a carry": 4,
+  "the overflow option is not a plain value": 6,
+  "the field bag changes the zone or the calendar": 2,
+  "the case does not pass \u2014 Error: prototype Expected SameValue(\u00abclass {": 1,
+  "no operation \u2014 the case states no value this recorder sees": 99,
+  "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 22,
+  "the case does not pass \u2014 Error: should not get 'calendarId' property": 5,
+  "the case does not pass \u2014 Error: name descriptor value should be compare; name value should be compare": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.compare) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys one, getOwnPropertyDescriptor one.year, getOwnPropertyDescriptor one.month, getOwnPropertyDescriptor one.monthCode, getOwnPr": 1,
+  "the case does not pass \u2014 Error: compare descriptor should not be enumerable": 1,
+  "the case does not pass \u2014 Error: Expected a TypeError to be thrown but no exception was thrown at all": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be from; name value should be from": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.from) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.disambiguation, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor ": 2,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor option": 2,
+  "the case does not pass \u2014 Error: Actual [ownKeys item, getOwnPropertyDescriptor item.year, getOwnPropertyDescriptor item.month, getOwnPropertyDescriptor item.monthCode, getO": 1,
+  "the case does not pass \u2014 Error: from descriptor should not be enumerable": 1,
+  "the case does not pass \u2014 Error: length descriptor value should be 2; length value should be 2": 1,
+  "the case does not pass \u2014 Error: ZonedDateTime descriptor should not be enumerable": 1,
+  "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1": 10,
+  "the case does not pass \u2014 Error: name descriptor value should be add; name value should be add": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.add) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, get options.overflow, get options.overflow.toString, call options.overfl": 2,
+  "the case does not pass \u2014 Error: Actual [ownKeys duration, getOwnPropertyDescriptor duration.years, getOwnPropertyDescriptor duration.months, getOwnPropertyDescriptor durati": 2,
+  "the case does not pass \u2014 Error: constructor descriptor value should be function RecordingZonedDateTime(...args) {": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be equals; name value should be equals": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.equals) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys other, getOwnPropertyDescriptor other.year, getOwnPropertyDescriptor other.month, getOwnPropertyDescriptor other.monthCode, ": 3,
+  "the case does not pass \u2014 Error: name descriptor value should be getTimeZoneTransition; name value should be getTimeZoneTransition": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.getTimeZoneTransition) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys fields, getOwnPropertyDescriptor fields.year, getOwnPropertyDescriptor fields.month, getOwnPropertyDescriptor fields.monthCo": 2,
+  "the case does not pass \u2014 Error: prototype descriptor should not be writable": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be round; name value should be round": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.round) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.roundingIncrement, getOwnPropertyDe": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.roundingMode, getOwnPropertyDescrip": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be since; name value should be since": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.since) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.largestUnit, getOwnPropertyDescript": 2,
+  "the case does not pass \u2014 Error: name descriptor value should be startOfDay; name value should be startOfDay": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.startOfDay) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be subtract; name value should be subtract": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.subtract) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toInstant; name value should be toInstant": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toInstant) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toJSON; name value should be toJSON": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toJSON) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toLocaleString; name value should be toLocaleString": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toLocaleString) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toPlainDateTime; name value should be toPlainDateTime": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainDateTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toPlainDate; name value should be toPlainDate": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainDate) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toPlainTime; name value should be toPlainTime": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be toString; name value should be toString": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toString) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.calendarName, getOwnPropertyDescriptor options.timeZoneName, getOwnPropertyDescrip": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.fractionalSecondDigits, getOwnPropertyDescriptor options.roundingMode, getOwnPrope": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be until; name value should be until": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.until) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be valueOf; name value should be valueOf": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.valueOf) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be withCalendar; name value should be withCalendar": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withCalendar) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be withPlainTime; name value should be withPlainTime": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withPlainTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Actual [ownKeys plainTimeLike, getOwnPropertyDescriptor plainTimeLike.hour, getOwnPropertyDescriptor plainTimeLike.minute, getOwnPropertyDes": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be withTimeZone; name value should be withTimeZone": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withTimeZone) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: name descriptor value should be with; name value should be with": 1,
+  "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.with) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": 1,
+  "the case does not pass \u2014 Error: Instance of CustomZonedDateTime Expected SameValue(\u00ab[object Object]\u00bb, \u00ab[object Object]\u00bb) to be true": 1
+ },
+ "cases": [
+  {
+   "case": "builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype Expected SameValue(\u00abclass {"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "calendar-invalid-iso-string.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "calendar-wrong-type.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-case-insensitive.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-iso-string.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 16
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-leap-second.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-string.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-wrong-type.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "compare/argument-propertybag-calendar-year-zero.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "compare/argument-propertybag-invalid-offset-string.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 14
+  },
+  {
+   "case": "compare/argument-propertybag-offset-not-agreeing-with-timezone.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "compare/argument-propertybag-optional-properties.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-string-datetime.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 52
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-string-leap-second.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-string-multiple-offsets.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-string-sub-minute-offset.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-string-year-zero.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-string.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/argument-propertybag-timezone-wrong-type.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 18
+  },
+  {
+   "case": "compare/argument-string-calendar-annotation-invalid-key.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "compare/argument-string-calendar-annotation.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "compare/argument-string-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "compare/argument-string-critical-unknown-annotation.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "compare/argument-string-date-with-utc-offset.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 25
+  },
+  {
+   "case": "compare/argument-string-limits.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 24
+  },
+  {
+   "case": "compare/argument-string-minus-sign.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "compare/argument-string-multiple-calendar.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "compare/argument-string-multiple-time-zone.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "compare/argument-string-sub-minute-offset.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "compare/argument-string-time-separators.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "compare/argument-string-time-zone-annotation.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "compare/argument-string-too-many-decimals.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "compare/argument-string-unknown-annotation.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/argument-wrong-type.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 22
+  },
+  {
+   "case": "compare/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/calendar-temporal-object.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: should not get 'calendarId' property"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/casts-arguments.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/infinity-throws-rangeerror.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 54
+  },
+  {
+   "case": "compare/leap-second.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be compare; name value should be compare"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/no-fractional-minutes-hours.js",
+   "reasons": [
+    "the comparison converts its arguments from another shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "compare/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.compare) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys one, getOwnPropertyDescriptor one.year, getOwnPropertyDescriptor one.month, getOwnPropertyDescriptor one.monthCode, getOwnPr"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "compare/prop-desc.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: compare descriptor should not be enumerable"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "construction-and-properties.js",
+   "reasons": [
+    "the answer is not an instant",
+    "the calendar count is not what this library computes",
+    "the calendar field is not one an ISO calendar has",
+    "the field is not a number",
+    "the offset is written as text, which the text cases cover"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Expected a TypeError to be thrown but no exception was thrown at all"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/argument-string-negative-extended-year.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/calendar-temporal-object.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: should not get 'calendarId' property"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be from; name value should be from"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.from) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/observable-get-overflow-argument-primitive.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.disambiguation, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor "
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/observable-get-overflow-argument-string-invalid.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.disambiguation, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor "
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor option"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys item, getOwnPropertyDescriptor item.year, getOwnPropertyDescriptor item.month, getOwnPropertyDescriptor item.monthCode, getO"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/prop-desc.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: from descriptor should not be enumerable"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/roundtrip-from-property-bag.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "from/roundtrip-from-string.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "from/year-zero.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "get-prototype-from-constructor-throws.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 2; length value should be 2"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "limits.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "missing-arguments.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "name.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prop-desc.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: ZonedDateTime descriptor should not be enumerable"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/add-large-subseconds.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "prototype/add/argument-duration-max-plus-min-date.js",
+   "reasons": [
+    "the duration is not a plain duration",
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 30
+  },
+  {
+   "case": "prototype/add/argument-duration-max.js",
+   "reasons": [
+    "the duration is not a plain duration",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 28
+  },
+  {
+   "case": "prototype/add/argument-duration-out-of-range.js",
+   "reasons": [
+    "the duration is not a plain duration",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 46
+  },
+  {
+   "case": "prototype/add/argument-invalid-property.js",
+   "reasons": [
+    "the duration has a field this library does not",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/add/argument-mixed-sign.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/argument-not-object.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/add/argument-singular-properties.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/add/argument-string-fractional-units-rounding-mode.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/argument-string-negative-fractional-units.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/basic-arithmetic.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 64
+  },
+  {
+   "case": "prototype/add/branding.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/add/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/casts-argument.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/constrain-when-ambiguous-result.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/math-order-of-operations-add-constrain.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/add/math-order-of-operations-add-none.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/add/math-order-of-operations-add-reject.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/month-boundary.js",
+   "reasons": [
+    "the calendar count is not what this library computes",
+    "the calendar field is not one an ISO calendar has",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 26
+  },
+  {
+   "case": "prototype/add/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be add; name value should be add"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/negative-epochnanoseconds.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/non-integer-throws-rangeerror.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "prototype/add/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.add) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/options-object.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, get options.overflow, get options.overflow.toString, call options.overfl"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/options-undefined.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/add/options-wrong-type.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/add/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys duration, getOwnPropertyDescriptor duration.years, getOwnPropertyDescriptor duration.months, getOwnPropertyDescriptor durati"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/overflow-adding-months-to-max-year.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/overflow-invalid-string.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/add/overflow-wrong-type.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/add/overflow.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/symmetrical-wrt-negative-durations-in-time-part.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/add/throw-when-ambiguous-result-with-reject.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/add/throw-when-intermediate-datetime-outside-valid-limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/calendarId/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/calendarId/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: constructor descriptor value should be function RecordingZonedDateTime(...args) {"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/day/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/day/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/dayOfWeek/basic.js",
+   "reasons": [
+    "the calendar count is not what this library computes"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/dayOfWeek/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/dayOfWeek/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/dayOfYear/basic.js",
+   "reasons": [
+    "the calendar count is not what this library computes"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/dayOfYear/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/dayOfYear/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/daysInMonth/basic.js",
+   "reasons": [
+    "the calendar count is not what this library computes"
+   ],
+   "operations": 18
+  },
+  {
+   "case": "prototype/daysInMonth/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/daysInMonth/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/daysInWeek/basic.js",
+   "reasons": [
+    "the calendar count is not what this library computes"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/daysInWeek/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/daysInWeek/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/daysInYear/basic.js",
+   "reasons": [
+    "the calendar count is not what this library computes"
+   ],
+   "operations": 13
+  },
+  {
+   "case": "prototype/daysInYear/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/daysInYear/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/epochMilliseconds/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/epochMilliseconds/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/epochNanoseconds/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/epochNanoseconds/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/argument-object.js",
+   "reasons": [
+    "the other value is a bag with an offset, a form this library does not convert"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-case-insensitive.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-iso-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-leap-second.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-wrong-type.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-calendar-year-zero.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-invalid-offset-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-offset-not-agreeing-with-timezone.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-optional-properties.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-case-insensitive.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-normalize-offset-strings.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-string-datetime.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 26
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-string-leap-second.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-string-multiple-offsets.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-string-sub-minute-offset.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-string-year-zero.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/argument-propertybag-timezone-wrong-type.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/equals/argument-string-calendar-annotation-invalid-key.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-string-calendar-annotation.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-string-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/equals/argument-string-critical-unknown-annotation.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/equals/argument-string-date-with-utc-offset.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 21
+  },
+  {
+   "case": "prototype/equals/argument-string-limits.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/equals/argument-string-minus-sign.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/equals/argument-string-multiple-calendar.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-string-multiple-time-zone.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/equals/argument-string-sub-minute-offset.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/equals/argument-string-time-separators.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-string-time-zone-annotation.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/equals/argument-string-too-many-decimals.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/argument-string-unknown-annotation.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/equals/argument-valid.js",
+   "reasons": [
+    "the other value is written as a text, which this library reads before asking"
+   ],
+   "operations": 55
+  },
+  {
+   "case": "prototype/equals/argument-wrong-type.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/equals/branding.js",
+   "reasons": [
+    "an equality is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/equals/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/calendar-temporal-object.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: should not get 'calendarId' property"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/casts-argument.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/infinity-throws-rangeerror.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 27
+  },
+  {
+   "case": "prototype/equals/leap-second.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be equals; name value should be equals"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/no-fractional-minutes-hours.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.equals) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys other, getOwnPropertyDescriptor other.year, getOwnPropertyDescriptor other.month, getOwnPropertyDescriptor other.monthCode, "
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/equals/requires-properties.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/equals/year-zero.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/equals/zoneddatetime-string-multiple-offsets.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/equals/zoneddatetime-string.js",
+   "reasons": [
+    "the other value is not a zoned date and time"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/era/basic.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/era/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/era/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/eraYear/basic.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/eraYear/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/eraYear/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/branding.js",
+   "reasons": [
+    "a search is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/direction-undefined.js",
+   "reasons": [
+    "the direction is not a plain value",
+    "the direction is not given"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/direction-wrong-type.js",
+   "reasons": [
+    "the direction is not a plain value",
+    "the direction is not one this library has"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be getTimeZoneTransition; name value should be getTimeZoneTransition"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.getTimeZoneTransition) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/options-undefined.js",
+   "reasons": [
+    "the direction is not a plain value",
+    "the direction is not given"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys fields, getOwnPropertyDescriptor fields.year, getOwnPropertyDescriptor fields.month, getOwnPropertyDescriptor fields.monthCo"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/wrong-string.js",
+   "reasons": [
+    "the direction is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/getTimeZoneTransition/wrong-type.js",
+   "reasons": [
+    "the direction is not a plain value",
+    "the direction is not one this library has"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/hour/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/hour/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/hoursInDay/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/hoursInDay/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/inLeapYear/basic.js",
+   "reasons": [
+    "the field is not a number"
+   ],
+   "operations": 13
+  },
+  {
+   "case": "prototype/inLeapYear/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/inLeapYear/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/microsecond/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/microsecond/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/millisecond/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/millisecond/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/minute/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/minute/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/month/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/month/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/monthCode/basic.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/monthCode/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/monthCode/no-leap-months.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has"
+   ],
+   "operations": 60
+  },
+  {
+   "case": "prototype/monthCode/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/monthsInYear/basic.js",
+   "reasons": [
+    "the calendar count is not what this library computes"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/monthsInYear/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/monthsInYear/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/nanosecond/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/nanosecond/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/offset/basic.js",
+   "reasons": [
+    "the offset is written as text, which the text cases cover"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/offset/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/offset/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/offsetNanoseconds/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/offsetNanoseconds/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/prop-desc.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype descriptor should not be writable"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/branding.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/round/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/day-rounding-out-of-range.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/get-start-of-day-throws.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/round/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be round; name value should be round"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.round) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.roundingIncrement, getOwnPropertyDe"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/options-wrong-type.js",
+   "reasons": [
+    "the options are not a plain bag",
+    "the round is asked without a unit",
+    "the unit is not one this library has"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/round/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.roundingMode, getOwnPropertyDescrip"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/rounded-date-time-outside-valid-limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/rounding-direction.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/round/roundingincrement-nan.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/roundingincrement-non-integer.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/roundingincrement-out-of-range.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/round/roundingincrement-undefined.js",
+   "reasons": [
+    "the increment is not a number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/roundingincrement-wrong-type.js",
+   "reasons": [
+    "the increment is not a number"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/round/roundingmode-invalid-string.js",
+   "reasons": [
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/round/roundingmode-undefined.js",
+   "reasons": [
+    "the rounding mode is not a plain value"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/round/roundingmode-wrong-type.js",
+   "reasons": [
+    "the rounding mode is not a plain value",
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/round/roundto-invalid-string.js",
+   "reasons": [
+    "the unit is not one this library has"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/round/smallestunit-invalid-string.js",
+   "reasons": [
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/round/smallestunit-wrong-type.js",
+   "reasons": [
+    "the smallestUnit is not a plain value",
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/round/throws-without-parameter.js",
+   "reasons": [
+    "the round is asked without a unit"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/round/throws-without-smallestunit.js",
+   "reasons": [
+    "the round is asked without a unit"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/second/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/second/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/argument-at-limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 30
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-case-insensitive.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-iso-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-leap-second.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-wrong-type.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/since/argument-propertybag-calendar-year-zero.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/since/argument-propertybag-invalid-offset-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/since/argument-propertybag-offset-not-agreeing-with-timezone.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/argument-propertybag-optional-properties.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-string-datetime.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 26
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-string-leap-second.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-string-multiple-offsets.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-string-sub-minute-offset.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-string-year-zero.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/argument-propertybag-timezone-wrong-type.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/since/argument-string-calendar-annotation-invalid-key.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/argument-string-calendar-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/argument-string-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/since/argument-string-critical-unknown-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/since/argument-string-date-with-utc-offset.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 21
+  },
+  {
+   "case": "prototype/since/argument-string-limits.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/since/argument-string-minus-sign.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/since/argument-string-multiple-calendar.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/argument-string-multiple-time-zone.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/since/argument-string-sub-minute-offset.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/since/argument-string-time-separators.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/argument-string-time-zone-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/since/argument-string-too-many-decimals.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/argument-string-unknown-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/since/argument-wrong-type.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/since/branding.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/since/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/calendar-temporal-object.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: should not get 'calendarId' property"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/casts-argument.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/float64-representable-integer.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/infinity-throws-rangeerror.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 27
+  },
+  {
+   "case": "prototype/since/invalid-rounding-increments.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/since/largestunit-invalid-string.js",
+   "reasons": [
+    "the largestUnit is not a unit this library has"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/since/largestunit-plurals-accepted.js",
+   "reasons": [
+    "the corpus's expected value is the one a double holds, which is coarser than the instant"
+   ],
+   "operations": 25
+  },
+  {
+   "case": "prototype/since/largestunit-smallestunit-mismatch.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 45
+  },
+  {
+   "case": "prototype/since/largestunit-undefined.js",
+   "reasons": [
+    "the largestUnit is not a plain value",
+    "the options are not a plain bag"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/largestunit-wrong-type.js",
+   "reasons": [
+    "the largestUnit is not a plain value",
+    "the largestUnit is not a unit this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/since/largestunit.js",
+   "reasons": [
+    "the corpus's expected value is the one a double holds, which is coarser than the instant"
+   ],
+   "operations": 16
+  },
+  {
+   "case": "prototype/since/leap-second.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be since; name value should be since"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/no-fractional-minutes-hours.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.since) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/options-object.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.largestUnit, getOwnPropertyDescript"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/options-undefined.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/options-wrong-type.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/since/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys other, getOwnPropertyDescriptor other.year, getOwnPropertyDescriptor other.month, getOwnPropertyDescriptor other.monthCode, "
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/reversibility-of-differences.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "prototype/since/round-cross-unit-boundary.js",
+   "reasons": [
+    "a rounded step that fills the unit above is not carried into it"
+   ],
+   "operations": 17
+  },
+  {
+   "case": "prototype/since/roundingincrement-addition-out-of-range.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/roundingincrement-nan.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/roundingincrement-non-integer.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/roundingincrement-out-of-range.js",
+   "reasons": [
+    "a difference in range is not refused",
+    "the increment is not a whole number"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/since/roundingincrement-undefined.js",
+   "reasons": [
+    "the increment is not a number",
+    "the options are not a plain bag"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/roundingincrement-wrong-type.js",
+   "reasons": [
+    "the increment is not a number"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/since/roundingmode-half-boundary.js",
+   "reasons": [
+    "an exact half of a negative difference is rounded the wrong way"
+   ],
+   "operations": 228
+  },
+  {
+   "case": "prototype/since/roundingmode-halfEven.js",
+   "reasons": [
+    "an exact half at the nanosecond is broken by parity this library does not track"
+   ],
+   "operations": 28
+  },
+  {
+   "case": "prototype/since/roundingmode-invalid-string.js",
+   "reasons": [
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/since/roundingmode-undefined.js",
+   "reasons": [
+    "the rounding mode is not a plain value"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/roundingmode-wrong-type.js",
+   "reasons": [
+    "the rounding mode is not a plain value",
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/since/smallestunit-invalid-string.js",
+   "reasons": [
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/since/smallestunit-undefined.js",
+   "reasons": [
+    "the options are not a plain bag",
+    "the smallestUnit is not a plain value"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/smallestunit-wrong-type.js",
+   "reasons": [
+    "the smallestUnit is not a plain value",
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/since/subseconds.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/weeks-and-months-are-mutually-exclusive.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/since/year-zero.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/since/zoneddatetime-string-multiple-offsets.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/since/zoneddatetime-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/startOfDay/branding.js",
+   "reasons": [
+    "the start of a day is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/startOfDay/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/startOfDay/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/startOfDay/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be startOfDay; name value should be startOfDay"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/startOfDay/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.startOfDay) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/startOfDay/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/startOfDay/throws-if-epoch-nanoseconds-outside-valid-limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds",
+    "the start of a day is not refused"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/subtract/argument-duration-max-plus-min-date.js",
+   "reasons": [
+    "the duration is not a plain duration",
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 30
+  },
+  {
+   "case": "prototype/subtract/argument-duration-max.js",
+   "reasons": [
+    "the duration is not a plain duration",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 28
+  },
+  {
+   "case": "prototype/subtract/argument-duration-out-of-range.js",
+   "reasons": [
+    "the duration is not a plain duration",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 46
+  },
+  {
+   "case": "prototype/subtract/argument-invalid-property.js",
+   "reasons": [
+    "the duration has a field this library does not",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/subtract/argument-mixed-sign.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/argument-not-object.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/subtract/argument-singular-properties.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/subtract/argument-string-fractional-units-rounding-mode.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/argument-string-negative-fractional-units.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/basic-arithmetic.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 64
+  },
+  {
+   "case": "prototype/subtract/branding.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/subtract/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/casts-argument.js",
+   "reasons": [
+    "the duration is not a plain duration"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/constrain-when-ambiguous-result.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/math-order-of-operations-subtract-constrain.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/subtract/math-order-of-operations-subtract-none.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/subtract/math-order-of-operations-subtract-reject.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/month-boundary.js",
+   "reasons": [
+    "the calendar count is not what this library computes",
+    "the calendar field is not one an ISO calendar has",
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 26
+  },
+  {
+   "case": "prototype/subtract/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be subtract; name value should be subtract"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/negative-epochnanoseconds.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/non-integer-throws-rangeerror.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "prototype/subtract/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.subtract) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/options-object.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, get options.overflow, get options.overflow.toString, call options.overfl"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/options-undefined.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/subtract/options-wrong-type.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/subtract/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys duration, getOwnPropertyDescriptor duration.years, getOwnPropertyDescriptor duration.months, getOwnPropertyDescriptor durati"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/overflow-invalid-string.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/subtract/overflow-subtracting-months-from-min-year.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/overflow-wrong-type.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/subtract/overflow.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/subtract-large-subseconds.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "prototype/subtract/symmetrical-wrt-negative-durations.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/subtract/throw-when-ambiguous-result-with-reject.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/subtract/throw-when-intermediate-datetime-outside-valid-limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/timeZoneId/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/timeZoneId/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/branding.js",
+   "reasons": [
+    "a reading is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/toInstant/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toInstant; name value should be toInstant"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toInstant) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/recent-date.js",
+   "reasons": [
+    "the answer is not an instant"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/year-less-than-1.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/toInstant/year-less-than-99.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toInstant/year-zero-leap-day.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toJSON/branding.js",
+   "reasons": [
+    "a text is not refused for a value in range"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/toJSON/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toJSON/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toJSON/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toJSON; name value should be toJSON"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toJSON/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toJSON) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toJSON/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toJSON/year-format.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 13
+  },
+  {
+   "case": "prototype/toLocaleString/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toLocaleString/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toLocaleString/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toLocaleString; name value should be toLocaleString"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toLocaleString/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toLocaleString) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toLocaleString/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDate/branding.js",
+   "reasons": [
+    "a reading is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/toPlainDate/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDate/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDate/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toPlainDate; name value should be toPlainDate"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDate/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainDate) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDate/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDateTime/branding.js",
+   "reasons": [
+    "a reading is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/toPlainDateTime/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDateTime/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDateTime/limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/toPlainDateTime/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toPlainDateTime; name value should be toPlainDateTime"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDateTime/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainDateTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainDateTime/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainTime/branding.js",
+   "reasons": [
+    "a reading is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/toPlainTime/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainTime/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainTime/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toPlainTime; name value should be toPlainTime"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainTime/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toPlainTime/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/branding.js",
+   "reasons": [
+    "a text is not refused for a value in range"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/toString/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/calendarname-always.js",
+   "reasons": [
+    "a calendar in the text is not this library's shape"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/calendarname-critical.js",
+   "reasons": [
+    "a calendar in the text is not this library's shape"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/calendarname-invalid-string.js",
+   "reasons": [
+    "a calendar in the text is not this library's shape"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/toString/calendarname-undefined.js",
+   "reasons": [
+    "the calendar option is not a plain value"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/calendarname-wrong-type.js",
+   "reasons": [
+    "a calendar in the text is not this library's shape",
+    "the calendar option is not a plain value"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/toString/fractionalseconddigits-invalid-string.js",
+   "reasons": [
+    "the digits are not a number"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/toString/fractionalseconddigits-nan.js",
+   "reasons": [
+    "the digits are not a number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/fractionalseconddigits-non-integer.js",
+   "reasons": [
+    "a text is not refused for a value in range"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/fractionalseconddigits-out-of-range.js",
+   "reasons": [
+    "a text is not refused for a value in range",
+    "the digits are not a number"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/toString/fractionalseconddigits-undefined.js",
+   "reasons": [
+    "the digits is not a plain value",
+    "the options are not a plain bag"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/toString/fractionalseconddigits-wrong-type.js",
+   "reasons": [
+    "the digits are not a number",
+    "the digits is not a plain value"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/toString/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be toString; name value should be toString"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toString) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/offset-invalid-string.js",
+   "reasons": [
+    "the offset option is not one this library has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/offset-undefined.js",
+   "reasons": [
+    "the offset option is not a plain value"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/offset-wrong-type.js",
+   "reasons": [
+    "the offset option is not a plain value",
+    "the offset option is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/toString/options-object.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.calendarName, getOwnPropertyDescriptor options.timeZoneName, getOwnPropertyDescrip"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/options-wrong-type.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/toString/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.fractionalSecondDigits, getOwnPropertyDescriptor options.roundingMode, getOwnPrope"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/rounding-direction.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/toString/roundingmode-invalid-string.js",
+   "reasons": [
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/toString/roundingmode-undefined.js",
+   "reasons": [
+    "the rounding mode is not a plain value"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/toString/roundingmode-wrong-type.js",
+   "reasons": [
+    "the rounding mode is not a plain value",
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/toString/smallestunit-fractionalseconddigits.js",
+   "reasons": [
+    "a text is not refused for a value in range"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/smallestunit-invalid-string.js",
+   "reasons": [
+    "a text is not refused for a value in range",
+    "a text rounds to a minute at the largest, as the reference does",
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 21
+  },
+  {
+   "case": "prototype/toString/smallestunit-undefined.js",
+   "reasons": [
+    "the smallestUnit is not a plain value"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/toString/smallestunit-valid-units.js",
+   "reasons": [
+    "a text is not refused for a value in range",
+    "a text rounds to a minute at the largest, as the reference does",
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/toString/smallestunit-wrong-type.js",
+   "reasons": [
+    "the smallestUnit is not a plain value",
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/toString/timezonename-invalid-string.js",
+   "reasons": [
+    "the zone name option is not one this library has"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/toString/timezonename-undefined.js",
+   "reasons": [
+    "the zone name is not a plain value"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/toString/timezonename-wrong-type.js",
+   "reasons": [
+    "the zone name is not a plain value",
+    "the zone name option is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/toString/year-format.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 13
+  },
+  {
+   "case": "prototype/toStringTag/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/argument-at-limits.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 30
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-case-insensitive.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-iso-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-leap-second.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-wrong-type.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/until/argument-propertybag-calendar-year-zero.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/until/argument-propertybag-invalid-offset-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/until/argument-propertybag-offset-not-agreeing-with-timezone.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/argument-propertybag-optional-properties.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-string-datetime.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 26
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-string-leap-second.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-string-multiple-offsets.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-string-sub-minute-offset.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-string-year-zero.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/argument-propertybag-timezone-wrong-type.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/until/argument-string-calendar-annotation-invalid-key.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/argument-string-calendar-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/argument-string-calendar-invalid-iso-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/until/argument-string-critical-unknown-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/until/argument-string-date-with-utc-offset.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 21
+  },
+  {
+   "case": "prototype/until/argument-string-limits.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/until/argument-string-minus-sign.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/until/argument-string-multiple-calendar.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/argument-string-multiple-time-zone.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/until/argument-string-sub-minute-offset.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/until/argument-string-time-separators.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/argument-string-time-zone-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/until/argument-string-too-many-decimals.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/argument-string-unknown-annotation.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/until/argument-wrong-type.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/until/branding.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/until/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/calendar-temporal-object.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: should not get 'calendarId' property"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/casts-argument.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/float64-representable-integer.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/infinity-throws-rangeerror.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 27
+  },
+  {
+   "case": "prototype/until/invalid-increments.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/until/largestunit-invalid-string.js",
+   "reasons": [
+    "the largestUnit is not a unit this library has"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/until/largestunit-plurals-accepted.js",
+   "reasons": [
+    "the corpus's expected value is the one a double holds, which is coarser than the instant"
+   ],
+   "operations": 25
+  },
+  {
+   "case": "prototype/until/largestunit-smallestunit-mismatch.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 45
+  },
+  {
+   "case": "prototype/until/largestunit-undefined.js",
+   "reasons": [
+    "the largestUnit is not a plain value",
+    "the options are not a plain bag"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/largestunit-wrong-type.js",
+   "reasons": [
+    "the largestUnit is not a plain value",
+    "the largestUnit is not a unit this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/until/leap-second.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be until; name value should be until"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/no-fractional-minutes-hours.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.until) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/options-object.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.largestUnit, getOwnPropertyDescript"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/options-undefined.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/options-wrong-type.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/until/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys other, getOwnPropertyDescriptor other.year, getOwnPropertyDescriptor other.month, getOwnPropertyDescriptor other.monthCode, "
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/round-cross-unit-boundary.js",
+   "reasons": [
+    "a rounded step that fills the unit above is not carried into it"
+   ],
+   "operations": 17
+  },
+  {
+   "case": "prototype/until/roundingincrement-addition-out-of-range.js",
+   "reasons": [
+    "a difference in range is not refused"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/roundingincrement-nan.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/roundingincrement-non-integer.js",
+   "reasons": [
+    "the increment is not a whole number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/roundingincrement-out-of-range.js",
+   "reasons": [
+    "a difference in range is not refused",
+    "the increment is not a whole number"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/until/roundingincrement-undefined.js",
+   "reasons": [
+    "the increment is not a number",
+    "the options are not a plain bag"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/roundingincrement-wrong-type.js",
+   "reasons": [
+    "the increment is not a number"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/until/roundingmode-half-boundary.js",
+   "reasons": [
+    "an exact half of a negative difference is rounded the wrong way"
+   ],
+   "operations": 228
+  },
+  {
+   "case": "prototype/until/roundingmode-halfEven.js",
+   "reasons": [
+    "an exact half at the nanosecond is broken by parity this library does not track"
+   ],
+   "operations": 28
+  },
+  {
+   "case": "prototype/until/roundingmode-invalid-string.js",
+   "reasons": [
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/until/roundingmode-undefined.js",
+   "reasons": [
+    "the rounding mode is not a plain value"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/roundingmode-wrong-type.js",
+   "reasons": [
+    "the rounding mode is not a plain value",
+    "the rounding mode is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/until/smallestunit-invalid-string.js",
+   "reasons": [
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/until/smallestunit-undefined.js",
+   "reasons": [
+    "the options are not a plain bag",
+    "the smallestUnit is not a plain value"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/smallestunit-wrong-type.js",
+   "reasons": [
+    "the smallestUnit is not a plain value",
+    "the smallestUnit is not a unit this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/until/subseconds.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/weeks-and-months-are-mutually-exclusive.js",
+   "reasons": [
+    "the sum passes what a JavaScript number holds exactly"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/until/year-zero.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/until/zoneddatetime-string-multiple-offsets.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/until/zoneddatetime-string.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/valueOf/basic.js",
+   "reasons": [
+    "a reading is not refused"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/valueOf/branding.js",
+   "reasons": [
+    "a reading is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/valueOf/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/valueOf/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/valueOf/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be valueOf; name value should be valueOf"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/valueOf/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.valueOf) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/valueOf/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/weekOfYear/basic.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has"
+   ],
+   "operations": 29
+  },
+  {
+   "case": "prototype/weekOfYear/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/weekOfYear/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/basic-year-month-day.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has",
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 11
+  },
+  {
+   "case": "prototype/with/branding.js",
+   "reasons": [
+    "the value is not a zoned date and time"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/with/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/copy-properties-not-undefined.js",
+   "reasons": [
+    "the field is not a number"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/disambiguation-invalid-string.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/disambiguation-wrong-type.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/with/incorrectly-spelled-properties-ignored.js",
+   "reasons": [
+    "the field is not one an ISO calendar has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/infinity-throws-rangeerror.js",
+   "reasons": [
+    "a field is not a number",
+    "the field is not a number"
+   ],
+   "operations": 54
+  },
+  {
+   "case": "prototype/with/invalid-disambiguation.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/with/invalid-offset.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/with/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/minimum-instant-with-one-hour-offset.js",
+   "reasons": [
+    "the instant is outside the range a count of nanoseconds holds"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/month-and-month-code-must-agree.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be with; name value should be with"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.with) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/object-must-contain-at-least-one-property.js",
+   "reasons": [
+    "a field bag in range is not refused",
+    "the field is not one an ISO calendar has"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/with/offset-invalid-string.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/offset-property-invalid-string.js",
+   "reasons": [
+    "the field is not one an ISO calendar has"
+   ],
+   "operations": 28
+  },
+  {
+   "case": "prototype/with/offset-wrong-type.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/with/options-read-before-algorithmic-validation.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor option"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/options-wrong-type.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 12
+  },
+  {
+   "case": "prototype/with/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys fields, getOwnPropertyDescriptor fields.year, getOwnPropertyDescriptor fields.month, getOwnPropertyDescriptor fields.monthCo"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/overflow-invalid-string.js",
+   "reasons": [
+    "the overflow option is not one this library has"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/with/overflow-options.js",
+   "reasons": [
+    "a field edit that neither fits nor refuses leaves a reading this library places differently"
+   ],
+   "operations": 20
+  },
+  {
+   "case": "prototype/with/overflow-reject-throws.js",
+   "reasons": [
+    "the three sub-second fields are one number here, so a field past its own range reads as a carry"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/with/overflow-undefined.js",
+   "reasons": [
+    "the overflow option is not a plain value"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/overflow-wrong-type.js",
+   "reasons": [
+    "the overflow option is not a plain value",
+    "the overflow option is not one this library has"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/with/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/throws-if-calendar-name-included.js",
+   "reasons": [
+    "the field bag changes the zone or the calendar"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/throws-if-timezone-included.js",
+   "reasons": [
+    "the field bag changes the zone or the calendar"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/throws-on-string.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/with/throws-on-temporal-object-with-calendar.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/with/throws-on-temporal-object-with-time-zone.js",
+   "reasons": [
+    "the options are not a plain bag"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/zoned-datetime-like-at-minimum-date-time-with-offset.js",
+   "reasons": [
+    "the field is not one an ISO calendar has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/with/zoned-datetime-like-at-minimum-date-time.js",
+   "reasons": [
+    "a field bag in range is not refused"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withCalendar/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withCalendar/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withCalendar/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be withCalendar; name value should be withCalendar"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withCalendar/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withCalendar) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withCalendar/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/argument-number.js",
+   "reasons": [
+    "the time is not a text"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-calendar-annotation-invalid-key.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-calendar-annotation.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 16
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-critical-unknown-annotation.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-date-with-utc-offset.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 27
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-minus-sign.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-multiple-calendar.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-multiple-time-zone.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 7
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-no-implicit-midnight.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-time-designator-required-for-disambiguation.js",
+   "reasons": [
+    "the time carries an offset or a calendar",
+    "the time is not a text of a time of day"
+   ],
+   "operations": 69
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-time-separators.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-time-zone-annotation.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 24
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-too-many-decimals.js",
+   "reasons": [
+    "a time of day in range is not refused",
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 8
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-unknown-annotation.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 13
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-with-time-designator.js",
+   "reasons": [
+    "the time is not a text of a time of day"
+   ],
+   "operations": 6
+  },
+  {
+   "case": "prototype/withPlainTime/argument-string-with-utc-designator.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/withPlainTime/argument-wrong-type.js",
+   "reasons": [
+    "a time of day in range is not refused",
+    "the field is not a time of day",
+    "the time is not a text",
+    "the time is not a text of a time of day",
+    "the time is not one this library has"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/withPlainTime/argument-zoneddatetime-balance-negative-time-units.js",
+   "reasons": [
+    "the time is not one this library has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/argument-zoneddatetime-negative-epochnanoseconds.js",
+   "reasons": [
+    "the time is not one this library has"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/branding.js",
+   "reasons": [
+    "a time of day in range is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/withPlainTime/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/get-start-of-day-throws.js",
+   "reasons": [
+    "a time of day in range is not refused"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/withPlainTime/incorrectly-spelled-properties-ignored.js",
+   "reasons": [
+    "the field is not a time of day"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/leap-second.js",
+   "reasons": [
+    "the field is not a time of day",
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/withPlainTime/length.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be withPlainTime; name value should be withPlainTime"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withPlainTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/order-of-operations.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Actual [ownKeys plainTimeLike, getOwnPropertyDescriptor plainTimeLike.hour, getOwnPropertyDescriptor plainTimeLike.minute, getOwnPropertyDes"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/plaintime-propertybag-no-time-units.js",
+   "reasons": [
+    "a time of day in range is not refused"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withPlainTime/throws-if-epoch-nanoseconds-outside-valid-limits.js",
+   "reasons": [
+    "a time of day in range is not refused"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/withPlainTime/year-zero.js",
+   "reasons": [
+    "the time carries an offset or a calendar"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/withTimeZone/branding.js",
+   "reasons": [
+    "a zone the database has is not refused"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/withTimeZone/builtin.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withTimeZone/length.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withTimeZone/name.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: name descriptor value should be withTimeZone; name value should be withTimeZone"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withTimeZone/not-a-constructor.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withTimeZone) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withTimeZone/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-case-insensitive.js",
+   "reasons": [
+    "the zone name is matched whatever its case, which this library does not"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-string-datetime.js",
+   "reasons": [
+    "the zone is written as a date and time, a form this library does not read as a zone"
+   ],
+   "operations": 29
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-string-leap-second.js",
+   "reasons": [
+    "the zone is written as a date and time with a leap second, which this library does not read as a zone"
+   ],
+   "operations": 4
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-string-multiple-offsets.js",
+   "reasons": [
+    "the zone is written as a date and time, a form this library does not read as a zone"
+   ],
+   "operations": 3
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-string-sub-minute-offset.js",
+   "reasons": [
+    "a zone the database has is not refused"
+   ],
+   "operations": 10
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-string-year-zero.js",
+   "reasons": [
+    "a zone the database has is not refused"
+   ],
+   "operations": 2
+  },
+  {
+   "case": "prototype/withTimeZone/timezone-wrong-type.js",
+   "reasons": [
+    "a zone the database has is not refused",
+    "the zone is not a name"
+   ],
+   "operations": 9
+  },
+  {
+   "case": "prototype/year/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/year/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/yearOfWeek/basic.js",
+   "reasons": [
+    "the calendar field is not one an ISO calendar has"
+   ],
+   "operations": 5
+  },
+  {
+   "case": "prototype/yearOfWeek/branding.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "prototype/yearOfWeek/prop-desc.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "subclass.js",
+   "reasons": [
+    "the case does not pass \u2014 Error: Instance of CustomZonedDateTime Expected SameValue(\u00ab[object Object]\u00bb, \u00ab[object Object]\u00bb) to be true"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "timezone-iso-string.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "timezone-string-sub-minute-offset.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  },
+  {
+   "case": "timezone-wrong-type.js",
+   "reasons": [
+    "no operation \u2014 the case states no value this recorder sees"
+   ],
+   "operations": 1
+  }
+ ]
+}
