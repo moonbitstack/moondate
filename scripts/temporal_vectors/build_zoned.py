@@ -36,18 +36,10 @@ FIELDS = ["year", "month", "day", "hour", "minute", "second", "nano"]
 # answered there. `prototype/until/largestunit.js`, the twin of the `since` case
 # below, is not listed: it does not run under the reference at all.
 DIFFERENCES = {
-    "prototype/until/round-cross-unit-boundary.js":
-        "a rounded step that fills the unit above is not carried into it",
-    "prototype/since/round-cross-unit-boundary.js":
-        "a rounded step that fills the unit above is not carried into it",
-    "prototype/until/roundingmode-halfEven.js":
-        "an exact half at the nanosecond is broken by parity this library does not track",
-    "prototype/since/roundingmode-halfEven.js":
-        "an exact half at the nanosecond is broken by parity this library does not track",
-    "prototype/until/roundingmode-half-boundary.js":
-        "an exact half of a negative difference is rounded the wrong way",
-    "prototype/since/roundingmode-half-boundary.js":
-        "an exact half of a negative difference is rounded the wrong way",
+    "prototype/until/roundingincrement-addition-out-of-range.js":
+        "a length of a hundred million days is more than a count of nanoseconds holds",
+    "prototype/since/roundingincrement-addition-out-of-range.js":
+        "a length of a hundred million days is more than a count of nanoseconds holds",
     "prototype/until/largestunit-plurals-accepted.js":
         "the corpus's expected value is the one a double holds, which is coarser than the instant",
     "prototype/since/largestunit-plurals-accepted.js":
@@ -300,17 +292,23 @@ def field(case, name, me, out, tables):
     if name in ("epochNanoseconds", "timeZoneId", "calendarId", "timeZone",
                 "calendar"):
         raise Skip("the identifier is the value's own, not a computation")
-    if name in ("monthCode", "era", "eraYear", "weekOfYear", "yearOfWeek"):
-        raise Skip("the calendar field is not one an ISO calendar has")
+    if name in ("era", "eraYear"):
+        raise Skip("the era is a text of its own, and the ISO year is the field")
     if name == "offset":
         raise Skip("the offset is written as text, which the text cases cover")
     if out.get("t") not in ("prim", "bigint"):
         raise Skip("the field is not a number")
     if isinstance(out.get("v"), (str, bool)) or out.get("v") is None:
+        if name == "monthCode" and isinstance(out.get("v"), str):
+            # The month code is "M01" to "M12" in an ISO calendar, so the number
+            # it names is the month, and the reading is still of this library's
+            # own month field.
+            code = out["v"]
+            if not code.startswith("M"):
+                raise Skip("the month code is not one an ISO calendar writes")
+            tables.add("fields", (case, *stamp(me), name, int(code[1:])))
+            return
         raise Skip("the field is not a number")
-    if name in ("daysInMonth", "daysInYear", "monthsInYear", "inLeapYear",
-                "daysInWeek", "dayOfWeek", "dayOfYear"):
-        raise Skip("the calendar count is not what this library computes")
     if is_throw(out):
         raise Skip("a field is not refused")
     tables.add("fields", (case, *stamp(me), name, number(out, "the field")))

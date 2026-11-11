@@ -6,21 +6,17 @@
   "operations": 9551
  },
  "answered": {
-  "rows": 3113,
-  "cases": 236
+  "rows": 3675,
+  "cases": 248
  },
  "differences": {
   "prototype/equals/argument-object.js": "the other value is a bag with an offset, a form this library does not convert",
   "prototype/equals/argument-valid.js": "the other value is written as a text, which this library reads before asking",
   "prototype/since/largestunit-plurals-accepted.js": "the corpus's expected value is the one a double holds, which is coarser than the instant",
   "prototype/since/largestunit.js": "the corpus's expected value is the one a double holds, which is coarser than the instant",
-  "prototype/since/round-cross-unit-boundary.js": "a rounded step that fills the unit above is not carried into it",
-  "prototype/since/roundingmode-half-boundary.js": "an exact half of a negative difference is rounded the wrong way",
-  "prototype/since/roundingmode-halfEven.js": "an exact half at the nanosecond is broken by parity this library does not track",
+  "prototype/since/roundingincrement-addition-out-of-range.js": "a length of a hundred million days is more than a count of nanoseconds holds",
   "prototype/until/largestunit-plurals-accepted.js": "the corpus's expected value is the one a double holds, which is coarser than the instant",
-  "prototype/until/round-cross-unit-boundary.js": "a rounded step that fills the unit above is not carried into it",
-  "prototype/until/roundingmode-half-boundary.js": "an exact half of a negative difference is rounded the wrong way",
-  "prototype/until/roundingmode-halfEven.js": "an exact half at the nanosecond is broken by parity this library does not track",
+  "prototype/until/roundingincrement-addition-out-of-range.js": "a length of a hundred million days is more than a count of nanoseconds holds",
   "prototype/with/overflow-options.js": "a field edit that neither fits nor refuses leaves a reading this library places differently",
   "prototype/with/overflow-reject-throws.js": "the three sub-second fields are one number here, so a field past its own range reads as a carry",
   "prototype/withTimeZone/timezone-case-insensitive.js": "the zone name is matched whatever its case, which this library does not",
@@ -30,24 +26,20 @@
  },
  "counts": {
   "a calendar in the text is not this library's shape": 9,
-  "a difference in range is not refused": 142,
+  "a difference in range is not refused": 138,
   "a field bag in range is not refused": 37,
   "a field edit that neither fits nor refuses leaves a reading this library places differently": 20,
   "a field is not a number": 18,
+  "a length of a hundred million days is more than a count of nanoseconds holds": 24,
   "a reading is not refused": 46,
-  "a rounded step that fills the unit above is not carried into it": 34,
   "a search is not refused": 9,
   "a text is not refused for a value in range": 25,
   "a text rounds to a minute at the largest, as the reference does": 12,
   "a time of day in range is not refused": 18,
   "a zone the database has is not refused": 25,
   "an equality is not refused": 9,
-  "an exact half at the nanosecond is broken by parity this library does not track": 56,
-  "an exact half of a negative difference is rounded the wrong way": 456,
   "no operation \u2014 the case states no value this recorder sees": 99,
   "the answer is not an instant": 2,
-  "the calendar count is not what this library computes": 56,
-  "the calendar field is not one an ISO calendar has": 120,
   "the calendar option is not a plain value": 6,
   "the case does not pass \u2014 Error: Actual [ownKeys duration, getOwnPropertyDescriptor duration.years, getOwnPropertyDescriptor duration.months, getOwnPropertyDescriptor durati": 2,
   "the case does not pass \u2014 Error: Actual [ownKeys fields, getOwnPropertyDescriptor fields.year, getOwnPropertyDescriptor fields.month, getOwnPropertyDescriptor fields.monthCo": 2,
@@ -128,20 +120,21 @@
   "the direction is not one this library has": 12,
   "the duration has a field this library does not": 4,
   "the duration is not a plain duration": 124,
+  "the era is a text of its own, and the ISO year is the field": 14,
   "the field bag changes the zone or the calendar": 2,
   "the field is not a number": 51,
   "the field is not a time of day": 3,
   "the field is not one an ISO calendar has": 31,
-  "the identifier is the value's own, not a computation": 1009,
+  "the identifier is the value's own, not a computation": 1123,
   "the increment is not a number": 24,
   "the increment is not a whole number": 15,
-  "the instant is outside the range a count of nanoseconds holds": 162,
+  "the instant is outside the range a count of nanoseconds holds": 164,
   "the largestUnit is not a plain value": 12,
   "the largestUnit is not a unit this library has": 28,
   "the offset is written as text, which the text cases cover": 4,
   "the offset option is not a plain value": 6,
   "the offset option is not one this library has": 4,
-  "the operation is about the host object, not the value": 1460,
+  "the operation is about the host object, not the value": 1470,
   "the options are not a plain bag": 46,
   "the other value is a bag with an offset, a form this library does not convert": 8,
   "the other value is not a zoned date and time": 245,
@@ -496,12 +489,10 @@
    "case": "construction-and-properties.js",
    "reasons": [
     "the answer is not an instant",
-    "the calendar count is not what this library computes",
-    "the calendar field is not one an ISO calendar has",
     "the field is not a number",
     "the offset is written as text, which the text cases cover"
    ],
-   "operations": 11
+   "operations": 3
   },
   {
    "case": "constructor.js",
@@ -790,11 +781,10 @@
   {
    "case": "prototype/add/month-boundary.js",
    "reasons": [
-    "the calendar count is not what this library computes",
-    "the calendar field is not one an ISO calendar has",
+    "the era is a text of its own, and the ISO year is the field",
     "the sum passes what a JavaScript number holds exactly"
    ],
-   "operations": 26
+   "operations": 20
   },
   {
    "case": "prototype/add/name.js",
@@ -951,13 +941,6 @@
    "operations": 1
   },
   {
-   "case": "prototype/dayOfWeek/basic.js",
-   "reasons": [
-    "the calendar count is not what this library computes"
-   ],
-   "operations": 1
-  },
-  {
    "case": "prototype/dayOfWeek/branding.js",
    "reasons": [
     "no operation \u2014 the case states no value this recorder sees"
@@ -970,13 +953,6 @@
     "no operation \u2014 the case states no value this recorder sees"
    ],
    "operations": 1
-  },
-  {
-   "case": "prototype/dayOfYear/basic.js",
-   "reasons": [
-    "the calendar count is not what this library computes"
-   ],
-   "operations": 7
   },
   {
    "case": "prototype/dayOfYear/branding.js",
@@ -993,13 +969,6 @@
    "operations": 1
   },
   {
-   "case": "prototype/daysInMonth/basic.js",
-   "reasons": [
-    "the calendar count is not what this library computes"
-   ],
-   "operations": 18
-  },
-  {
    "case": "prototype/daysInMonth/branding.js",
    "reasons": [
     "no operation \u2014 the case states no value this recorder sees"
@@ -1014,13 +983,6 @@
    "operations": 1
   },
   {
-   "case": "prototype/daysInWeek/basic.js",
-   "reasons": [
-    "the calendar count is not what this library computes"
-   ],
-   "operations": 3
-  },
-  {
    "case": "prototype/daysInWeek/branding.js",
    "reasons": [
     "no operation \u2014 the case states no value this recorder sees"
@@ -1033,13 +995,6 @@
     "no operation \u2014 the case states no value this recorder sees"
    ],
    "operations": 1
-  },
-  {
-   "case": "prototype/daysInYear/basic.js",
-   "reasons": [
-    "the calendar count is not what this library computes"
-   ],
-   "operations": 13
   },
   {
    "case": "prototype/daysInYear/branding.js",
@@ -1450,7 +1405,7 @@
   {
    "case": "prototype/era/basic.js",
    "reasons": [
-    "the calendar field is not one an ISO calendar has"
+    "the era is a text of its own, and the ISO year is the field"
    ],
    "operations": 1
   },
@@ -1471,7 +1426,7 @@
   {
    "case": "prototype/eraYear/basic.js",
    "reasons": [
-    "the calendar field is not one an ISO calendar has"
+    "the era is a text of its own, and the ISO year is the field"
    ],
    "operations": 1
   },
@@ -1683,25 +1638,11 @@
    "operations": 1
   },
   {
-   "case": "prototype/monthCode/basic.js",
-   "reasons": [
-    "the calendar field is not one an ISO calendar has"
-   ],
-   "operations": 1
-  },
-  {
    "case": "prototype/monthCode/branding.js",
    "reasons": [
     "no operation \u2014 the case states no value this recorder sees"
    ],
    "operations": 1
-  },
-  {
-   "case": "prototype/monthCode/no-leap-months.js",
-   "reasons": [
-    "the calendar field is not one an ISO calendar has"
-   ],
-   "operations": 60
   },
   {
    "case": "prototype/monthCode/prop-desc.js",
@@ -1713,9 +1654,9 @@
   {
    "case": "prototype/monthsInYear/basic.js",
    "reasons": [
-    "the calendar count is not what this library computes"
+    "the instant is outside the range a count of nanoseconds holds"
    ],
-   "operations": 2
+   "operations": 1
   },
   {
    "case": "prototype/monthsInYear/branding.js",
@@ -2396,18 +2337,11 @@
    "operations": 20
   },
   {
-   "case": "prototype/since/round-cross-unit-boundary.js",
-   "reasons": [
-    "a rounded step that fills the unit above is not carried into it"
-   ],
-   "operations": 17
-  },
-  {
    "case": "prototype/since/roundingincrement-addition-out-of-range.js",
    "reasons": [
-    "a difference in range is not refused"
+    "a length of a hundred million days is more than a count of nanoseconds holds"
    ],
-   "operations": 2
+   "operations": 12
   },
   {
    "case": "prototype/since/roundingincrement-nan.js",
@@ -2445,20 +2379,6 @@
     "the increment is not a number"
    ],
    "operations": 7
-  },
-  {
-   "case": "prototype/since/roundingmode-half-boundary.js",
-   "reasons": [
-    "an exact half of a negative difference is rounded the wrong way"
-   ],
-   "operations": 228
-  },
-  {
-   "case": "prototype/since/roundingmode-halfEven.js",
-   "reasons": [
-    "an exact half at the nanosecond is broken by parity this library does not track"
-   ],
-   "operations": 28
   },
   {
    "case": "prototype/since/roundingmode-invalid-string.js",
@@ -2723,11 +2643,10 @@
   {
    "case": "prototype/subtract/month-boundary.js",
    "reasons": [
-    "the calendar count is not what this library computes",
-    "the calendar field is not one an ISO calendar has",
+    "the era is a text of its own, and the ISO year is the field",
     "the sum passes what a JavaScript number holds exactly"
    ],
-   "operations": 26
+   "operations": 20
   },
   {
    "case": "prototype/subtract/name.js",
@@ -3829,18 +3748,11 @@
    "operations": 1
   },
   {
-   "case": "prototype/until/round-cross-unit-boundary.js",
-   "reasons": [
-    "a rounded step that fills the unit above is not carried into it"
-   ],
-   "operations": 17
-  },
-  {
    "case": "prototype/until/roundingincrement-addition-out-of-range.js",
    "reasons": [
-    "a difference in range is not refused"
+    "a length of a hundred million days is more than a count of nanoseconds holds"
    ],
-   "operations": 2
+   "operations": 12
   },
   {
    "case": "prototype/until/roundingincrement-nan.js",
@@ -3878,20 +3790,6 @@
     "the increment is not a number"
    ],
    "operations": 7
-  },
-  {
-   "case": "prototype/until/roundingmode-half-boundary.js",
-   "reasons": [
-    "an exact half of a negative difference is rounded the wrong way"
-   ],
-   "operations": 228
-  },
-  {
-   "case": "prototype/until/roundingmode-halfEven.js",
-   "reasons": [
-    "an exact half at the nanosecond is broken by parity this library does not track"
-   ],
-   "operations": 28
   },
   {
    "case": "prototype/until/roundingmode-invalid-string.js",
@@ -4023,13 +3921,6 @@
    "operations": 1
   },
   {
-   "case": "prototype/weekOfYear/basic.js",
-   "reasons": [
-    "the calendar field is not one an ISO calendar has"
-   ],
-   "operations": 29
-  },
-  {
    "case": "prototype/weekOfYear/branding.js",
    "reasons": [
     "no operation \u2014 the case states no value this recorder sees"
@@ -4046,10 +3937,9 @@
   {
    "case": "prototype/with/basic-year-month-day.js",
    "reasons": [
-    "the calendar field is not one an ISO calendar has",
     "the instant is outside the range a count of nanoseconds holds"
    ],
-   "operations": 11
+   "operations": 9
   },
   {
    "case": "prototype/with/branding.js",
@@ -4663,13 +4553,6 @@
     "no operation \u2014 the case states no value this recorder sees"
    ],
    "operations": 1
-  },
-  {
-   "case": "prototype/yearOfWeek/basic.js",
-   "reasons": [
-    "the calendar field is not one an ISO calendar has"
-   ],
-   "operations": 5
   },
   {
    "case": "prototype/yearOfWeek/branding.js",

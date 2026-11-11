@@ -142,6 +142,25 @@ fn field_named(value : @zone.ZonedDateTime, name : String) -> Int64? {
     "millisecond" => Some((value.nanos() / 1_000_000 % 1000).to_int64())
     "offsetNanoseconds" => Some(value.offset().to_int64() * 1_000_000_000L)
     "hoursInDay" => Some(value.hours_in_day().to_int64())
+    // The counts a calendar answers about a day, which the corpus asks for by
+    // name. A month code is "M01" to "M12", so the number it names is the month.
+    "monthCode" => Some(value.month().to_int64())
+    "daysInMonth" =>
+      Some(@moondate.length(value.year(), value.month()).to_int64())
+    "daysInYear" => Some(if @moondate.leap(value.year()) { 366L } else { 365L })
+    "monthsInYear" => Some(12L)
+    "inLeapYear" => Some(if @moondate.leap(value.year()) { 1L } else { 0L })
+    "daysInWeek" => Some(7L)
+    "dayOfWeek" => Some(value.date().isoweekday().to_int64())
+    "dayOfYear" => Some(value.date().yearday().to_int64())
+    "weekOfYear" => {
+      let (_, week, _) = value.date().isocalendar()
+      Some(week.to_int64())
+    }
+    "yearOfWeek" => {
+      let (year, _, _) = value.date().isocalendar()
+      Some(year.to_int64())
+    }
     "epochMilliseconds" =>
       Some(value.epoch() * 1000L + value.nanos().to_int64() / 1_000_000L)
     _ => None
