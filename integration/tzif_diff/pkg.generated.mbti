@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitstack/moondate/tzif_diff"
+package "moonbitstack/moondate-tzif-diff"
 
 import {
   "moonbitlang/x/time",

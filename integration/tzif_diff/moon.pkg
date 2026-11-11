@@ -1,4 +1,9 @@
+// The comparison itself, which is build code rather than part of the library:
+// the same seven TZif files read through two readers, saying where they disagree.
+// It lives here so that what it needs — a second reader, and the family's hex for
+// the fixtures — is the bench's dependency and not the library's.
 import {
   "moonbitstack/moondate/zone",
+  "moonbitstack/moonbase/base16",
   "moonbitlang/x/time",
 }

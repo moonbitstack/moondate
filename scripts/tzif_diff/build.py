@@ -27,7 +27,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-PKG_DIR = os.path.join(ROOT, "src", "tzif_diff")
+PKG_DIR = os.path.join(ROOT, "integration", "tzif_diff")
 LIB = os.path.join(PKG_DIR, "lib.mbt")
 TEST = os.path.join(PKG_DIR, "tzif_diff_wbtest.mbt")
 PKG = os.path.join(PKG_DIR, "moon.pkg")
@@ -126,27 +126,10 @@ let diff_instants : Array[(String, Int64, Int32)] = [
 
 CHECKERS = """
 ///|
-/// Hexadecimal as bytes.
+/// The bytes a zone is filed under, from the hexadecimal they are written in.
 fn diff_hex_bytes(text : String) -> Bytes {
-  let out : Array[Byte] = []
-  for k = 0; k < text.length(); k = k + 2 {
-    out.push(
-      ((diff_nibble(text[k].unsafe_to_char()) << 4) |
-      diff_nibble(text[k + 1].unsafe_to_char())).to_byte(),
-    )
-  }
-  Bytes::from_array(out)
-}
-
-///|
-fn diff_nibble(c : Char) -> Int32 {
-  let value = c.to_int()
-  if value >= 97 {
-    value - 87
-  } else if value >= 65 {
-    value - 55
-  } else {
-    value - 48
+  @base16.decode(text) catch {
+    _ => abort("a fixture in this file is not hexadecimal")
   }
 }
 
@@ -330,9 +313,16 @@ def main() -> int:
         "// release and one between the two readers.\n"
         + TEST_BODY
     )
+    # A run that found none of the files would write an empty bench over
+    # a good one, and the test that replays it would pass on nothing.
+    if not files:
+        sys.stderr.write("no zone files under {}; nothing written\n".format(zoneinfo))
+        raise SystemExit(1)
+
     pkg_text = (
         "import {\n"
         '  "moonbitstack/moondate/zone",\n'
+        '  "moonbitstack/moonbase/base16",\n'
         '  "moonbitlang/x/time",\n'
         "}\n"
     )
@@ -356,7 +346,7 @@ def main() -> int:
     with open(PKG, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(pkg_text)
     print(
-        "wrote src/tzif_diff ({} files, {} instants, {} bytes of TZif)".format(
+        "wrote integration/tzif_diff ({} files, {} instants, {} bytes of TZif)".format(
             len(zones), len(instants), sum(len(f) for f in files),
         )
     )

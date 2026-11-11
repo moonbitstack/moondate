@@ -708,27 +708,10 @@ let diff_instants : Array[(String, Int64, Int32)] = [
 ]
 
 ///|
-/// Hexadecimal as bytes.
+/// The bytes a zone is filed under, from the hexadecimal they are written in.
 fn diff_hex_bytes(text : String) -> Bytes {
-  let out : Array[Byte] = []
-  for k = 0; k < text.length(); k = k + 2 {
-    out.push(
-      ((diff_nibble(text[k].unsafe_to_char()) << 4) |
-      diff_nibble(text[k + 1].unsafe_to_char())).to_byte(),
-    )
-  }
-  Bytes::from_array(out)
-}
-
-///|
-fn diff_nibble(c : Char) -> Int32 {
-  let value = c.to_int()
-  if value >= 97 {
-    value - 87
-  } else if value >= 65 {
-    value - 55
-  } else {
-    value - 48
+  @base16.decode(text) catch {
+    _ => abort("a fixture in this file is not hexadecimal")
   }
 }
 
