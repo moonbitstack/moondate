@@ -22,6 +22,10 @@ pub(all) suberror Refused {
   Unknown(name~ : String)
   /// A wall clock that names no instant, refused by [`Fold::Reject`].
   Missing(text~ : String)
+  /// A value or a length outside the range this library keeps: an instant too
+  /// far from the epoch to be counted in nanoseconds, a difference longer than
+  /// one, a field the calendar has no room for.
+  Range(text~ : String)
   /// A field of a date and time that is out of range, the refusal the calendar
   /// and the clock give: the day the month does not have, the second that is not
   /// a clock reading. It is carried here rather than raised by the package that
@@ -44,6 +48,7 @@ pub impl Show for Refused with fn output(self, logger) {
       )
     Unknown(name~) => logger.write_string("no such zone: \{name}")
     Missing(text~) => logger.write_string("this clock never happens: \{text}")
+    Range(text~) => logger.write_string(text)
     BadDate(e) => logger.write_string(e.to_string())
   }
 }

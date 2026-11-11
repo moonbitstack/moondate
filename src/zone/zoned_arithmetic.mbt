@@ -104,6 +104,68 @@ fn mirrored(rounding : @moondate.Rounding) -> @moondate.Rounding {
 }
 
 ///|
+/// The largest unit a difference may use, given what was asked for.
+///
+/// An hour is the default, because an instant is a count of time first; a
+/// smallest unit above it lifts the largest, because a difference asked for in
+/// whole days cannot be answered in hours. Asking for a largest unit below the
+/// smallest one is not a difference anyone can want, and it is refused rather
+/// than quietly reordered.
+fn largest_unit_of(
+  largest_unit : @moondate.TimeUnit?,
+  smallest_unit : @moondate.TimeUnit?,
+) -> @moondate.TimeUnit raise Refused {
+  match (largest_unit, smallest_unit) {
+    (Some(largest), Some(smallest)) =>
+      if rank(smallest) > rank(largest) {
+        raise Range(text="the smallest unit is larger than the largest one")
+      } else {
+        largest
+      }
+    (Some(largest), None) => largest
+    (None, Some(smallest)) =>
+      if rank(smallest) > rank(Hours) {
+        smallest
+      } else {
+        Hours
+      }
+    (None, None) => Hours
+  }
+}
+
+///|
+/// The increment a difference may be measured by.
+///
+/// A step has to land on the unit again — there is no fifteen past the hour in a
+/// clock of eleven-minute steps — and a calendar unit is only stepped above one
+/// when it is the whole answer, since half a month is not a month.
+fn check_step(
+  unit : @moondate.TimeUnit,
+  increment : Int64,
+  largest : @moondate.TimeUnit,
+) -> Unit raise Refused {
+  if increment < 1L {
+    raise Range(text="the increment is not a positive number")
+  }
+  if !unit.is_exact() {
+    if increment != 1L && unit != largest {
+      raise Range(
+        text="a calendar unit is stepped by one unless it is the whole answer",
+      )
+    }
+    return
+  }
+  let limit = match unit {
+    Hours => 24L
+    Minutes | Seconds => 60L
+    _ => 1000L
+  }
+  if increment >= limit || limit % increment != 0L {
+    raise Range(text="the increment does not divide the unit it steps by")
+  }
+}
+
+///|
 /// The span from one value to another, before any rounding.
 fn difference(
   start : ZonedDateTime,
@@ -113,25 +175,38 @@ fn difference(
   rounding~ : @moondate.Rounding,
   increment~ : Int64,
 ) -> @moondate.Period raise Refused {
-  // The default largest unit is an hour, but a smallest unit bigger than that
-  // lifts it: asking for whole years of a difference cannot be answered in
-  // hours.
-  let largest = match largest_unit {
-    Some(unit) => unit
-    None =>
-      match smallest_unit {
-        Some(unit) => if rank(unit) > rank(Hours) { unit } else { Hours }
-        None => Hours
-      }
+  let largest = largest_unit_of(largest_unit, smallest_unit)
+  if start.epoch == end.epoch && start.nano == end.nano {
+    return @moondate.zero
   }
   let exact = difference_exact(start, end, largest)
   match smallest_unit {
     None => exact
     Some(unit) => {
-      if unit != largest && unit != Days {
-        check_increment(unit, increment)
+      check_step(unit, increment, largest)
+      if largest.is_exact() {
+        // Below a day every unit has one length, so rounding the count of
+        // nanoseconds and writing it out again is the whole of the question.
+        let span = nanos_between(start, end)
+        balance(
+          @moondate.round_increment(
+            span,
+            unit.nanos().unwrap() * increment,
+            rounding,
+          ),
+          largest,
+        )
+      } else {
+        round_difference(
+          origin_of(start),
+          nanos_between(start, end),
+          exact,
+          largest,
+          unit,
+          rounding,
+          increment,
+        )
       }
-      round_difference(start, end, exact, largest, unit, rounding, increment)
     }
   }
 }
@@ -185,7 +260,7 @@ fn difference_exact(
       middle_nanos >= end_nanos
     }
     if correction == limit || reached {
-      let dates = date_between(start_date, middle, largest)
+      let dates = start_date.until(middle, largest_unit=largest)
       let rest = (end.epoch - middle_epoch) * 1_000_000_000L +
         end.nano.to_int64() -
         start.nano.to_int64()
@@ -204,64 +279,6 @@ fn difference_exact(
     correction = correction + 1
   }
   @moondate.zero
-}
-
-///|
-/// Nanoseconds from one instant to another.
-fn nanos_between(start : ZonedDateTime, end : ZonedDateTime) -> Int64 {
-  (end.epoch - start.epoch) * 1_000_000_000L +
-  end.nano.to_int64() -
-  start.nano.to_int64()
-}
-
-///|
-/// The date part of a difference: two dates, and the units the answer may use.
-///
-/// From a week down the count is of days. A month is not a number of days, so
-/// from a month up the answer is the whole months that fit, and what is left
-/// over is days. A day of the month that is smaller than the one the count
-/// started on borrows a month back: the thirty-first of January to the
-/// twenty-eighth of February is twenty-eight days, because a month that clamps
-/// its day is not a month the other end agrees with.
-fn date_between(
-  start : @moondate.Date,
-  end : @moondate.Date,
-  largest : @moondate.TimeUnit,
-) -> @moondate.Period {
-  let days = end.days() - start.days()
-  match largest {
-    Weeks => {
-      let weeks = days / 7
-      {
-        ..@moondate.zero,
-        weeks: weeks.to_int64(),
-        days: (days % 7).to_int64(),
-      }
-    }
-    Days => { ..@moondate.zero, days: days.to_int64(), }
-    _ => {
-      let mut months = end.year.to_int64() * 12L +
-        end.month.to_int64() -
-        (start.year.to_int64() * 12L + start.month.to_int64())
-      if months != 0L {
-        let travel = if months > 0L { 1L } else { -1L }
-        // A day of the month that moved backwards means a whole month does not
-        // fit; taking one back leaves the days to say the rest.
-        if (end.day - start.day).to_int64() * travel < 0L {
-          months = months - travel
-        }
-      }
-      let anchor = start.plus_months(months.to_int())
-      let rest = end.days() - anchor.days()
-      let years = if largest == Years { months / 12L } else { 0L }
-      {
-        ..@moondate.zero,
-        years,
-        months: months - years * 12L,
-        days: rest.to_int64(),
-      }
-    }
-  }
 }
 
 ///|
@@ -322,233 +339,6 @@ fn balance(total : Int64, largest : @moondate.TimeUnit) -> @moondate.Period {
 
 ///|
 /// The period with everything below `unit` dropped.
-
-///|
-/// [`truncate_to`] with the step the increment asks for: the field of the unit is
-/// taken back to a multiple of it, towards zero.
-fn truncate_step(
-  period : @moondate.Period,
-  unit : @moondate.TimeUnit,
-  increment : Int64,
-) -> @moondate.Period {
-  let zero = @moondate.zero
-  let step = fn(n : Int64) -> Int64 {
-    if increment <= 1L {
-      n
-    } else {
-      n - n % increment
-    }
-  }
-  match unit {
-    Years => { ..zero, years: step(period.years), }
-    Months =>
-      { ..zero, years: step(period.years), months: step(period.months), }
-    Weeks =>
-      {
-        ..zero,
-        years: period.years,
-        months: period.months,
-        weeks: step(period.weeks),
-      }
-    Days =>
-      {
-        ..zero,
-        years: period.years,
-        months: period.months,
-        weeks: period.weeks,
-        days: step(period.days),
-      }
-    Hours =>
-      {
-        ..zero,
-        years: period.years,
-        months: period.months,
-        weeks: period.weeks,
-        days: period.days,
-        hours: step(period.hours),
-      }
-    Minutes =>
-      {
-        ..zero,
-        years: period.years,
-        months: period.months,
-        weeks: period.weeks,
-        days: period.days,
-        hours: period.hours,
-        minutes: step(period.minutes),
-      }
-    Seconds =>
-      {
-        ..zero,
-        years: period.years,
-        months: period.months,
-        weeks: period.weeks,
-        days: period.days,
-        hours: period.hours,
-        minutes: period.minutes,
-        seconds: step(period.seconds),
-      }
-    Millis =>
-      {
-        years: period.years,
-        months: period.months,
-        weeks: period.weeks,
-        days: period.days,
-        hours: period.hours,
-        minutes: period.minutes,
-        seconds: period.seconds,
-        // A step of milliseconds is a multiple of a thousandth of a second, not of
-        // a nanosecond: the increment counts the unit, not the field below it.
-        nanos: period.nanos - period.nanos % (1_000_000L * increment),
-      }
-    Micros =>
-      {
-        years: period.years,
-        months: period.months,
-        weeks: period.weeks,
-        days: period.days,
-        hours: period.hours,
-        minutes: period.minutes,
-        seconds: period.seconds,
-        nanos: period.nanos - period.nanos % (1_000L * increment),
-      }
-    Nanos => { ..period, nanos: step(period.nanos), }
-  }
-}
-
-///|
-/// The period rounded to `unit`, measured from where the difference started.
-///
-/// A length in months, weeks or days is not a multiple of anything: the half-way
-/// point between one month and two is at a different number of nanoseconds every
-/// time, so the boundaries are found by adding the candidates to the start and
-/// comparing where each lands. That is also what makes rounding to a day mean
-/// the day the clocks are having rather than twenty-four hours.
-fn round_difference(
-  start : ZonedDateTime,
-  end : ZonedDateTime,
-  exact : @moondate.Period,
-  largest : @moondate.TimeUnit,
-  unit : @moondate.TimeUnit,
-  rounding : @moondate.Rounding,
-  increment : Int64,
-) -> @moondate.Period raise Refused {
-  let sign = exact.sign()
-  if sign == 0 {
-    return exact
-  }
-  // Nothing below the unit to drop: the exact answer is the answer.
-  let truncated = truncate_step(exact, unit, increment)
-  if exact.equal(truncated) {
-    return exact
-  }
-  let target = nanos_between(start, end)
-  let here = nanos_between(start, start.add(truncated))
-  let step = @moondate.Period::of(
-    unit,
-    if sign > 0 {
-      increment
-    } else {
-      -increment
-    },
-  )
-  let there = nanos_between(start, start.add(truncated.add(step)))
-  let span = there - here
-  if span == 0L {
-    return truncated
-  }
-  let rest = if sign > 0 { target - here } else { here - target }
-  let span = if span > 0L { span } else { -span }
-  let up = choose_up(
-    rest,
-    span,
-    rounding,
-    count_of(truncated, unit) / increment,
-    sign,
-  )
-  let answer = if up { truncated.add(step) } else { truncated }
-  // A step that fills the unit above is written the way the largest unit allows:
-  // twelve months asked for in years is a year.
-  rebase(answer, largest)
-}
-
-///|
-/// How many of `unit` the period names, for the parity a tie on an exact half is
-/// broken by.
-fn count_of(period : @moondate.Period, unit : @moondate.TimeUnit) -> Int64 {
-  match unit {
-    Years => period.years
-    Months => period.months
-    Weeks => period.weeks
-    Days => period.days
-    Hours => period.hours
-    Minutes => period.minutes
-    Seconds => period.seconds
-    _ => period.nanos
-  }
-}
-
-///|
-/// Whether to take the step up, given how far past the lower candidate the value
-/// lies and how far the two candidates are apart.
-///
-/// The two distances are taken in absolute value, so a direction word means what
-/// it says: `Ceil` is towards positive infinity, which for a negative difference
-/// is the shorter one, and `Expand` is away from zero either way.
-fn choose_up(
-  rest : Int64,
-  span : Int64,
-  rounding : @moondate.Rounding,
-  index : Int64,
-  sign : Int32,
-) -> Bool {
-  if rest <= 0L {
-    return false
-  }
-  let twice = rest * 2L
-  match rounding {
-    // The direction words do not look at how far along the value is: anything
-    // past the lower candidate is enough.
-    Ceil => sign > 0
-    Floor => sign < 0
-    Expand => true
-    Trunc => false
-    HalfCeil => twice > span || (twice == span && sign > 0)
-    HalfFloor => twice > span || (twice == span && sign < 0)
-    HalfExpand => twice >= span
-    HalfTrunc => twice > span
-    HalfEven =>
-      if twice > span {
-        true
-      } else if twice < span {
-        false
-      } else {
-        index % 2L != 0L
-      }
-  }
-}
-
-///|
-/// A period rebalanced so that no field is bigger than the largest unit allows:
-/// twelve months asked for in years is one year.
-fn rebase(
-  period : @moondate.Period,
-  largest : @moondate.TimeUnit,
-) -> @moondate.Period {
-  match largest {
-    Years => {
-      let months = period.months
-      let years = period.years + months / 12L
-      let months = months % 12L
-      if months == 0L && years != 0L && period.days == 0L && period.weeks == 0L {
-        { ..period, years, months, }
-      } else {
-        { ..period, years, months, }
-      }
-    }
-    _ => period
-  }
-}
 
 ///|
 /// The instant moved to the nearest multiple of a unit, in this zone.

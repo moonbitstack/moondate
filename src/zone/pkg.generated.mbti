@@ -16,6 +16,7 @@ pub(all) suberror Refused {
   Unsupported(version~ : Char)
   Unknown(name~ : String)
   Missing(text~ : String)
+  Range(text~ : String)
   BadDate(@moondate.Refused)
 }
 pub fn Refused::equal(Self, Self) -> Bool
