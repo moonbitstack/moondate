@@ -131,6 +131,7 @@ pub fn Date::plus_months(Self, Int32) -> Self
 pub fn Date::replace(Self, year? : Int32, month? : Int32, day? : Int32) -> Self raise Refused
 pub fn Date::to_repr(Self) -> @debug.Repr
 pub fn Date::to_string(Self) -> String
+pub fn Date::until(Self, Self, largest_unit? : TimeUnit) -> Period
 pub fn Date::weekday(Self) -> Int32
 pub fn Date::yearday(Self) -> Int32
 pub impl Show for Date
@@ -187,6 +188,7 @@ pub(all) struct Period {
   nanos : Int64
 }
 pub fn Period::add(Self, Self) -> Self
+pub fn Period::compare(Self, Self, start? : Date) -> Int32 raise Refused
 pub fn Period::equal(Self, Self) -> Bool
 pub fn Period::has_date(Self) -> Bool
 pub fn Period::has_mixed_sign(Self) -> Bool
@@ -196,10 +198,13 @@ pub fn Period::new(years? : Int64, months? : Int64, weeks? : Int64, days? : Int6
 pub fn Period::not_equal(Self, Self) -> Bool
 pub fn Period::of(TimeUnit, Int64) -> Self
 pub fn Period::output(Self, &Logger) -> Unit
+pub fn Period::parse(StringView) -> Self raise Refused
+pub fn Period::round(Self, smallest_unit~ : TimeUnit, increment? : Int64, rounding? : Rounding, start? : Date) -> Self raise Refused
 pub fn Period::sign(Self) -> Int32
 pub fn Period::span(Self) -> Span
 pub fn Period::to_repr(Self) -> @debug.Repr
 pub fn Period::to_string(Self) -> String
+pub fn Period::total(Self, unit~ : TimeUnit, start? : Date) -> Double raise Refused
 pub impl Show for Period
 
 #derive(Eq, @debug.Debug)
@@ -279,6 +284,7 @@ pub fn TimeUnit::equal(Self, Self) -> Bool
 pub fn TimeUnit::is_exact(Self) -> Bool
 pub fn TimeUnit::nanos(Self) -> Int64?
 pub fn TimeUnit::not_equal(Self, Self) -> Bool
+pub fn TimeUnit::order(Self) -> Int32
 pub fn TimeUnit::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)

@@ -252,6 +252,11 @@
 <div class="doc"><p>The text form, as a <code>String</code>, from <code>Show</code>.</p></div>
 
 </article>
+<article class="api-item" id="m-moondate-Date-until">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::until</span>(Self, Self, largest_unit? : TimeUnit) -&gt; Period</div>
+
+
+</article>
 </div>
 </section>
 <section class="api-type" id="type-moondate-Moment">
@@ -499,6 +504,11 @@
 </article>
 </div>
 <div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Period-compare">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::compare</span>(Self, Self, start? : Date) -&gt; Int32 <span class="kw">raise</span> Refused</div>
+<div class="doc"><p>Three-way ordering from <code>Compare</code>: less, equal or greater.</p></div>
+
+</article>
 <article class="api-item" id="m-moondate-Period-equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::equal</span>(Self, Self) -&gt; Bool</div>
 <div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
@@ -514,9 +524,24 @@
 <div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
 
 </article>
+<article class="api-item" id="m-moondate-Period-parse">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::parse</span>(StringView) -&gt; Self <span class="kw">raise</span> Refused</div>
+
+
+</article>
+<article class="api-item" id="m-moondate-Period-round">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::round</span>(Self, smallest_unit~ : TimeUnit, increment? : Int64, rounding? : Rounding, start? : Date) -&gt; Self <span class="kw">raise</span> Refused</div>
+
+
+</article>
 <article class="api-item" id="m-moondate-Period-to_repr">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::to_repr</span>(Self) -&gt; @debug.Repr</div>
 <div class="doc"><p>The debug representation, from <code>Debug</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Period-total">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::total</span>(Self, unit~ : TimeUnit, start? : Date) -&gt; Double <span class="kw">raise</span> Refused</div>
+
 
 </article>
 </div>
@@ -744,6 +769,11 @@
 <article class="api-item" id="m-moondate-TimeUnit-not_equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::not_equal</span>(Self, Self) -&gt; Bool</div>
 <div class="doc"><p>The negation of <code>equal</code>, from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-TimeUnit-order">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">TimeUnit::order</span>(Self) -&gt; Int32</div>
+
 
 </article>
 <article class="api-item" id="m-moondate-TimeUnit-to_repr">
@@ -1780,7 +1810,7 @@
 <div class="sig"><span class="kw">pub</span>(all) <span class="kw">suberror</span> <span class="name">Refused</span></div>
 <div class="doc"><p>Why a zone, a rule or a wall clock was refused.</p>
 <p>A zone database is a binary format with a version byte, a set of rules whose text is a small language of its own, and a question — which instant does this clock name — that has no answer for one hour a year in most of the world. Each of those fails in its own way, and the message says which.</p></div>
-<ul class="members"><li>Malformed(kind~ : String, at~ : Int32)</li><li>Truncated(want~ : Int32, got~ : Int32)</li><li>Unsupported(version~ : Char)</li><li>Unknown(name~ : String)</li><li>Missing(text~ : String)</li><li>BadDate(@moondate.Refused)</li></ul>
+<ul class="members"><li>Malformed(kind~ : String, at~ : Int32)</li><li>Truncated(want~ : Int32, got~ : Int32)</li><li>Unsupported(version~ : Char)</li><li>Unknown(name~ : String)</li><li>Missing(text~ : String)</li><li>Range(text~ : String)</li><li>BadDate(@moondate.Refused)</li></ul>
 <div class="method-list"><div class="mlabel">Trait methods</div>
 <article class="api-item" id="m-zone-Refused-equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Refused::equal</span>(Self, Self) -&gt; Bool</div>
