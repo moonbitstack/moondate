@@ -21,8 +21,9 @@ moon add moonbitstack/moondate
 | the database | `moonbitstack/moondate/tzdata` | `load`, `find`, `zones`, `links`, `release` |
 | the machine's zones | `moonbitstack/moondate/zoneinfo` | `open`, `named`, `system`, `directory` |
 
-`ZonedDateTime` is the value that keeps a `Tz` rather than one reading of it, and
-`Period` is a length in calendar units. Both are in `zone` and the root package.
+`ZonedDateTime` is in `zone`: the value that keeps a `Tz` rather than one reading
+of it. `Period` is in the root package: a length in calendar units, which the
+calendar writes and reads as an ISO 8601 duration.
 
 ## Read a timestamp and write it another way
 
@@ -81,7 +82,20 @@ println(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Hours).to_string()
 
 The same two instants are a day apart or twenty-three hours apart, depending on the
 unit asked for; both answers are right. `since` is the same reading the other way
-round. `round(smallest_unit~, increment~, rounding~)` moves the reading to the
+round.
+
+A length on its own answers the same questions from a date: `round` to a unit,
+`total` in one unit, and `compare` against another length. `start` is what says
+how long a month is, so a length with one in it refuses without it rather than
+assuming thirty days.
+
+```moonbit
+let length = @moondate.Period::parse("P1Y11M24D")
+let from = @moondate.Date::new(2024, 1, 1)
+println(length.round(smallest_unit=@moondate.TimeUnit::Months, rounding=@moondate.Rounding::Expand, start=from))
+println(@moondate.Period::parse("PT1H30M").total(unit=@moondate.TimeUnit::Hours))
+println(@moondate.Period::parse("P1M").compare(@moondate.Period::parse("P31D"), start=@moondate.Date::new(2024, 2, 1)))
+``` `round(smallest_unit~, increment~, rounding~)` moves the reading to the
 nearest unit — a day is as long as the clocks make it — and `with_fields`,
 `with_plain_time`, `start_of_day`, `hours_in_day` and `get_time_zone_transition`
 answer the rest of the questions Temporal's `ZonedDateTime` does.
@@ -110,6 +124,10 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
   force at that instant, so adding a span across a transition leaves the offset
   stale. Go back through `Tz::moment` when a change has to be crossed, or keep a
   `ZonedDateTime`, which reads the rules itself.
+- **A length with a month in it needs a date.** `Period::round`, `total` and
+  `compare` take `start`; without one a length of hours or less still answers and
+  one with a calendar in it is refused, because eleven months is 334 or 335 days
+  depending on which February it starts after.
 - **A `Span` crosses a change by counting time, a `Period` by reading the clock.**
   `plus(day)` is exactly twenty-four hours; `add(Period::new(days=1))` is the same
   reading tomorrow, which is twenty-three or twenty-five hours on the days the

@@ -297,10 +297,34 @@ a month on from the thirty-first of January is the twenty-eighth of February, an
 the way back is thirty-one days. A period whose fields run both ways is refused,
 because a calendar cannot add one.
 
-A `Period` is a length, not a text: it writes ISO 8601 (`to_string`, and `Show`)
-but does not read one back. Nothing in the two corpora asks for a parser, and a
-length with a calendar field in it needs a zone to mean anything, so the reading
-belongs where the zone is, in `until`.
+A length is a text as well: `Period::parse` reads ISO 8601's duration form —
+`P1Y2M3DT4H5M6.007S`, `P1W`, `-PT0.5S` — with a fraction allowed on the last field
+and only from days down, because half a month is not a number of days that two
+calendars agree on.
+
+```moonbit
+assert_eq(@moondate.Period::parse("P1Y2M3DT4H5M6.007S").to_string(), "P1Y2M3DT4H5M6.007S")
+assert_eq(@moondate.Period::parse("-PT1.5H").to_string(), "-PT1H30M")
+assert_eq(@moondate.Period::parse("P1.5D").to_string(), "P1DT12H")
+```
+
+The three questions a length answers on its own — `round` to a unit, `total` in
+one unit, and `compare` against another length — are counted from a date, because
+a month and a day are not lengths until something says where they start. They take
+`start`; without one, a length of hours or less still answers, and one with a
+calendar in it is refused rather than guessed at.
+
+```moonbit
+let from = @moondate.Date::new(2024, 1, 1)
+let length = @moondate.Period::new(years=1, months=11, days=24)
+assert_eq(length.round(smallest_unit=@moondate.TimeUnit::Months, rounding=@moondate.Rounding::Expand, start=from).to_string(), "P2Y")
+assert_eq(length.total(unit=@moondate.TimeUnit::Days, start=from), 724.0)
+assert_eq(@moondate.Period::parse("P1M").compare(@moondate.Period::parse("P31D"), start=@moondate.Date::new(2024, 2, 1)), -1)
+```
+
+The rounding is the one `until` uses, so the two agree: a step that fills the unit
+above is carried into it (`PT1H60M` is written `PT2H`), an exact half is decided by
+the direction the mode names, and `half_even` looks at whether the count is even.
 
 A value also edits itself with `with_fields` and `with_plain_time`, rounds with
 `round` to a unit from a day down (`hours`, `minutes`, the three below a second)
@@ -329,8 +353,8 @@ unless `rounding` says otherwise.
 | `Tz` | `@zone.Tz::parse(bytes)`, `@zone.Tz::of`, `@tzdata.load(name)`, `@zoneinfo.open`, `@zoneinfo.named`, `@zoneinfo.system` | `name`, `at`, `offset`, `abbrev`, `is_dst`, `changes`, `read`, `epoch`, `moment`, `zoned`, `readings`, `rule` |
 | `ZonedDateTime` | `ZonedDateTime::of(year, month, day, zone~)`, `::from_unix(epoch, zone~)`, `::of_moment(moment, zone~)` | `into(zone)`, `moment`, `epoch`, `nanos`, `offset`, `offset_minutes`, `abbrev`, `is_dst`, `reading`, `plus`, `plus_days`, `plus_months`, `add`, `subtract`, `until`, `since`, `round`, `with_fields`, `with_plain_time`, `with_year` … `with_second`, `start_of_day`, `hours_in_day`, `get_time_zone_transition`, `equals`, `compare`, `isoformat`, `to_string`, `zone_name`, `year` … `second` |
 | `Reading` | — | the fields: when it began, the offset in seconds, whether daylight saving was on, the abbreviation |
-| `Period` | `Period::new`, `Period::of(unit, n)`, `zero` | `years` … `nanos`, `add`, `neg`, `span`, `sign`, `is_zero`, `has_date`, `has_mixed_sign`, `to_string` |
-| `TimeUnit` | `Years` … `Nanos` | `nanos`, `is_exact` |
+| `Period` | `Period::new`, `of(unit, n)`, `parse`, `zero` | `years` … `nanos`, `add`, `neg`, `span`, `round`, `total`, `compare`, `sign`, `is_zero`, `has_date`, `has_mixed_sign`, `to_string` |
+| `TimeUnit` | `Years` … `Nanos` | `nanos`, `is_exact`, `order` |
 | `Rounding` | `Ceil`, `Floor`, `Expand`, `Trunc`, the four halves, `HalfEven` | — |
 | `Local` | `Tz::read` | `epoch(fold~)`, `is_exact` |
 | `Rule` | `Rule::parse` | `text`, `at` |
@@ -386,34 +410,44 @@ are the ones it has no way to, and each is named for the reason.
 `built-ins/Temporal/ZonedDateTime` is the suite about this library's own
 `ZonedDateTime`: 902 cases at that commit, of which 691 run under the reference
 implementation — `temporal-polyfill` 1.0.8, pinned like the corpus — and state
-9551 operations between them. 3113 of those operations are questions this library
-can be asked, and they land as 3113 rows over 236 cases; the rest are about the
+9551 operations between them. 3675 of those operations are questions this library
+can be asked, and they land as 3675 rows over 248 cases; the rest are about the
 object rather than the value — a property descriptor, a coercion of an argument, a
 calendar.
 
 Every one of the 902 is accounted for in
 `scripts/temporal_vectors/zoned_exclusions.json`, whose figures are written by the
-build: 236 cases contribute rows, 640 are named one by one with the reason their
-operations were left out, and 66 do both, because part of a case can be answered
+build: 248 cases contribute rows, 625 are named one by one with the reason their
+operations were left out, and 63 do both, because part of a case can be answered
 while the rest of it cannot. The remaining 92 contribute no row and no reason of
 their own: everything they state is about the object — a coercion, a descriptor,
 the value's own identifier — and the file counts that per operation rather than
 per case. `run_zoned.py --check` in CI fails when the transcription and the
 corpus disagree.
 
-Seventeen cases are ones where the answer would differ rather than cases this
-library cannot be asked: a rounded step that fills the unit above (`PT1H60M` for
-`PT2H`), an exact half at the nanosecond, a half of a negative difference, cases
-whose expected value is the one a JavaScript number holds exactly, the zone written
-as a date and time — or in another case, or with a leap second — the other value of
-`equals` given as a text or a bag, and the three sub-second fields that are one
-number here. They are listed under `DIFFERENCES` in the builder with the reason
-each, and in the report in the same words. None of them is in the tables: the build
-stops if one ever is, so no case in the suite is answered and wrong.
+Thirteen cases are ones where the answer would differ rather than cases this library
+cannot be asked: three whose expected value is the one a JavaScript number holds
+exactly, four about a zone written as a date and time — or in another case, or with
+a leap second — one about a zone name matched whatever its case, two about the other
+value of `equals` given as a text or a bag, two where a field edit neither fits nor
+refuses, and two where the rounding increment names a hundred million days, more
+than a count of nanoseconds holds. They are listed under `DIFFERENCES` in the
+builder with the reason each, and in the report in the same words. None of them is
+in the tables: the build stops if one ever is, so no case in the suite is answered
+and wrong.
+
+The same corpus is read the other way round as a specification of length: the
+reference's answers about a length rounded to a unit, counted in one unit and
+compared with another are generated by `scripts/temporal_vectors/run_duration.py`
+and replayed from `src/period_vectors_test.mbt` — 1890 roundings, 540 totals, 324
+comparisons and 14 texts, each asked from a plain date. A length measured in a
+named zone is a difference between two instants, which is what `until` and `since`
+on a `ZonedDateTime` answer; the table is the calendar a package with no database
+can offer.
 
 The zone database is checked two ways at the same time. Against the release: the
 transitions a `Tz` reads are the ones `zic` writes for the same source. And against
-a second implementation, `moonbitlang/x`'s `time`: `src/tzif_diff/` reads the same
+a second implementation, `moonbitlang/x`'s `time`: `integration/tzif_diff/` reads the same
 seven TZif files — UTC, Kathmandu, Kolkata, New York, Sydney, Chatham, Berlin —
 through this library's reader and through `Zone::from_tzif`, at 673 instants chosen
 across 1800 to 2100, each anchored to Python's `zoneinfo` reading the same bytes.
@@ -432,7 +466,7 @@ has every method and every parameter.
 | `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `instant`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
 | `Span` | `Span::new`, `of`, `nanosecond` … `day` | `add`, `sub`, `seconds`, `total_seconds`, `parts`, `neg`, `abs` |
 | `Period` | `Period::new`, `of(unit, n)`, `zero` | `years` … `nanos`, `add`, `neg`, `span`, `sign`, `is_zero`, `has_date`, `has_mixed_sign`, `to_string` |
-| `TimeUnit` | `Years` … `Nanos` | `nanos`, `is_exact` |
+| `TimeUnit` | `Years` … `Nanos` | `nanos`, `is_exact`, `order` |
 | `Rounding` | `Ceil`, `Floor`, `Expand`, `Trunc`, `HalfCeil`, `HalfFloor`, `HalfExpand`, `HalfTrunc`, `HalfEven` | — |
 | `Zone` | `Utc`, `Offset(minutes)`, `Named(name, offset, abbrev)`, `Precise(nanos)` | `nanos`, `seconds`, `minutes`, `name`, `abbrev` |
 | `Cron` | `@cron.parse` | `matches`, `next` |
@@ -487,8 +521,10 @@ instead of searching forever.
 
 The calendar is `date.mbt`, the wire formats are `text.mbt`, the `%` directives
 are `strftime.mbt`, the Go layout is `layout.mbt`, the LDML pattern is
-`pattern.mbt`, the rest of the surface is `python.mbt`, the schedule is `cron/`,
-the TZif reader and the POSIX rules are `zone/`, and the database is `tzdata/`.
+`pattern.mbt`, the rest of the surface is `python.mbt`, a length's arithmetic is
+`period_measure.mbt` and `period_arithmetic.mbt`, the schedule is `cron/`, the
+TZif reader, the POSIX rules and the rounding of a zoned difference are `zone/`,
+and the database is `tzdata/`.
 Each public item has a doc comment saying what it does and, where there is a rule
 behind it, which specification the rule comes from.
 

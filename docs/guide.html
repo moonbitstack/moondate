@@ -466,7 +466,21 @@ PT23H</div>
           <div class="output"><span class="lbl">output</span>P1Y2M3D
 P40W
 PT4H5M6.007S</div>
-          <p>Adding one needs a zone and a starting point, which is why <span class="mono">ZonedDateTime</span> carries the <span class="mono">add</span>, <span class="mono">until</span> and <span class="mono">round</span> that take one.</p>
+          <p>Adding one needs a zone and a starting point, which is why <span class="mono">ZonedDateTime</span> carries the <span class="mono">add</span>, <span class="mono">until</span> and <span class="mono">round</span> that take one. A length on its own answers the same three questions from a date: <span class="mono">round</span> to a unit, <span class="mono">total</span> in one unit, and <span class="mono">compare</span> against another length.</p>
+          <div class="code">
+            <div class="bar"><span class="name">lengths.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let length = @moondate.Period::parse("P1Y11M24D")
+  let from = @moondate.Date::new(2024, 1, 1)
+  println(length.round(smallest_unit=@moondate.TimeUnit::Months, rounding=@moondate.Rounding::Expand, start=from))
+  println(@moondate.Period::parse("PT1H30M").total(unit=@moondate.TimeUnit::Hours))
+  println(@moondate.Period::parse("P1M").compare(@moondate.Period::parse("P31D"), start=@moondate.Date::new(2024, 2, 1)))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>P2Y
+1.5
+-1</div>
+          <p>Eleven months is longer than thirty-one days from the first of February and shorter from the first of April, which is why the comparison takes the date too.</p>
         </article>
 
         <article class="step" id="wire">
