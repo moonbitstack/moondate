@@ -44,7 +44,7 @@ jobs:
         run: |
           moon update
           moon build --target js --release src/examples/browser
-          cp _build/js/release/build/examples/browser/browser.js docs/assets/moondate.js
+          cp _build/js/release/build/moonbitstack/moondate/examples/browser/browser.js docs/assets/moondate.js
           npx --yes less docs/assets/site.less docs/assets/site.css
           python3 scripts/gen_api.py
           git diff --exit-code docs/api.html
