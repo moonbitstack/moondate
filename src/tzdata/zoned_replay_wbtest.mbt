@@ -331,6 +331,31 @@ test "test262: the zone answers for the fields of a reading" {
 }
 
 ///|
+test "test262: the era a value has" {
+  let wrong : Array[String] = []
+  for row in eras_all() {
+    match value_of(row.zone, row.epoch, row.nano) {
+      None => wrong.push(row.case + ": the database has no " + row.zone)
+      Some(value) =>
+        match row.name {
+          "era" =>
+            if value.era() is Some(_) {
+              wrong.push(row.case + ": an era this calendar does not name")
+            }
+          _ =>
+            if value.era_year() is Some(_) {
+              wrong.push(row.case + ": an era year this calendar does not name")
+            }
+        }
+    }
+  }
+  for line in wrong {
+    println(line)
+  }
+  assert_eq(wrong.length(), 0)
+}
+
+///|
 test "test262: the text a value writes" {
   let wrong : Array[String] = []
   for row in texts_all() {
@@ -517,6 +542,46 @@ test "test262: a value rounded" {
               )
             }
         }
+    }
+  }
+  for line in wrong {
+    println(line)
+  }
+  assert_eq(wrong.length(), 0)
+}
+
+///|
+test "test262: a difference this library refuses" {
+  let wrong : Array[String] = []
+  for row in refused_diffs_all() {
+    let start = value_of(row.zone, row.epoch, row.nano)
+    let end = value_of(row.other_zone, row.other_epoch, row.other_nano)
+    match (start, end) {
+      (Some(start), Some(end)) => {
+        let largest = if row.largest < 0 {
+          None
+        } else {
+          Some(unit_coded(row.largest))
+        }
+        let smallest = if row.smallest < 0 {
+          None
+        } else {
+          Some(unit_coded(row.smallest))
+        }
+        let got = spanned(
+          start,
+          end,
+          row.since,
+          largest,
+          smallest,
+          rounding_coded(row.rounding),
+          row.increment,
+        )
+        if got is Some(answer) {
+          wrong.push(row.case + ": " + answer.to_string() + ", want refused")
+        }
+      }
+      _ => wrong.push(row.case + ": the database has no " + row.zone)
     }
   }
   for line in wrong {

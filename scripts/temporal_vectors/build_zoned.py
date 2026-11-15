@@ -65,6 +65,70 @@ DIFFERENCES = {
 }
 ABSENT = -(2**63)
 
+# The reasons that are about JavaScript and not about a date: the corpus asks the
+# object model as much as the value — a receiver of the wrong brand, an argument
+# coerced from a string or a bag, a getter on an options object read in a certain
+# order, a property descriptor. A MoonBit library has no such model: the value is
+# what is tested, through the typed API, and a case about the model has nothing to
+# ask it. Everything else in the report is a gap in this library, counted there.
+JAVASCRIPT_ONLY = {
+    "the operation is about the host object, not the value":
+        "the corpus calls a method the value does not have; the same computation is a function here",
+    "the identifier is the value's own, not a computation":
+        "`calendarId` and `timeZoneId` are strings this library writes, not readings of a value",
+    "the value is not a zoned date and time":
+        "the receiver is a subclass or a bag, which is a brand check on the object",
+    "the other value is not a zoned date and time":
+        "an argument is a bag or another type, which the corpus coerces",
+    "the other value is written as a text, which this library reads before asking":
+        "the argument is a text, which the corpus converts and this library's caller does",
+    "the comparison converts its arguments from another shape":
+        "`compare` takes anything convertible; this library's takes two values",
+    "the sum passes what a JavaScript number holds exactly":
+        "the reference adds in doubles; the corpus's expectation is that arithmetic",
+    "the corpus's expected value is the one a double holds, which is coarser than the instant":
+        "the corpus's own expected value is a double",
+    "the duration is not a plain duration":
+        "an argument is a duration-shaped bag, which the corpus converts",
+    "the options are not a plain bag":
+        "an options object built out of getters, which the corpus reads in order",
+    "the field is not a number": "a field of a bag, which the corpus coerces",
+    "a field is not a number": "a field of a bag, which the corpus coerces",
+    "the increment is not a number": "an option, which the corpus coerces",
+    "the increment is not a whole number": "an option, which the corpus coerces",
+    "the digits are not a number": "an option, which the corpus coerces",
+    "the digits is not a plain value": "an option, which the corpus coerces",
+    "the rounding mode is not a plain value": "an option, which the corpus coerces",
+    "the smallestUnit is not a plain value": "an option, which the corpus coerces",
+    "the largestUnit is not a plain value": "an option, which the corpus coerces",
+    "the direction is not a plain value": "an option, which the corpus coerces",
+    "the offset option is not a plain value": "an option, which the corpus coerces",
+    "the overflow option is not a plain value": "an option, which the corpus coerces",
+    "the calendar option is not a plain value": "an option, which the corpus coerces",
+    "the zone name is not a plain value": "an option, which the corpus coerces",
+    "the time is not a text": "an argument, which the corpus converts",
+    "the time is not a text of a time of day": "an argument, which the corpus converts",
+    "the field is not a time of day": "an argument, which the corpus converts",
+    "the time is not one this library has": "an argument, which the corpus converts",
+    "an option is not a unit this library has": "an option, which the corpus coerces",
+    "the smallestUnit is not a unit this library has": "an option, which the corpus coerces",
+    "the largestUnit is not a unit this library has": "an option, which the corpus coerces",
+    "the rounding mode is not one this library has": "an option, which the corpus coerces",
+    "the unit is not one this library has": "an option, which the corpus coerces",
+    "the direction is not one this library has": "an option, which the corpus coerces",
+    "the zone name option is not one this library has": "an option, which the corpus coerces",
+    "the offset option is not one this library has": "an option, which the corpus coerces",
+    "the overflow option is not one this library has": "an option, which the corpus coerces",
+    "the zone is not a name": "an argument, which the corpus converts",
+    "the calendar option is not a plain value ": "an option, which the corpus coerces",
+    "the duration has a field this library does not": "a duration-shaped bag, which the corpus converts",
+    "the offset is written as text": "a reading this library writes, not computes",
+    "the field bag changes the zone or the calendar":
+        "an edit that changes the calendar, which is an object the corpus changes",
+    "no operation — the case states no value this recorder sees":
+        "the case asserts something about the object and never calls a value",
+}
+
 
 class Skip(Exception):
     def __init__(self, reason):
@@ -83,10 +147,9 @@ def zoned(value):
 def stamp(value):
     entry = zoned(value)
     ns = int(entry["ns"])
-    # A count of nanoseconds is what this library keeps in a period, so an
-    # instant outside the range one holds is a question it cannot be asked.
-    if not -(2**63) <= ns < 2**63:
-        raise Skip("the instant is outside the range a count of nanoseconds holds")
+    # An instant is kept as the seconds it holds and the nanoseconds after them,
+    # so the whole range a zoned date and time names is a question this library
+    # can be asked; only a count of nanoseconds would run out, and none is made.
     return (entry["tz"], ns // 10**9, ns % 10**9)
 
 
@@ -293,7 +356,14 @@ def field(case, name, me, out, tables):
                 "calendar"):
         raise Skip("the identifier is the value's own, not a computation")
     if name in ("era", "eraYear"):
-        raise Skip("the era is a text of its own, and the ISO year is the field")
+        # This library's calendar has no eras, and neither has the ISO calendar
+        # the corpus asks about: the answer is `undefined`, which is a fact about
+        # the value and not a gap. A calendar that does name eras is a table this
+        # library does not carry, and those cases stay out.
+        if out.get("t") != "undefined":
+            raise Skip("the era of a calendar this library does not have")
+        tables.add("eras", (case, *stamp(me), name))
+        return
     if name == "offset":
         raise Skip("the offset is written as text, which the text cases cover")
     if out.get("t") not in ("prim", "bigint"):
@@ -371,12 +441,26 @@ def diff(case, me, args, out, since, tables):
     if not args:
         raise Skip("the other value is not given")
     other = stamp(args[0])
+    here = stamp(me)
+    # A difference is counted in nanoseconds before it is written out in fields,
+    # so two instants more than 292 years apart are further apart than one count
+    # of them reaches. The value holds either instant; the step between them is
+    # what runs out.
+    gap = abs((here[1] - other[1]) * 10**9 + here[2] - other[2])
+    if gap >= 2**63:
+        raise Skip("a difference of more than 292 years is more than a count of nanoseconds holds")
     options = bag(args[1]) if len(args) > 1 else {}
     largest = unit_of(options, "largestUnit")
     smallest = unit_of(options, "smallestUnit")
     rounding = rounding_of(options, 3)
     increment = increment_of(options)
     if is_throw(out):
+        if refused_by_us(largest, smallest, increment):
+            # A difference whose step or whose units this library refuses too:
+            # the corpus says it must throw and this says why.
+            tables.add("refused_diffs", (case, stamp(me), other, since, largest,
+                                          smallest, rounding, increment))
+            return
         raise Skip("a difference in range is not refused")
     if out.get("t") != "duration":
         raise Skip("the answer is not a duration")
@@ -385,6 +469,25 @@ def diff(case, me, args, out, since, tables):
             int(out["ms"]) * 10**6 + int(out["us"]) * 10**3 + int(out["ns"]))
     tables.add("diffs", (case, stamp(me), other, since, largest, smallest,
                          rounding, increment, want))
+
+
+def refused_by_us(largest, smallest, increment):
+    """Whether this library refuses the step or the units a difference asks for."""
+    if smallest < 0:
+        return False
+    if largest >= 0 and smallest > largest:
+        return True
+    return not step_taken(smallest, increment)
+
+
+def step_taken(unit, increment):
+    """Whether this library rounds by that step, which decides who refuses what."""
+    if unit >= 7:
+        return False
+    if unit == 3:
+        return increment == 1
+    limit = 24 if unit == 4 else (60 if unit in (5, 6) else 1000)
+    return increment < limit and limit % increment == 0
 
 
 def rounding(case, me, args, out, tables):
@@ -404,6 +507,11 @@ def rounding(case, me, args, out, tables):
     if smallest < 0:
         raise Skip("the round is asked without a unit")
     if is_throw(out):
+        if step_taken(smallest, increment):
+            # The step is one this library takes, so the refusal is about the
+            # instant: the reference bounds one at a hundred million days and this
+            # library's values run further, which the README says.
+            raise Skip("the reference refuses a round this library answers, its instants being bounded and ours not")
         # A round this library refuses: the increment is not one it accepts, or
         # the value cannot be placed. Recorded as a refusal to be checked.
         tables.add("refused_rounds", (case, stamp(me), smallest, rounding_mode,
@@ -614,6 +722,8 @@ STRUCTS = {
     "edits": ("EditCase", "case : String; zone : String; epoch : Int64; nano : Int32; year : Int64; month : Int64; day : Int64; hour : Int64; minute : Int64; second : Int64; nano_field : Int64; strict : Bool; want_zone : String; want_epoch : Int64; want_nano : Int32"),
     "timesets": ("TimeSetNanos", "case : String; zone : String; epoch : Int64; nano : Int32; at : Int64; want_zone : String; want_epoch : Int64; want_nano : Int32"),
     "zones": ("ZoneCase", "case : String; zone : String; epoch : Int64; nano : Int32; into_zone : String; want_zone : String; want_epoch : Int64; want_nano : Int32"),
+    "eras": ("EraCase", "case : String; zone : String; epoch : Int64; nano : Int32; name : String"),
+    "refused_diffs": ("RefusedDiff", "case : String; zone : String; epoch : Int64; nano : Int32; other_zone : String; other_epoch : Int64; other_nano : Int32; since : Bool; largest : Int32; smallest : Int32; rounding : Int32; increment : Int64"),
 }
 
 def lit(value):
@@ -779,6 +889,25 @@ def main():
                         case: DIFFERENCES[case] for case in sorted(tables.differed)
                     },
                     "counts": dict(sorted(tables.reasons.items())),
+            "javascript_only": {
+                reason: {
+                    "operations": count,
+                    "why": JAVASCRIPT_ONLY.get(
+                        reason,
+                        "a case about the object model, which the reference does not"
+                        " pass either",
+                    ),
+                }
+                for reason, count in sorted(tables.reasons.items())
+                if reason in JAVASCRIPT_ONLY
+                or reason.startswith("the case does not pass")
+            },
+            "library": {
+                reason: count
+                for reason, count in sorted(tables.reasons.items())
+                if reason not in JAVASCRIPT_ONLY
+                and not reason.startswith("the case does not pass")
+            },
                     "cases": lines,
                 },
                 handle,
