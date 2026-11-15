@@ -191,6 +191,10 @@ so it stays a value: it can be compared, written and moved to another zone with 
 database in reach. Crossing a transition is the one thing a value cannot do, which
 is what `Tz::moment` is for.
 
+A zone is named whatever its case, which is how the standard writes it:
+`america/new_york`, `AMERICA/NEW_YORK` and `us/eastern` all name the one zone, and
+the value is filed under the release's own spelling.
+
 ### The database the machine already has
 
 Carrying the release is one way to have a database; reading the one the system
@@ -297,7 +301,10 @@ assert_eq(noon.until(tomorrow, largest_unit=@moondate.TimeUnit::Hours).to_string
 ```
 
 The same two instants are a day apart or twenty-three hours apart depending on
-the unit they are asked for, and both answers are right. `until` takes the largest
+the unit they are asked for, and both answers are right. The difference is kept as
+the seconds it holds and the nanoseconds into the second, so two values three
+centuries apart still answer — in hours, in days, or in any unit down to seconds —
+rather than running out of a count of nanoseconds at 292 years. `until` takes the largest
 field the answer may use and, with `smallest_unit` and `rounding`, how finely it is
 measured; `since` asks from this value's side and turns the answer round, with the
 rounding direction mirrored, because a difference in a calendar is not symmetric —
@@ -439,42 +446,42 @@ are the ones it has no way to, and each is named for the reason.
 `built-ins/Temporal/ZonedDateTime` is the suite about this library's own
 `ZonedDateTime`: 902 cases at that commit, of which 691 run under the reference
 implementation — `temporal-polyfill` 1.0.8, pinned like the corpus — and state
-9551 operations between them. 3781 of those operations are questions this library
-can be asked, and they land as 3781 rows over 263 cases: the readings, the texts,
+9551 operations between them. 3919 of those operations are questions this library
+can be asked, and they land as 3919 rows over 267 cases: the readings, the texts,
 the arithmetic, the roundings, the eras — which the ISO calendar does not name —
-and the differences and roundings whose step this library refuses, as the corpus
-says it must.
+the differences and roundings whose step or units this library refuses, and the
+differences of more than 292 years, which are answered in the days they span and
+the nanoseconds into the day.
 
 Every one of the 902 is accounted for in
 `scripts/temporal_vectors/zoned_exclusions.json`, whose figures are written by the
-build: 263 cases contribute rows, 611 are named one by one with the reason their
+build: 267 cases contribute rows, 607 are named one by one with the reason their
 operations were left out, 64 do both, because part of a case can be answered while
 the rest of it cannot, and 92 contribute no row and no reason of their own:
 everything they state is about the object — a coercion, a descriptor — and the
 file counts that per operation rather than per case. `run_zoned.py --check` in CI
 fails when the transcription and the corpus disagree.
 
-Those operations are counted twice over in the report, because there are two
-reasons to leave one out. 5200 of them are about the JavaScript object and not
-about a date: a receiver of the wrong brand, an argument the corpus coerces from a
-string or a bag, a getter on an options object read in a certain order, a property
-descriptor, a length or a name that belongs to the function. A MoonBit library has
-no such model; the value is what is asked, through the typed API. The other 694
-are gaps in this library, each named with what would close it — a calendar written
-in the text, an options bag, a text writer that clamps the precision it is given
-instead of refusing it, and the cases where the reference refuses a value because
-its own instants stop at a hundred million days and this library's do not.
+The operations left out are counted four ways, because there are four reasons to
+leave one out. 5317 are about the JavaScript object and not about a date: a
+receiver of the wrong brand, an argument the corpus coerces from a string or a bag,
+a getter on an options object read in a certain order, a property descriptor, a
+`length` or a `name` that belongs to the function. A MoonBit library has no such
+model; the value is what is asked, through the typed API. 272 are about how a
+question is spelled rather than about a date — a bag where this library takes a
+field at a time, a text where it takes a value, an option where it takes a
+parameter — and the computation behind each of them is here. 114 are differences
+of answer rather than gaps: the reference's own instants stop at a hundred million
+days where this library's do not, it adds in doubles where this library adds
+exactly, and it files the UTC zone as `UTC` where this library files it under the
+release's `Etc/UTC`. 53 are gaps: 41 a calendar this library does not carry, 7 a
+writer that clamps the precision it is given instead of refusing it, and 5 a
+refusal a value this library's types allow cannot make.
 
 Thirteen cases are ones where the answer would differ rather than cases this library
-cannot be asked: three whose expected value is the one a JavaScript number holds
-exactly, four about a zone written as a date and time — or in another case, or with
-a leap second — one about a zone name matched whatever its case, two about the other
-value of `equals` given as a text or a bag, two where a field edit neither fits nor
-refuses, and two where the rounding increment names a hundred million days, more
-than a count of nanoseconds holds. They are listed under `DIFFERENCES` in the
-builder with the reason each, and in the report in the same words. None of them is
-in the tables: the build stops if one ever is, so no case in the suite is answered
-and wrong.
+cannot be asked, listed under `DIFFERENCES` in the builder with the reason each and
+in the report in the same words. None of them is in the tables: the build stops if
+one ever is, so no case in the suite is answered and wrong.
 
 The same corpus is read the other way round as a specification of length: the
 reference's answers about a length rounded to a unit, counted in one unit and

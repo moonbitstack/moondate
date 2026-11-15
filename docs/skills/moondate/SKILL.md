@@ -59,6 +59,10 @@ println(tz.epoch(date, time))                    // the first of the two
 println(tz.epoch(date, time, fold=@zone.Later))  // the second
 ```
 
+A zone is named whatever its case: `america/new_york` and `us/eastern` are the
+same zone as `America/New_York`, and the value comes back under the release's own
+spelling.
+
 Twice a year a wall clock names two instants or none. `tz.read(date, time)`
 answers with `Ambiguous`, `Skipped` or `Exact`; `Local::epoch(fold~)` picks:
 `Compatible` (the default, first of two and second of none), `Earlier`, `Later`,
@@ -167,6 +171,10 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
   seconds, and `parse` reads them back.
 - **The database is a release, not a rule of nature.** `@tzdata.release` names the
   version carried; a government can change a zone at any time.
+- **A difference is not a count of nanoseconds.** `until` and `since` keep one as
+  the seconds it holds and the nanoseconds into the second, so two values three
+  centuries apart answer in hours or days; only a difference asked for in
+  milliseconds or below runs out at 292 years.
 - **There are no eras.** `Date::era` and `Date::era_year` answer `None`, and so do
   their twins on a `ZonedDateTime`: the calendar counts from 1 and signs the years
   before it, so year 0 is 1 BC. A calendar whose years are named twice is a table
