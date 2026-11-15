@@ -79,6 +79,14 @@ ignored, and `[!foo=bar]` says the reader *must* understand the key — which it
 not, so it refuses. Two zones, two calendars, or a key with a capital in it are
 refused as well.
 
+The calendar counts years from 1 and signs the ones before it, so year 0 is 1 BC
+and year -1 is 2 BC. That is the ISO 8601 reading every format here uses, and it is
+the reason `Date::era` and `Date::era_year` answer `None`: a calendar with eras
+names a year twice — a Gregorian era beside a Japanese one, a Buddhist year, a
+regnal year — and each of those is a table of eras with a start date each, which is
+a database and not a rule. A year that is ambiguous without one is a year this
+library does not claim to name.
+
 ## What it reads and writes
 
 | Form | Where it is used |
@@ -326,6 +334,27 @@ The rounding is the one `until` uses, so the two agree: a step that fills the un
 above is carried into it (`PT1H60M` is written `PT2H`), an exact half is decided by
 the direction the mode names, and `half_even` looks at whether the count is even.
 
+A length is not bounded at the 292 years a count of nanoseconds reaches. It is
+placed as the days it spans and the nanoseconds into the day, so a length of a
+million years is added, rounded, counted and compared exactly; the bound is the one
+a duration holds — 2^32 - 1 for each calendar field and 2^53 seconds for the clock
+fields together — and a length past it is refused where it is measured, which is
+where a reader of the ISO text refuses it too.
+
+```moonbit
+let date = @moondate.Date::new(2024, 1, 31)
+assert_eq(date.add(@moondate.Period::parse("P1M")).to_string(), "2024-02-29")
+let far = @moondate.Period::parse("P1000000Y")
+assert_eq(date.add(far).to_string(), "1002024-01-31")
+assert_eq(far.total(unit=@moondate.TimeUnit::Days, start=date), 365242500.0)
+assert_eq(far.round(smallest_unit=@moondate.TimeUnit::Months, start=date).to_string(), "P1000000Y")
+```
+
+`Date::add` and `Date::subtract` place a period on the calendar: the months first,
+clamped to a day the month has, then the days, and the clock part as whole days,
+because a date has no time of day to keep the remainder in. That is the inverse of
+`Date::until`, and a period whose fields run both ways is refused by both.
+
 A value also edits itself with `with_fields` and `with_plain_time`, rounds with
 `round` to a unit from a day down (`hours`, `minutes`, the three below a second)
 in any of the nine directions, and answers `start_of_day`, `hours_in_day` and
@@ -410,20 +439,31 @@ are the ones it has no way to, and each is named for the reason.
 `built-ins/Temporal/ZonedDateTime` is the suite about this library's own
 `ZonedDateTime`: 902 cases at that commit, of which 691 run under the reference
 implementation — `temporal-polyfill` 1.0.8, pinned like the corpus — and state
-9551 operations between them. 3675 of those operations are questions this library
-can be asked, and they land as 3675 rows over 248 cases; the rest are about the
-object rather than the value — a property descriptor, a coercion of an argument, a
-calendar.
+9551 operations between them. 3781 of those operations are questions this library
+can be asked, and they land as 3781 rows over 263 cases: the readings, the texts,
+the arithmetic, the roundings, the eras — which the ISO calendar does not name —
+and the differences and roundings whose step this library refuses, as the corpus
+says it must.
 
 Every one of the 902 is accounted for in
 `scripts/temporal_vectors/zoned_exclusions.json`, whose figures are written by the
-build: 248 cases contribute rows, 625 are named one by one with the reason their
-operations were left out, and 63 do both, because part of a case can be answered
-while the rest of it cannot. The remaining 92 contribute no row and no reason of
-their own: everything they state is about the object — a coercion, a descriptor,
-the value's own identifier — and the file counts that per operation rather than
-per case. `run_zoned.py --check` in CI fails when the transcription and the
-corpus disagree.
+build: 263 cases contribute rows, 611 are named one by one with the reason their
+operations were left out, 64 do both, because part of a case can be answered while
+the rest of it cannot, and 92 contribute no row and no reason of their own:
+everything they state is about the object — a coercion, a descriptor — and the
+file counts that per operation rather than per case. `run_zoned.py --check` in CI
+fails when the transcription and the corpus disagree.
+
+Those operations are counted twice over in the report, because there are two
+reasons to leave one out. 5200 of them are about the JavaScript object and not
+about a date: a receiver of the wrong brand, an argument the corpus coerces from a
+string or a bag, a getter on an options object read in a certain order, a property
+descriptor, a length or a name that belongs to the function. A MoonBit library has
+no such model; the value is what is asked, through the typed API. The other 694
+are gaps in this library, each named with what would close it — a calendar written
+in the text, an options bag, a text writer that clamps the precision it is given
+instead of refusing it, and the cases where the reference refuses a value because
+its own instants stop at a hundred million days and this library's do not.
 
 Thirteen cases are ones where the answer would differ rather than cases this library
 cannot be asked: three whose expected value is the one a JavaScript number holds
@@ -439,8 +479,10 @@ and wrong.
 The same corpus is read the other way round as a specification of length: the
 reference's answers about a length rounded to a unit, counted in one unit and
 compared with another are generated by `scripts/temporal_vectors/run_duration.py`
-and replayed from `src/period_vectors_test.mbt` — 1890 roundings, 540 totals, 324
-comparisons and 14 texts, each asked from a plain date. A length measured in a
+and replayed from `src/period_vectors_test.mbt` — 2835 roundings, 810 totals, 729
+comparisons, 14 texts and 11 lengths at the range the reference holds, each asked
+from a plain date. Nine of the lengths are longer than the 292 years a count of
+nanoseconds reaches and are answered exactly all the same. A length measured in a
 named zone is a difference between two instants, which is what `until` and `since`
 on a `ZonedDateTime` answer; the table is the calendar a package with no database
 can offer.
@@ -461,7 +503,7 @@ has every method and every parameter.
 
 | Type | Built with | Asked |
 |:--|:--|:--|
-| `Date` | `Date::new`, `of_days`, `of_ordinal`, `of_isocalendar` | `weekday`, `yearday`, `isocalendar`, `ordinal`, `days`, `diff`, `plus_days`, `plus_months`, `replace` |
+| `Date` | `Date::new`, `of_days`, `of_ordinal`, `of_isocalendar` | `weekday`, `yearday`, `isocalendar`, `ordinal`, `days`, `diff`, `plus_days`, `plus_months`, `add`, `subtract`, `until`, `replace`, `era`, `era_year` |
 | `Time` | `Time::new`, `midnight`, `end_of_day` | `nanos`, `replace` |
 | `Moment` | `parse`, `of_isoformat`, `http`, `asn1`, `strftime`, `strptime`, `layout`, `parse_layout`, `pattern`, `parse_pattern`, `combine`, `of_epoch` | `epoch`, `instant`, `timestamp`, `date`, `time`, `zone`, `utcoffset`, `astimezone`, `isoformat`, `to_iso_string`, `to_utc_string`, `strftime`, `layout`, `pattern`, `http_text`, `asn1_text`, `ctime`, `timetuple`, `weekday`, `isocalendar`, `ordinal`, `diff`, `plus`, `replace` |
 | `Span` | `Span::new`, `of`, `nanosecond` … `day` | `add`, `sub`, `seconds`, `total_seconds`, `parts`, `neg`, `abs` |

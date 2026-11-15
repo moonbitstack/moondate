@@ -9,6 +9,13 @@
   "rows": 3781,
   "cases": 263
  },
+ "accounted": {
+  "cases": 902,
+  "with_rows": 263,
+  "with_reason": 611,
+  "both": 64,
+  "neither": 92
+ },
  "differences": {
   "prototype/equals/argument-object.js": "the other value is a bag with an offset, a form this library does not convert",
   "prototype/equals/argument-valid.js": "the other value is written as a text, which this library reads before asking",

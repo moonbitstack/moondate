@@ -152,6 +152,8 @@ pub fn ZonedDateTime::date(Self) -> @moondate.Date
 pub fn ZonedDateTime::day(Self) -> Int32
 pub fn ZonedDateTime::epoch(Self) -> Int64
 pub fn ZonedDateTime::equals(Self, Self) -> Bool
+pub fn ZonedDateTime::era(Self) -> String?
+pub fn ZonedDateTime::era_year(Self) -> Int32?
 pub fn ZonedDateTime::from_unix(Int64, nano? : Int32, zone~ : Tz) -> Self
 pub fn ZonedDateTime::get_time_zone_transition(Self, direction~ : Direction) -> Self?
 pub fn ZonedDateTime::hour(Self) -> Int32

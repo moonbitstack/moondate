@@ -873,6 +873,20 @@ def main():
             {"case": case, "reasons": sorted(reasons), "operations": count}
             for case, (reasons, count) in sorted(counted.items())
         ]
+        # Every case is either asked, or named with a reason, or both — and a case
+        # that is neither states nothing this transcription could reach. The four
+        # counts are written down so that a figure in the README can be checked
+        # against this file rather than against a run.
+        listed = set(counted)
+        rows_cases = set(tables.answered)
+        total_cases = len(data["cases"]) + len(data["left"])
+        accounted = {
+            "cases": total_cases,
+            "with_rows": len(rows_cases),
+            "with_reason": len(listed),
+            "both": len(rows_cases & listed),
+            "neither": total_cases - len(rows_cases | listed),
+        }
         with open(args.report, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(
                 {
@@ -885,6 +899,7 @@ def main():
                         "operations": operations,
                     },
                     "answered": {"rows": total, "cases": len(tables.answered)},
+                    "accounted": accounted,
                     "differences": {
                         case: DIFFERENCES[case] for case in sorted(tables.differed)
                     },

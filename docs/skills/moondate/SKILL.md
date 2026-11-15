@@ -95,7 +95,25 @@ let from = @moondate.Date::new(2024, 1, 1)
 println(length.round(smallest_unit=@moondate.TimeUnit::Months, rounding=@moondate.Rounding::Expand, start=from))
 println(@moondate.Period::parse("PT1H30M").total(unit=@moondate.TimeUnit::Hours))
 println(@moondate.Period::parse("P1M").compare(@moondate.Period::parse("P31D"), start=@moondate.Date::new(2024, 2, 1)))
-``` `round(smallest_unit~, increment~, rounding~)` moves the reading to the
+``` A length is not bounded at the 292 years an `Int64` of nanoseconds reaches: it is
+placed as the days it spans and the nanoseconds into the day, so a length of a
+million years is added, rounded, counted and compared exactly. The bound is the
+one a duration holds — 2^32 - 1 for each calendar field, 2^53 seconds for the clock
+fields together — and a length past it is refused where it is measured.
+
+```moonbit
+let from = @moondate.Date::new(2024, 1, 31)
+let far = @moondate.Period::parse("P1000000Y")
+println(from.add(far))                                        // 1002024-01-31
+println(far.total(unit=@moondate.TimeUnit::Days, start=from))  // 365242500
+println(from.subtract(@moondate.Period::parse("P1M")))         // 2023-12-31
+```
+
+`Date::add` and `Date::subtract` place a period on the calendar: months first,
+clamped to a day the month has, then days, and the clock part as whole days. A
+period whose fields run both ways is refused by both.
+
+`round(smallest_unit~, increment~, rounding~)` moves the reading to the
 nearest unit — a day is as long as the clocks make it — and `with_fields`,
 `with_plain_time`, `start_of_day`, `hours_in_day` and `get_time_zone_transition`
 answer the rest of the questions Temporal's `ZonedDateTime` does.
@@ -149,3 +167,11 @@ day of week are or-ed when both are restricted, which is Vixie cron's rule.
   seconds, and `parse` reads them back.
 - **The database is a release, not a rule of nature.** `@tzdata.release` names the
   version carried; a government can change a zone at any time.
+- **There are no eras.** `Date::era` and `Date::era_year` answer `None`, and so do
+  their twins on a `ZonedDateTime`: the calendar counts from 1 and signs the years
+  before it, so year 0 is 1 BC. A calendar whose years are named twice is a table
+  of eras with a start date each, and none is carried here.
+- **A `Period` past a duration's range is refused where it is measured.** A period
+  built by hand can state any `Int64`, but `round`, `total`, `compare` and
+  `Date::add` refuse a calendar field past 2^32 - 1 or a clock part past 2^53
+  seconds, which is where the ISO text refuses it too.

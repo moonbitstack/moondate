@@ -202,6 +202,11 @@
 </article>
 </div>
 <div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-moondate-Date-add">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::add</span>(Self, Period) -&gt; Self <span class="kw">raise</span> Refused</div>
+
+
+</article>
 <article class="api-item" id="m-moondate-Date-compare">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::compare</span>(Self, Self) -&gt; Int32</div>
 <div class="doc"><p>Three-way ordering from <code>Compare</code>: less, equal or greater.</p></div>
@@ -210,6 +215,16 @@
 <article class="api-item" id="m-moondate-Date-equal">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::equal</span>(Self, Self) -&gt; Bool</div>
 <div class="doc"><p>Structural equality from <code>Eq</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-era">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::era</span>(Self) -&gt; String?</div>
+
+
+</article>
+<article class="api-item" id="m-moondate-Date-era_year">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::era_year</span>(Self) -&gt; Int32?</div>
+
 
 </article>
 <article class="api-item" id="m-moondate-Date-not_equal">
@@ -240,6 +255,11 @@
 <article class="api-item" id="m-moondate-Date-output">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::output</span>(Self, &amp;Logger) -&gt; Unit</div>
 <div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>
+
+</article>
+<article class="api-item" id="m-moondate-Date-subtract">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Date::subtract</span>(Self, Period) -&gt; Self <span class="kw">raise</span> Refused</div>
+
 
 </article>
 <article class="api-item" id="m-moondate-Date-to_repr">
@@ -493,7 +513,8 @@
 </article>
 <article class="api-item" id="m-moondate-Period-span">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">Period::span</span>(Self) -&gt; Span</div>
-<div class="doc"><p>The clock part as a span: the fields from hours down, which are exact.</p></div>
+<div class="doc"><p>The clock part as a span: the fields from hours down, which are exact.</p>
+<p>A span is a count of nanoseconds, so it reaches a little over 292 years and a length does not: a clock part longer than that has no span to be, and this aborts rather than return one that looks like a number. Every function that measures a length — [<code>Period::round</code>], [<code>Period::total</code>], [<code>Period::compare</code>] — takes the whole length instead and has no such limit.</p></div>
 
 </article>
 <article class="api-item" id="m-moondate-Period-to_string">
@@ -1797,6 +1818,16 @@
 </article>
 </div>
 <div class="method-list"><div class="mlabel">Trait methods</div>
+<article class="api-item" id="m-zone-ZonedDateTime-era">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::era</span>(Self) -&gt; String?</div>
+
+
+</article>
+<article class="api-item" id="m-zone-ZonedDateTime-era_year">
+<div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::era_year</span>(Self) -&gt; Int32?</div>
+
+
+</article>
 <article class="api-item" id="m-zone-ZonedDateTime-output">
 <div class="sig"><span class="kw">pub</span> <span class="kw">fn</span> <span class="name">ZonedDateTime::output</span>(Self, &amp;Logger) -&gt; Unit</div>
 <div class="doc"><p>Writes the text form to a logger, from <code>Show</code>.</p></div>

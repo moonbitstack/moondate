@@ -109,10 +109,13 @@ pub(all) struct Date {
   month : Int32
   day : Int32
 }
+pub fn Date::add(Self, Period) -> Self raise Refused
 pub fn Date::compare(Self, Self) -> Int32
 pub fn Date::days(Self) -> Int32
 pub fn Date::diff(Self, Self) -> Span
 pub fn Date::equal(Self, Self) -> Bool
+pub fn Date::era(Self) -> String?
+pub fn Date::era_year(Self) -> Int32?
 pub fn Date::isocalendar(Self) -> (Int32, Int32, Int32)
 pub fn Date::isoweekday(Self) -> Int32
 pub fn Date::new(Int32, Int32, Int32) -> Self raise Refused
@@ -129,6 +132,7 @@ pub fn Date::output(Self, &Logger) -> Unit
 pub fn Date::plus_days(Self, Int32) -> Self
 pub fn Date::plus_months(Self, Int32) -> Self
 pub fn Date::replace(Self, year? : Int32, month? : Int32, day? : Int32) -> Self raise Refused
+pub fn Date::subtract(Self, Period) -> Self raise Refused
 pub fn Date::to_repr(Self) -> @debug.Repr
 pub fn Date::to_string(Self) -> String
 pub fn Date::until(Self, Self, largest_unit? : TimeUnit) -> Period

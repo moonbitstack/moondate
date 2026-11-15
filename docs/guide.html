@@ -481,6 +481,34 @@ PT4H5M6.007S</div>
 1.5
 -1</div>
           <p>Eleven months is longer than thirty-one days from the first of February and shorter from the first of April, which is why the comparison takes the date too.</p>
+          <p>A length is not bounded at the 292 years an <span class="mono">Int64</span> of nanoseconds reaches. It is placed as the days it spans and the nanoseconds into the day, so a million years is added, rounded, counted and compared exactly; the bound is the one a duration holds, and a length past it is refused where it is measured.</p>
+          <div class="code">
+            <div class="bar"><span class="name">far.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main raise {
+  let from = @moondate.Date::new(2024, 1, 31)
+  let length = @moondate.Period::parse("P1000000Y")
+  println(length)
+  println(from.add(length))
+  println(length.total(unit=@moondate.TimeUnit::Days, start=from))
+  println(length.round(smallest_unit=@moondate.TimeUnit::Months, start=from))
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>P1000000Y
+1002024-01-31
+365242500
+P1000000Y</div>
+          <p><span class="mono">Date::add</span> and <span class="mono">Date::subtract</span> place a period on the calendar: the months first, clamped to a day the month has, then the days, and the clock part as whole days, because a date has no time of day to keep the remainder in.</p>
+          <p>The calendar counts years from 1 and signs the ones before it, so year 0 is 1 BC. Eras — a Gregorian era beside a Japanese one, a Buddhist year, a regnal year — are tables with a start date each, and this library carries no such table, so <span class="mono">Date::era</span> and <span class="mono">Date::era_year</span> answer <span class="mono">None</span>.</p>
+          <div class="code">
+            <div class="bar"><span class="name">eras.mbt</span><button class="copy" data-copy="self">Copy</button></div>
+            <pre><code>fn main {
+  let date = @moondate.Date::new(2024, 1, 31)
+  println(date.era())
+  println(date.era_year())
+}</code></pre>
+          </div>
+          <div class="output"><span class="lbl">output</span>None
+None</div>
         </article>
 
         <article class="step" id="wire">
