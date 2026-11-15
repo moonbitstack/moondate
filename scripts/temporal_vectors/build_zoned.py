@@ -46,12 +46,12 @@ DIFFERENCES = {
         "the corpus's expected value is the one a double holds, which is coarser than the instant",
     "prototype/since/largestunit.js":
         "the corpus's expected value is the one a double holds, which is coarser than the instant",
+    "prototype/withTimeZone/timezone-case-insensitive.js":
+        "the name is matched whatever its case now, and Temporal writes the zone it finds as `UTC` where this library files it under the release's `Etc/UTC`",
     "prototype/withTimeZone/timezone-string-datetime.js":
         "the zone is written as a date and time, a form this library does not read as a zone",
     "prototype/withTimeZone/timezone-string-multiple-offsets.js":
         "the zone is written as a date and time, a form this library does not read as a zone",
-    "prototype/withTimeZone/timezone-case-insensitive.js":
-        "the zone name is matched whatever its case, which this library does not",
     "prototype/equals/argument-valid.js":
         "the other value is written as a text, which this library reads before asking",
     "prototype/equals/argument-object.js":
@@ -64,6 +64,64 @@ DIFFERENCES = {
         "a field edit that neither fits nor refuses leaves a reading this library places differently",
 }
 ABSENT = -(2**63)
+
+# The files a suite writes about the object rather than about a date: a method
+# called on a receiver of the wrong brand, an argument of the wrong type, a
+# property descriptor, the `length` and `name` of a function, the shape of a
+# prototype. Each asserts something about the JavaScript object model, which a
+# MoonBit value does not have; the reasoning is in the report, once per case.
+OBJECT_MODEL_FILES = {
+    "branding.js": "the method is called on a receiver of another brand",
+    "prop-desc.js": "a property descriptor of the object is inspected",
+    "length.js": "the `length` of a function is inspected",
+    "name.js": "the `name` of a function is inspected",
+    "wrong-type.js": "an argument of the wrong type is coerced",
+    "prototype.js": "the shape of the prototype is inspected",
+    "get-prototype-from-constructor-throws.js": "the constructor's prototype is inspected",
+}
+
+
+# The reasons that are about how a question is spelled rather than about a date:
+# a bag where this library takes a field at a time, a text where it takes a value,
+# an option where it takes a parameter. The computation behind each of them exists
+# — `with_year` is what `with({year})` means, `parse` is what a text argument means
+# — so these are not capabilities this library lacks, and they are counted apart
+# from the ones that are.
+SHAPE = {
+    "the time carries an offset or a calendar":
+        "a time-of-day text is the argument; this library takes a `Time`, and reads the text with `parse`",
+    "a field bag in range is not refused":
+        "a bag of fields; this library spells the edit as `with_year` and its siblings",
+    "a field edit that neither fits nor refuses leaves a reading this library places differently":
+        "a bag with an `overflow` option, which this library takes per field",
+    "the zone is written as a date and time, a form this library does not read as a zone":
+        "a zone written as a text; this library takes a `Tz`",
+    "a zone the database has is not refused":
+        "a zone written as a text; this library takes a `Tz`",
+    "a time of day in range is not refused":
+        "a time-of-day text is the argument; this library takes a `Time`",
+    "the other value is a bag with an offset, a form this library does not convert":
+        "the other value is a bag; this library takes a value",
+    "a text rounds to a minute at the largest, as the reference does":
+        "a text rounded to a date unit; this library's writer rounds to an hour at the largest",
+    "the round is asked without a unit":
+        "a round with no unit; this library's `round` takes the unit it rounds to",
+    "the offset is written as text":
+        "the offset is a number here and a text there",
+    "the offset is written as text, which the text cases cover":
+        "the offset is a number here and a text there",
+    "the three sub-second fields are one number here, so a field past its own range reads as a carry":
+        "the three sub-second fields are one `nanos` here, as a `Span` holds them",
+    "the answer is not an instant":
+        "the corpus answers with an object; this library answers the two parts of one",
+    "the direction is not given":
+        "a search with no direction; this library's asks for one",
+}
+
+
+def object_model(case):
+    """Why a case is about the object and not about a date, or `None`."""
+    return OBJECT_MODEL_FILES.get(case.rsplit("/", 1)[-1])
 
 # The reasons that are about JavaScript and not about a date: the corpus asks the
 # object model as much as the value — a receiver of the wrong brand, an argument
@@ -441,14 +499,6 @@ def diff(case, me, args, out, since, tables):
     if not args:
         raise Skip("the other value is not given")
     other = stamp(args[0])
-    here = stamp(me)
-    # A difference is counted in nanoseconds before it is written out in fields,
-    # so two instants more than 292 years apart are further apart than one count
-    # of them reaches. The value holds either instant; the step between them is
-    # what runs out.
-    gap = abs((here[1] - other[1]) * 10**9 + here[2] - other[2])
-    if gap >= 2**63:
-        raise Skip("a difference of more than 292 years is more than a count of nanoseconds holds")
     options = bag(args[1]) if len(args) > 1 else {}
     largest = unit_of(options, "largestUnit")
     smallest = unit_of(options, "smallestUnit")
@@ -473,9 +523,15 @@ def diff(case, me, args, out, since, tables):
 
 def refused_by_us(largest, smallest, increment):
     """Whether this library refuses the step or the units a difference asks for."""
+    # The increment is checked whether or not a smallest unit is given, and a
+    # count of steps runs from one to a thousand million.
+    if increment < 1 or increment > 10**9:
+        return True
     if smallest < 0:
         return False
-    if largest >= 0 and smallest > largest:
+    # `UNITS` counts from the year down, so a smallest unit above the largest is
+    # the one with the smaller number.
+    if largest >= 0 and smallest < largest:
         return True
     return not step_taken(smallest, increment)
 
@@ -689,8 +745,7 @@ def canonical_zone(name):
         return name[:3] + ":" + name[3:]
     if len(name) == 6 and name[3] == ":" and name[0] in "+-":
         return name
-    if name != name.lower() and name != name.upper():
-        raise Skip("the zone name is matched whatever its case, which this library does not")
+    # A zone is named whatever its case, which the database's own lookup folds.
     return name
 
 
@@ -863,12 +918,57 @@ def main():
             "the identifier is the value's own, not a computation",
         }
         counted = {}
+        # Each operation left out is counted once, under the reason it was left
+        # out for; whether that reason is about the object or about a date is
+        # decided here, so the two figures in the README can be added up from the
+        # file instead of from a run.
+        # A reason that is the why of a difference is counted as one, not as a gap:
+        # the cases the builder names under `DIFFERENCES`, and the rounds the
+        # reference refuses because its own instants stop where this library's do
+        # not.
+        difference_reasons = set(DIFFERENCES.values()) | {
+            "the reference refuses a round this library answers, its instants being bounded and ours not"
+        }
+        javascript = {}
+        shape = {}
+        difference = {}
+        library = {}
         for entry in tables.excluded:
             if entry["reason"] in general:
                 continue
             reasons, count = counted.get(entry["case"], (set(), 0))
             reasons.add(entry["reason"])
             counted[entry["case"]] = (reasons, count + 1)
+            about_the_object = (
+                entry["reason"] in JAVASCRIPT_ONLY
+                or entry["reason"].startswith("the case does not pass")
+                or object_model(entry["case"]) is not None
+            )
+            if about_the_object:
+                why = JAVASCRIPT_ONLY.get(
+                    entry["reason"], object_model(entry["case"]) or "the object model"
+                )
+                slot = javascript.get(entry["reason"], {"operations": 0, "why": why})
+                slot["operations"] = slot["operations"] + 1
+                javascript[entry["reason"]] = slot
+            elif entry["reason"] in difference_reasons:
+                difference[entry["reason"]] = difference.get(entry["reason"], 0) + 1
+            elif entry["reason"] in SHAPE:
+                slot = shape.get(
+                    entry["reason"],
+                    {"operations": 0, "why": SHAPE[entry["reason"]]},
+                )
+                slot["operations"] = slot["operations"] + 1
+                shape[entry["reason"]] = slot
+            else:
+                library[entry["reason"]] = library.get(entry["reason"], 0) + 1
+        for reason in general:
+            # The two reasons that say nothing about a case in particular are in
+            # the totals, not in the list, so their operations are counted from
+            # the reasons rather than from the cases.
+            count = tables.reasons.get(reason, 0)
+            if count:
+                javascript[reason] = {"operations": count, "why": "not a computation of a value"}
         lines = [
             {"case": case, "reasons": sorted(reasons), "operations": count}
             for case, (reasons, count) in sorted(counted.items())
@@ -904,25 +1004,19 @@ def main():
                         case: DIFFERENCES[case] for case in sorted(tables.differed)
                     },
                     "counts": dict(sorted(tables.reasons.items())),
-            "javascript_only": {
-                reason: {
-                    "operations": count,
-                    "why": JAVASCRIPT_ONLY.get(
-                        reason,
-                        "a case about the object model, which the reference does not"
-                        " pass either",
-                    ),
-                }
-                for reason, count in sorted(tables.reasons.items())
-                if reason in JAVASCRIPT_ONLY
-                or reason.startswith("the case does not pass")
-            },
-            "library": {
-                reason: count
-                for reason, count in sorted(tables.reasons.items())
-                if reason not in JAVASCRIPT_ONLY
-                and not reason.startswith("the case does not pass")
-            },
+                    "javascript_only": {
+                        reason: slot
+                        for reason, slot in sorted(javascript.items())
+                    },
+                    "shape": {
+                        reason: slot for reason, slot in sorted(shape.items())
+                    },
+                    "difference": {
+                        reason: count for reason, count in sorted(difference.items())
+                    },
+                    "library": {
+                        reason: count for reason, count in sorted(library.items())
+                    },
                     "cases": lines,
                 },
                 handle,

@@ -6,13 +6,13 @@
   "operations": 9551
  },
  "answered": {
-  "rows": 3781,
-  "cases": 263
+  "rows": 3919,
+  "cases": 267
  },
  "accounted": {
   "cases": 902,
-  "with_rows": 263,
-  "with_reason": 611,
+  "with_rows": 267,
+  "with_reason": 607,
   "both": 64,
   "neither": 92
  },
@@ -26,15 +26,14 @@
   "prototype/until/roundingincrement-addition-out-of-range.js": "a length of a hundred million days is more than a count of nanoseconds holds",
   "prototype/with/overflow-options.js": "a field edit that neither fits nor refuses leaves a reading this library places differently",
   "prototype/with/overflow-reject-throws.js": "the three sub-second fields are one number here, so a field past its own range reads as a carry",
-  "prototype/withTimeZone/timezone-case-insensitive.js": "the zone name is matched whatever its case, which this library does not",
+  "prototype/withTimeZone/timezone-case-insensitive.js": "the name is matched whatever its case now, and Temporal writes the zone it finds as `UTC` where this library files it under the release's `Etc/UTC`",
   "prototype/withTimeZone/timezone-string-datetime.js": "the zone is written as a date and time, a form this library does not read as a zone",
   "prototype/withTimeZone/timezone-string-leap-second.js": "the zone is written as a date and time with a leap second, which this library does not read as a zone",
   "prototype/withTimeZone/timezone-string-multiple-offsets.js": "the zone is written as a date and time, a form this library does not read as a zone"
  },
  "counts": {
   "a calendar in the text is not this library's shape": 9,
-  "a difference in range is not refused": 90,
-  "a difference of more than 292 years is more than a count of nanoseconds holds": 50,
+  "a difference in range is not refused": 18,
   "a field bag in range is not refused": 37,
   "a field edit that neither fits nor refuses leaves a reading this library places differently": 20,
   "a field is not a number": 18,
@@ -137,6 +136,8 @@
   "the increment is not a whole number": 15,
   "the largestUnit is not a plain value": 12,
   "the largestUnit is not a unit this library has": 28,
+  "the name is matched whatever its case now, and Temporal writes the zone it finds as `UTC` where this library files it under the release's `Etc/UTC`": 3,
+  "the number does not fit the field this library keeps": 2,
   "the offset is written as text, which the text cases cover": 4,
   "the offset option is not a plain value": 6,
   "the offset option is not one this library has": 4,
@@ -161,18 +162,45 @@
   "the time is not a text of a time of day": 26,
   "the time is not one this library has": 6,
   "the unit is not one this library has": 13,
-  "the value is not a zoned date and time": 512,
+  "the value is not a zoned date and time": 494,
   "the zone is not a name": 5,
   "the zone is written as a date and time with a leap second, which this library does not read as a zone": 4,
   "the zone is written as a date and time, a form this library does not read as a zone": 32,
-  "the zone name is matched whatever its case, which this library does not": 3,
   "the zone name is not a plain value": 6,
   "the zone name option is not one this library has": 7
  },
  "javascript_only": {
+  "a difference in range is not refused": {
+   "operations": 18,
+   "why": "the method is called on a receiver of another brand"
+  },
   "a field is not a number": {
    "operations": 18,
    "why": "a field of a bag, which the corpus coerces"
+  },
+  "a reading is not refused": {
+   "operations": 45,
+   "why": "the method is called on a receiver of another brand"
+  },
+  "a search is not refused": {
+   "operations": 9,
+   "why": "the method is called on a receiver of another brand"
+  },
+  "a text is not refused for a value in range": {
+   "operations": 18,
+   "why": "the method is called on a receiver of another brand"
+  },
+  "a time of day in range is not refused": {
+   "operations": 9,
+   "why": "the method is called on a receiver of another brand"
+  },
+  "a zone the database has is not refused": {
+   "operations": 9,
+   "why": "the method is called on a receiver of another brand"
+  },
+  "an equality is not refused": {
+   "operations": 9,
+   "why": "the method is called on a receiver of another brand"
   },
   "no operation \u2014 the case states no value this recorder sees": {
    "operations": 99,
@@ -184,283 +212,283 @@
   },
   "the case does not pass \u2014 Error: Actual [ownKeys duration, getOwnPropertyDescriptor duration.years, getOwnPropertyDescriptor duration.months, getOwnPropertyDescriptor durati": {
    "operations": 2,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys fields, getOwnPropertyDescriptor fields.year, getOwnPropertyDescriptor fields.month, getOwnPropertyDescriptor fields.monthCo": {
    "operations": 2,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys item, getOwnPropertyDescriptor item.year, getOwnPropertyDescriptor item.month, getOwnPropertyDescriptor item.monthCode, getO": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys one, getOwnPropertyDescriptor one.year, getOwnPropertyDescriptor one.month, getOwnPropertyDescriptor one.monthCode, getOwnPr": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.calendarName, getOwnPropertyDescriptor options.timeZoneName, getOwnPropertyDescrip": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.disambiguation, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor ": {
    "operations": 2,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.fractionalSecondDigits, getOwnPropertyDescriptor options.roundingMode, getOwnPrope": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, get options.overflow, get options.overflow.toString, call options.overfl": {
    "operations": 2,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.overflow, getOwnPropertyDescriptor options.offset, getOwnPropertyDescriptor option": {
    "operations": 2,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.largestUnit, getOwnPropertyDescript": {
    "operations": 2,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.roundingIncrement, getOwnPropertyDe": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys options, getOwnPropertyDescriptor options.smallestUnit, getOwnPropertyDescriptor options.roundingMode, getOwnPropertyDescrip": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys other, getOwnPropertyDescriptor other.year, getOwnPropertyDescriptor other.month, getOwnPropertyDescriptor other.monthCode, ": {
    "operations": 3,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Actual [ownKeys plainTimeLike, getOwnPropertyDescriptor plainTimeLike.hour, getOwnPropertyDescriptor plainTimeLike.minute, getOwnPropertyDes": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Expected a TypeError to be thrown but no exception was thrown at all": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: Instance of CustomZonedDateTime Expected SameValue(\u00ab[object Object]\u00bb, \u00ab[object Object]\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: ZonedDateTime descriptor should not be enumerable": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "a property descriptor of the object is inspected"
   },
   "the case does not pass \u2014 Error: compare descriptor should not be enumerable": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "a property descriptor of the object is inspected"
   },
   "the case does not pass \u2014 Error: constructor descriptor value should be function RecordingZonedDateTime(...args) {": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: from descriptor should not be enumerable": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "a property descriptor of the object is inspected"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.compare) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.from) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.add) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.equals) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.getTimeZoneTransition) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.round) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.since) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.startOfDay) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.subtract) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toInstant) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toJSON) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toLocaleString) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainDate) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainDateTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toPlainTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.toString) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.until) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.valueOf) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.with) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withCalendar) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withPlainTime) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: isConstructor(Temporal.ZonedDateTime.prototype.withTimeZone) Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: length descriptor value should be 1; length value should be 1": {
    "operations": 10,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `length` of a function is inspected"
   },
   "the case does not pass \u2014 Error: length descriptor value should be 2; length value should be 2": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `length` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be add; name value should be add": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be compare; name value should be compare": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be equals; name value should be equals": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be from; name value should be from": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be getTimeZoneTransition; name value should be getTimeZoneTransition": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be round; name value should be round": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be since; name value should be since": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be startOfDay; name value should be startOfDay": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be subtract; name value should be subtract": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toInstant; name value should be toInstant": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toJSON; name value should be toJSON": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toLocaleString; name value should be toLocaleString": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toPlainDate; name value should be toPlainDate": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toPlainDateTime; name value should be toPlainDateTime": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toPlainTime; name value should be toPlainTime": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be toString; name value should be toString": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be until; name value should be until": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be valueOf; name value should be valueOf": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be with; name value should be with": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be withCalendar; name value should be withCalendar": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be withPlainTime; name value should be withPlainTime": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: name descriptor value should be withTimeZone; name value should be withTimeZone": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the `name` of a function is inspected"
   },
   "the case does not pass \u2014 Error: prototype Expected SameValue(\u00abclass {": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: prototype descriptor should not be writable": {
    "operations": 1,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "a property descriptor of the object is inspected"
   },
   "the case does not pass \u2014 Error: prototype property Expected SameValue(\u00abtrue\u00bb, \u00abfalse\u00bb) to be true": {
    "operations": 22,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the case does not pass \u2014 Error: should not get 'calendarId' property": {
    "operations": 5,
-   "why": "a case about the object model, which the reference does not pass either"
+   "why": "the object model"
   },
   "the comparison converts its arguments from another shape": {
    "operations": 406,
@@ -508,7 +536,7 @@
   },
   "the identifier is the value's own, not a computation": {
    "operations": 1123,
-   "why": "`calendarId` and `timeZoneId` are strings this library writes, not readings of a value"
+   "why": "not a computation of a value"
   },
   "the increment is not a number": {
    "operations": 24,
@@ -536,7 +564,7 @@
   },
   "the operation is about the host object, not the value": {
    "operations": 1470,
-   "why": "the corpus calls a method the value does not have; the same computation is a function here"
+   "why": "not a computation of a value"
   },
   "the options are not a plain bag": {
    "operations": 46,
@@ -558,6 +586,10 @@
    "operations": 9,
    "why": "an option, which the corpus coerces"
   },
+  "the reference refuses a round this library answers, its instants being bounded and ours not": {
+   "operations": 9,
+   "why": "the method is called on a receiver of another brand"
+  },
   "the rounding mode is not a plain value": {
    "operations": 32,
    "why": "an option, which the corpus coerces"
@@ -573,6 +605,10 @@
   "the smallestUnit is not a unit this library has": {
    "operations": 57,
    "why": "an option, which the corpus coerces"
+  },
+  "the start of a day is not refused": {
+   "operations": 9,
+   "why": "the method is called on a receiver of another brand"
   },
   "the sum passes what a JavaScript number holds exactly": {
    "operations": 492,
@@ -595,7 +631,7 @@
    "why": "an option, which the corpus coerces"
   },
   "the value is not a zoned date and time": {
-   "operations": 512,
+   "operations": 494,
    "why": "the receiver is a subclass or a bag, which is a brand check on the object"
   },
   "the zone is not a name": {
@@ -611,33 +647,61 @@
    "why": "an option, which the corpus coerces"
   }
  },
- "library": {
-  "a calendar in the text is not this library's shape": 9,
-  "a difference in range is not refused": 90,
-  "a difference of more than 292 years is more than a count of nanoseconds holds": 50,
-  "a field bag in range is not refused": 37,
+ "shape": {
+  "a field bag in range is not refused": {
+   "operations": 37,
+   "why": "a bag of fields; this library spells the edit as `with_year` and its siblings"
+  },
+  "a text rounds to a minute at the largest, as the reference does": {
+   "operations": 12,
+   "why": "a text rounded to a date unit; this library's writer rounds to an hour at the largest"
+  },
+  "a time of day in range is not refused": {
+   "operations": 9,
+   "why": "a time-of-day text is the argument; this library takes a `Time`"
+  },
+  "a zone the database has is not refused": {
+   "operations": 16,
+   "why": "a zone written as a text; this library takes a `Tz`"
+  },
+  "the answer is not an instant": {
+   "operations": 6,
+   "why": "the corpus answers with an object; this library answers the two parts of one"
+  },
+  "the direction is not given": {
+   "operations": 2,
+   "why": "a search with no direction; this library's asks for one"
+  },
+  "the offset is written as text, which the text cases cover": {
+   "operations": 4,
+   "why": "the offset is a number here and a text there"
+  },
+  "the round is asked without a unit": {
+   "operations": 5,
+   "why": "a round with no unit; this library's `round` takes the unit it rounds to"
+  },
+  "the time carries an offset or a calendar": {
+   "operations": 181,
+   "why": "a time-of-day text is the argument; this library takes a `Time`, and reads the text with `parse`"
+  }
+ },
+ "difference": {
   "a field edit that neither fits nor refuses leaves a reading this library places differently": 20,
   "a length of a hundred million days is more than a count of nanoseconds holds": 24,
-  "a reading is not refused": 46,
-  "a search is not refused": 9,
-  "a text is not refused for a value in range": 25,
-  "a text rounds to a minute at the largest, as the reference does": 12,
-  "a time of day in range is not refused": 18,
-  "a zone the database has is not refused": 25,
-  "an equality is not refused": 9,
-  "the answer is not an instant": 6,
-  "the direction is not given": 2,
-  "the field is not one an ISO calendar has": 32,
-  "the offset is written as text, which the text cases cover": 4,
+  "the name is matched whatever its case now, and Temporal writes the zone it finds as `UTC` where this library files it under the release's `Etc/UTC`": 3,
   "the other value is a bag with an offset, a form this library does not convert": 8,
-  "the reference refuses a round this library answers, its instants being bounded and ours not": 28,
-  "the round is asked without a unit": 5,
-  "the start of a day is not refused": 11,
+  "the reference refuses a round this library answers, its instants being bounded and ours not": 19,
   "the three sub-second fields are one number here, so a field past its own range reads as a carry": 4,
-  "the time carries an offset or a calendar": 181,
   "the zone is written as a date and time with a leap second, which this library does not read as a zone": 4,
-  "the zone is written as a date and time, a form this library does not read as a zone": 32,
-  "the zone name is matched whatever its case, which this library does not": 3
+  "the zone is written as a date and time, a form this library does not read as a zone": 32
+ },
+ "library": {
+  "a calendar in the text is not this library's shape": 9,
+  "a reading is not refused": 1,
+  "a text is not refused for a value in range": 7,
+  "the field is not one an ISO calendar has": 32,
+  "the number does not fit the field this library keeps": 2,
+  "the start of a day is not refused": 2
  },
  "cases": [
   {
@@ -2358,13 +2422,6 @@
    "operations": 1
   },
   {
-   "case": "prototype/since/argument-at-limits.js",
-   "reasons": [
-    "a difference of more than 292 years is more than a count of nanoseconds holds"
-   ],
-   "operations": 24
-  },
-  {
    "case": "prototype/since/argument-propertybag-calendar-case-insensitive.js",
    "reasons": [
     "the value is not a zoned date and time"
@@ -2591,7 +2648,7 @@
   {
    "case": "prototype/since/branding.js",
    "reasons": [
-    "the value is not a zoned date and time"
+    "a difference in range is not refused"
    ],
    "operations": 9
   },
@@ -2619,7 +2676,7 @@
   {
    "case": "prototype/since/float64-representable-integer.js",
    "reasons": [
-    "a difference of more than 292 years is more than a count of nanoseconds holds"
+    "the number does not fit the field this library keeps"
    ],
    "operations": 1
   },
@@ -2643,13 +2700,6 @@
     "the corpus's expected value is the one a double holds, which is coarser than the instant"
    ],
    "operations": 25
-  },
-  {
-   "case": "prototype/since/largestunit-smallestunit-mismatch.js",
-   "reasons": [
-    "a difference in range is not refused"
-   ],
-   "operations": 42
   },
   {
    "case": "prototype/since/largestunit-undefined.js",
@@ -2782,10 +2832,9 @@
   {
    "case": "prototype/since/roundingincrement-out-of-range.js",
    "reasons": [
-    "a difference in range is not refused",
     "the increment is not a whole number"
    ],
-   "operations": 6
+   "operations": 3
   },
   {
    "case": "prototype/since/roundingincrement-undefined.js",
@@ -3746,13 +3795,6 @@
    "operations": 1
   },
   {
-   "case": "prototype/until/argument-at-limits.js",
-   "reasons": [
-    "a difference of more than 292 years is more than a count of nanoseconds holds"
-   ],
-   "operations": 24
-  },
-  {
    "case": "prototype/until/argument-propertybag-calendar-case-insensitive.js",
    "reasons": [
     "the value is not a zoned date and time"
@@ -3979,7 +4021,7 @@
   {
    "case": "prototype/until/branding.js",
    "reasons": [
-    "the value is not a zoned date and time"
+    "a difference in range is not refused"
    ],
    "operations": 9
   },
@@ -4007,7 +4049,7 @@
   {
    "case": "prototype/until/float64-representable-integer.js",
    "reasons": [
-    "a difference of more than 292 years is more than a count of nanoseconds holds"
+    "the number does not fit the field this library keeps"
    ],
    "operations": 1
   },
@@ -4031,13 +4073,6 @@
     "the corpus's expected value is the one a double holds, which is coarser than the instant"
    ],
    "operations": 25
-  },
-  {
-   "case": "prototype/until/largestunit-smallestunit-mismatch.js",
-   "reasons": [
-    "a difference in range is not refused"
-   ],
-   "operations": 42
   },
   {
    "case": "prototype/until/largestunit-undefined.js",
@@ -4156,10 +4191,9 @@
   {
    "case": "prototype/until/roundingincrement-out-of-range.js",
    "reasons": [
-    "a difference in range is not refused",
     "the increment is not a whole number"
    ],
-   "operations": 6
+   "operations": 3
   },
   {
    "case": "prototype/until/roundingincrement-undefined.js",
@@ -4871,7 +4905,7 @@
   {
    "case": "prototype/withTimeZone/timezone-case-insensitive.js",
    "reasons": [
-    "the zone name is matched whatever its case, which this library does not"
+    "the name is matched whatever its case now, and Temporal writes the zone it finds as `UTC` where this library files it under the release's `Etc/UTC`"
    ],
    "operations": 3
   },
