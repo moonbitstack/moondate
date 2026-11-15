@@ -25,6 +25,21 @@ const UNITS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"
 const MODES = ["ceil", "floor", "expand", "trunc", "halfCeil", "halfFloor", "halfExpand", "halfTrunc", "halfEven"];
 const STARTS = ["2024-01-01", "2024-01-31", "2024-02-29", "2023-12-31", "2024-03-09"];
 
+// Lengths past the 292 years a count of nanoseconds reaches, which is the range
+// this library used to refuse and does not: every one of them is a length the
+// reference answers when the date it is measured from is inside its own range.
+const LARGE = [
+  { years: 200000 },
+  { years: -200000 },
+  { years: 200000, months: 6, days: 3 },
+  { years: 271000, months: 6 },
+  { days: 90000000, hours: 5 },
+  { hours: 2000000000 },
+  { seconds: 4000000000 },
+  { years: 200000, nanoseconds: 999999999 },
+  { months: 3000000, days: 17 },
+];
+
 const LENGTHS = [
   { years: 1, months: 11, days: 24 },
   { years: 2, months: 0, days: 0 },
@@ -65,7 +80,7 @@ function durationOf(length) {
 }
 
 const rounds = [];
-for (const length of LENGTHS) {
+for (const length of [...LENGTHS, ...LARGE]) {
   for (const unit of UNITS) {
     for (const mode of MODES) {
       for (const start of STARTS) {
@@ -95,7 +110,7 @@ for (const length of LENGTHS) {
 }
 
 const totals = [];
-for (const length of LENGTHS) {
+for (const length of [...LENGTHS, ...LARGE]) {
   for (const unit of [...UNITS, "milliseconds", "microseconds", "nanoseconds"]) {
     for (const start of STARTS.slice(0, 3)) {
       const result = answer(() => durationOf(length).total({ unit, relativeTo: start }));
@@ -104,12 +119,13 @@ for (const length of LENGTHS) {
   }
 }
 
+const ALL = [...LENGTHS, ...LARGE];
 const compares = [];
-for (let i = 0; i < LENGTHS.length; i++) {
-  for (let j = 0; j < LENGTHS.length; j++) {
+for (let i = 0; i < ALL.length; i++) {
+  for (let j = 0; j < ALL.length; j++) {
     const start = STARTS[(i + j) % STARTS.length];
-    const result = answer(() => Temporal.Duration.compare(durationOf(LENGTHS[i]), durationOf(LENGTHS[j]), { relativeTo: start }));
-    compares.push({ left: fields(LENGTHS[i]), right: fields(LENGTHS[j]), start, ok: result.ok, value: result.ok ? result.value : null });
+    const result = answer(() => Temporal.Duration.compare(durationOf(ALL[i]), durationOf(ALL[j]), { relativeTo: start }));
+    compares.push({ left: fields(ALL[i]), right: fields(ALL[j]), start, ok: result.ok, value: result.ok ? result.value : null });
   }
 }
 
@@ -139,5 +155,42 @@ const parses = texts.map((text) => {
   };
 });
 
-fs.writeFileSync(args.out, JSON.stringify({ rounds, totals, compares, parses }));
-console.log(`rounds ${rounds.length}, totals ${totals.length}, compares ${compares.length}, parses ${parses.length}`);
+// What the reference accepts as a length at all: every field is bounded at
+// 2^32 - 1, and the fields have to run the same way. The answers are the range
+// this library's own reader and arithmetic refuse at.
+const LIMITS = [
+  { years: 4294967295 },
+  { years: 4294967296 },
+  { years: -4294967295 },
+  { years: -4294967296 },
+  { seconds: 4294967295 },
+  { seconds: 4294967296 },
+  { nanoseconds: 4294967295 },
+  { nanoseconds: 4294967296 },
+  { hours: 4294967295 },
+  { days: 4294967296 },
+  { years: 0, months: 0, days: 0 },
+];
+
+const limits = LIMITS.map((length) => {
+  const result = answer(() => Temporal.Duration.from(fields(length)));
+  return {
+    length: fields(length),
+    ok: result.ok,
+    fields: result.ok ? {
+      years: result.value.years,
+      months: result.value.months,
+      weeks: result.value.weeks,
+      days: result.value.days,
+      hours: result.value.hours,
+      minutes: result.value.minutes,
+      seconds: result.value.seconds,
+      milliseconds: result.value.milliseconds,
+      microseconds: result.value.microseconds,
+      nanoseconds: result.value.nanoseconds,
+    } : null,
+  };
+});
+
+fs.writeFileSync(args.out, JSON.stringify({ rounds, totals, compares, parses, limits }));
+console.log(`rounds ${rounds.length}, totals ${totals.length}, compares ${compares.length}, parses ${parses.length}, limits ${limits.length}`);

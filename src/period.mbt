@@ -266,12 +266,17 @@ pub fn Period::add(self : Period, other : Period) -> Period {
 
 ///|
 /// The clock part as a span: the fields from hours down, which are exact.
+///
+/// A span is a count of nanoseconds, so it reaches a little over 292 years and a
+/// length does not: a clock part longer than that has no span to be, and this
+/// aborts rather than return one that looks like a number. Every function that
+/// measures a length — [`Period::round`], [`Period::total`], [`Period::compare`]
+/// — takes the whole length instead and has no such limit.
 pub fn Period::span(self : Period) -> Span {
-  {
-    nanos: self.hours * 3_600_000_000_000L +
-    self.minutes * 60_000_000_000L +
-    self.seconds * 1_000_000_000L +
-    self.nanos,
+  let whole = landing_of_clock(self)
+  match whole.as_nanos() {
+    Some(nanos) => { nanos, }
+    None => panic()
   }
 }
 
@@ -401,8 +406,12 @@ pub fn Period::to_string(self : Period) -> String {
       out.write_string(letter)
     }
   }
-  let seconds = self.seconds
-  if self.hours != 0L || self.minutes != 0L || seconds != 0L || self.nanos != 0L {
+  // The nanoseconds a `Span` holds are one number, so the fraction may be longer
+  // than a second and is carried into the seconds before it is written.
+  let carried = self.nanos / 1_000_000_000L
+  let seconds = self.seconds + carried
+  let nanos = self.nanos - carried * 1_000_000_000L
+  if self.hours != 0L || self.minutes != 0L || seconds != 0L || nanos != 0L {
     out.write_string("T")
     if self.hours != 0L {
       out.write_string(put(self.hours))
@@ -412,10 +421,10 @@ pub fn Period::to_string(self : Period) -> String {
       out.write_string(put(self.minutes))
       out.write_string("M")
     }
-    if seconds != 0L || self.nanos != 0L {
+    if seconds != 0L || nanos != 0L {
       out.write_string(put(seconds))
-      if self.nanos != 0L {
-        let rest = if self.nanos < 0L { -self.nanos } else { self.nanos }
+      if nanos != 0L {
+        let rest = if nanos < 0L { -nanos } else { nanos }
         let mut digits = rest.to_string()
         while digits.length() < 9 {
           digits = "0" + digits

@@ -23,6 +23,7 @@ pub fn Period::round(
   rounding~ : Rounding = HalfExpand,
   start? : Date,
 ) -> Period raise Refused {
+  checked(self)
   let largest = {
     let stated = largest_of(self)
     if smallest_unit.order() > stated.order() {
@@ -35,7 +36,7 @@ pub fn Period::round(
   if self.is_zero() {
     return self
   }
-  match start {
+  let answer = match start {
     Some(date) => {
       let destination = lands_on(date, self)
       let exact = balanced(date, self, largest)
@@ -49,9 +50,10 @@ pub fn Period::round(
           "a length in days, weeks, months or years needs the date it starts from",
         )
       } else {
+        let whole = landing_of_clock(self)
         balanced_from(
-          round_increment(
-            length_clock(self),
+          round_landing(
+            whole,
             smallest_unit.nanos().unwrap() * increment,
             rounding,
           ),
@@ -59,6 +61,8 @@ pub fn Period::round(
         )
       }
   }
+  checked(answer)
+  answer
 }
 
 ///|
@@ -76,8 +80,12 @@ pub fn Period::total(
   unit~ : TimeUnit,
   start? : Date,
 ) -> Double raise Refused {
+  checked(self)
   if !self.has_date() && unit.is_exact() {
-    return length_clock(self).to_double() / unit.nanos().unwrap().to_double()
+    let whole = landing_of_clock(self)
+    let per_day = day_of_nanos / unit.nanos().unwrap()
+    return whole.days.to_double() * per_day.to_double() +
+      whole.nanos.to_double() / unit.nanos().unwrap().to_double()
   }
   let date = match start {
     Some(date) => date
@@ -88,7 +96,9 @@ pub fn Period::total(
   }
   let destination = lands_on(date, self)
   if unit.is_exact() {
-    return destination.to_double() / unit.nanos().unwrap().to_double()
+    let per_day = day_of_nanos / unit.nanos().unwrap()
+    return destination.days.to_double() * per_day.to_double() +
+      destination.nanos.to_double() / unit.nanos().unwrap().to_double()
   }
   if self.is_zero() {
     return 0.0
@@ -119,10 +129,10 @@ pub fn Period::compare(
   other : Period,
   start? : Date,
 ) -> Int32 raise Refused {
+  checked(self)
+  checked(other)
   if !self.has_date() && !other.has_date() {
-    let here = length_clock(self)
-    let there = length_clock(other)
-    return if here < there { -1 } else if here > there { 1 } else { 0 }
+    return landing_of_clock(self).compare(landing_of_clock(other))
   }
   let date = match start {
     Some(date) => date
@@ -131,13 +141,5 @@ pub fn Period::compare(
         "a length in days, weeks, months or years needs the date it starts from",
       )
   }
-  let here = lands_on(date, self)
-  let there = lands_on(date, other)
-  if here < there {
-    -1
-  } else if here > there {
-    1
-  } else {
-    0
-  }
+  lands_on(date, self).compare(lands_on(date, other))
 }

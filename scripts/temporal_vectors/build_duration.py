@@ -40,7 +40,17 @@ def lit(value):
             return str(value)
         return str(value) + "L"
     if isinstance(value, float):
-        return repr(value)
+        # MoonBit reads a float only when it can see the point: `4e+18` is not a
+        # literal there, `4.0e18` is.
+        text = repr(value)
+        if "e" in text:
+            head, tail = text.split("e")
+            if "." not in head:
+                head += ".0"
+            text = head + "e" + tail.replace("+", "")
+        elif "." not in text:
+            text += ".0"
+        return text
     if isinstance(value, str):
         return json.dumps(value, ensure_ascii=False)
     raise ValueError(value)
@@ -98,6 +108,10 @@ def main():
             continue
         parses.append([lit(entry["text"]), lit(fields_of(entry["fields"]))])
 
+    limits = []
+    for entry in data.get("limits", []):
+        limits.append([lit(fields_of(entry["length"])), lit(bool(entry["ok"]))])
+
     def table(name, members, rows, chunk=200):
         out = ["///|\nstruct %s {\n" % name]
         names = []
@@ -123,10 +137,10 @@ def main():
 // temporal-polyfill, DON'T EDIT IT. Run the scripts in scripts/temporal_vectors/
 // to make it again.
 //
-// %d roundings, %d totals, %d comparisons and %d texts, each one a question the
-// reference implementation was asked and answered.
+// %d roundings, %d totals, %d comparisons, %d texts and %d lengths at the range
+// the reference holds, each one a question it was asked and answered.
 
-""" % (len(rounds), len(totals), len(compares), len(parses))
+""" % (len(rounds), len(totals), len(compares), len(parses), len(limits))
 
     body = ""
     body += table("RoundCase",
@@ -145,11 +159,15 @@ def main():
                   compares, 150)
     body += table("ParseCase", "text : String; want : (Int64, Int64, Int64, Int64, Int64, Int64, Int64, Int64)",
                   parses, 100)
+    body += table("LimitCase",
+                  "length : (Int64, Int64, Int64, Int64, Int64, Int64, Int64, Int64); "
+                  "taken : Bool",
+                  limits, 100)
 
     with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(head + body)
-    print("rows: %d rounds, %d totals, %d compares, %d parses"
-          % (len(rounds), len(totals), len(compares), len(parses)))
+    print("rows: %d rounds, %d totals, %d compares, %d parses, %d limits"
+          % (len(rounds), len(totals), len(compares), len(parses), len(limits)))
 
 
 if __name__ == "__main__":

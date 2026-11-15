@@ -104,6 +104,7 @@ pub fn Period::parse(text : StringView) -> Period raise Refused {
   if !seen_any {
     raise Malformed("a duration names at least one field")
   }
+  checked(period)
   period
 }
 
@@ -119,6 +120,9 @@ fn read_number(
   let mut digits = 0
   while at < length && is_digit(text[at].to_int()) {
     value = value * 10L + (text[at].unsafe_to_char().to_int() - 48).to_int64()
+    if value > largest_seconds {
+      raise Malformed("a field of a duration is past the largest one holds")
+    }
     digits = digits + 1
     at = at + 1
   }
@@ -149,7 +153,11 @@ fn read_number(
 /// The digits are taken as a fraction of the field's own length, which is exact
 /// for a field that divides evenly into nanoseconds, and the result is written in
 /// the fields below the one it was written on.
-fn fraction_of(digits : String, unit_nanos : Int64, sign : Int64) -> Period {
+fn fraction_of(
+  digits : String,
+  unit_nanos : Int64,
+  sign : Int64,
+) -> Period raise Refused {
   if digits.length() > 9 {
     return zero
   }
@@ -160,5 +168,5 @@ fn fraction_of(digits : String, unit_nanos : Int64, sign : Int64) -> Period {
     scale = scale * 10L
   }
   let part = value * (unit_nanos / scale)
-  balanced_from(part * sign, Hours)
+  balanced_from(landing_of_nanos(part * sign), Hours)
 }
