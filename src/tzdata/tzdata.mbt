@@ -162,8 +162,23 @@ pub fn parse(
 pub fn load(name : StringView) -> @zone.Tz raise @zone.Refused {
   let wanted = name.to_owned()
   let text = source_text()
-  let target = canonical(text, wanted)
-  let stretches = stretches_of(text, target)
+  let mut target = canonical(text, wanted)
+  let mut stretches = stretches_of(text, target)
+  if stretches.length() == 0 {
+    // A zone is named whatever its case: `america/new_york` is the same place as
+    // `America/New_York`, and the release's own spelling is the one the zone is
+    // then filed under.
+    match spelled_like(text, target) {
+      Some(spelling) => {
+        target = spelling
+        stretches = stretches_of(text, spelling)
+      }
+      None => ()
+    }
+  }
+  if stretches.length() == 0 {
+    raise @zone.Unknown(name=wanted)
+  }
   let rules : Map[String, Array[Line]] = Map([])
   for stretch in stretches {
     match stretch.saving {
@@ -188,6 +203,52 @@ pub fn find(name : StringView) -> @zone.Tz? {
     | @zone.Missing(_)
     | @zone.Range(_)
     | @zone.BadDate(_) => None
+  }
+}
+
+///|
+/// The name the release files a zone under when `wanted` is that name in another
+/// case: a zone's own name, or an alias resolved to the zone it points at.
+fn spelled_like(text : String, wanted : String) -> String? {
+  for line in lines_of(text) {
+    let tokens = tokens_of(line)
+    if tokens.length() < 3 {
+      continue
+    }
+    if tokens[0] == "Z" {
+      if same_letters(tokens[1], wanted) {
+        return Some(tokens[1])
+      }
+    } else if tokens[0] == "L" {
+      if same_letters(tokens[2], wanted) {
+        return Some(canonical(text, tokens[2]))
+      }
+    }
+  }
+  None
+}
+
+///|
+/// Whether two names are the same letters, whatever their case.
+fn same_letters(a : String, b : String) -> Bool {
+  if a.length() != b.length() {
+    return false
+  }
+  for i in 0..<a.length() {
+    if lower_letter(char_at(a, i)) != lower_letter(char_at(b, i)) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+/// An ASCII letter folded to lower case, and anything else as it is.
+fn lower_letter(c : Char) -> Char {
+  if c >= 'A' && c <= 'Z' {
+    (c.to_int() + 32).unsafe_to_char()
+  } else {
+    c
   }
 }
 
@@ -232,9 +293,6 @@ fn stretches_of(
           out.push(stretch_of(tokens, 0))
         }
     }
-  }
-  if out.length() == 0 {
-    raise @zone.Unknown(name=wanted)
   }
   out
 }
