@@ -42,21 +42,74 @@ fn origin_of(value : ZonedDateTime) -> Origin {
 let longest_span : Int64 = 9_223_372_036L
 
 ///|
+/// How far one instant is from another: the seconds it holds and the nanoseconds
+/// into the second, the nanoseconds always in `0 .. 1_000_000_000`.
+///
+/// A count of nanoseconds runs out after 292 years and an instant does not, so a
+/// difference is kept in the same two parts an instant is kept in. The floor form
+/// is what lets a comparison be two comparisons and a sign be the seconds'.
+priv struct Apart {
+  seconds : Int64
+  nanos : Int64
+}
+
+///|
+/// An apart from seconds and nanoseconds that may be past a second.
+fn apart_of(seconds : Int64, nanos : Int64) -> Apart {
+  let carried = floor_div(nanos, 1_000_000_000L)
+  { seconds: seconds + carried, nanos: nanos - carried * 1_000_000_000L, }
+}
+
+///|
+/// The instant `end` is from `start`.
+fn apart_between(start : ZonedDateTime, end : ZonedDateTime) -> Apart {
+  apart_of(end.epoch - start.epoch, end.nano.to_int64() - start.nano.to_int64())
+}
+
+///|
+/// Which of two apart values is further along.
+fn Apart::compare(self : Apart, other : Apart) -> Int32 {
+  if self.seconds < other.seconds {
+    -1
+  } else if self.seconds > other.seconds {
+    1
+  } else if self.nanos < other.nanos {
+    -1
+  } else if self.nanos > other.nanos {
+    1
+  } else {
+    0
+  }
+}
+
+///|
+/// The apart as one count of nanoseconds, or `None` past the 292 years one holds.
+fn Apart::as_nanos(self : Apart) -> Int64? {
+  if self.seconds > longest_span || self.seconds < -longest_span {
+    None
+  } else {
+    Some(self.seconds * 1_000_000_000L + self.nanos)
+  }
+}
+
+///|
 /// Nanoseconds from one instant to another, refused when the count does not fit.
 ///
 /// A wrong number is worse than no number: a difference that wraps is a length
-/// that looks plausible and is not, so it is refused rather than wrapped.
+/// that looks plausible and is not, so it is refused rather than wrapped. The
+/// questions that only compare two instants go through [`apart_between`] instead
+/// and have no such limit.
 fn nanos_between(
   start : ZonedDateTime,
   end : ZonedDateTime,
 ) -> Int64 raise Refused {
-  let seconds = end.epoch - start.epoch
-  if seconds > longest_span || seconds < -longest_span {
-    raise Range(
-      text="the difference is longer than a count of nanoseconds holds",
-    )
+  match apart_between(start, end).as_nanos() {
+    Some(nanos) => nanos
+    None =>
+      raise Range(
+        text="the difference is longer than a count of nanoseconds holds",
+      )
   }
-  seconds * 1_000_000_000L + end.nano.to_int64() - start.nano.to_int64()
 }
 
 ///|

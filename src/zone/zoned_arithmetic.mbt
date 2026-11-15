@@ -175,6 +175,12 @@ fn difference(
   rounding~ : @moondate.Rounding,
   increment~ : Int64,
 ) -> @moondate.Period raise Refused {
+  // The increment is read and checked whether or not a smallest unit names what
+  // it steps: a count of steps has to be a positive whole number of them, and a
+  // thousand million is the most a unit is ever cut into.
+  if increment < 1L || increment > 1_000_000_000L {
+    raise Range(text="the increment is not a number of steps a unit can take")
+  }
   let largest = largest_unit_of(largest_unit, smallest_unit)
   if start.epoch == end.epoch && start.nano == end.nano {
     return @moondate.zero
@@ -225,7 +231,7 @@ fn difference_exact(
   largest : @moondate.TimeUnit,
 ) -> @moondate.Period raise Refused {
   if largest.is_exact() {
-    return balance(nanos_between(start, end), largest)
+    return balance_between(start, end, largest)
   }
   let sign = end.compare(start)
   if sign == 0 {
@@ -237,7 +243,7 @@ fn difference_exact(
   // clock part of an answer is written from hours down whatever the date part
   // was allowed to use.
   if start_date == end_date {
-    return balance(nanos_between(start, end), Hours)
+    return balance_between(start, end, Hours)
   }
   let mut correction = 0
   if (end_time.nanos() - start_time.nanos()) * sign.to_int64() < 0L {
@@ -251,14 +257,13 @@ fn difference_exact(
     let middle = end_date.plus_days(-correction * sign)
     let middle_epoch = start.tz.epoch(middle, start_time)
     // The comparison is on the instant, nanoseconds and all: a middle reading in
-    // the same second as the end but after it in the fraction is past it.
-    let middle_nanos = middle_epoch * 1_000_000_000L + start.nano.to_int64()
-    let end_nanos = end.epoch * 1_000_000_000L + end.nano.to_int64()
-    let reached = if sign > 0 {
-      middle_nanos <= end_nanos
-    } else {
-      middle_nanos >= end_nanos
-    }
+    // the same second as the end but after it in the fraction is past it. It is a
+    // comparison of two instants, so it has no limit — a difference of three
+    // centuries is a difference all the same.
+    let towards = apart_of(middle_epoch - start.epoch, 0L).compare(
+      apart_between(start, end),
+    )
+    let reached = if sign > 0 { towards <= 0 } else { towards >= 0 }
     if correction == limit || reached {
       let dates = start_date.until(middle, largest_unit=largest)
       let rest = (end.epoch - middle_epoch) * 1_000_000_000L +
@@ -296,6 +301,80 @@ fn rank(unit : @moondate.TimeUnit) -> Int32 {
     Weeks => 7
     Months => 8
     Years => 9
+  }
+}
+
+///|
+/// How far one instant is from another, written in the fields from `largest` down.
+///
+/// The two parts are what the answer is counted in rather than one number: a
+/// difference of three centuries is nine thousand million hours, which no count of
+/// nanoseconds holds and a field of a duration does.
+fn balance_between(
+  start : ZonedDateTime,
+  end : ZonedDateTime,
+  largest : @moondate.TimeUnit,
+) -> @moondate.Period raise Refused {
+  let apart = apart_between(start, end)
+  if rank(largest) < rank(Seconds) {
+    // Below a second the answer is a count of nanoseconds, and a difference that
+    // long has none to be written as.
+    match apart.as_nanos() {
+      Some(total) => return balance(total, largest)
+      None =>
+        raise Range(
+          text="the difference is longer than a count of nanoseconds holds",
+        )
+    }
+  }
+  if rank(largest) > rank(Days) {
+    // A year, a month or a week is a calendar's answer and comes from `until` on
+    // the dates, not from a count of time.
+    raise Range(text="the unit a difference is written in is a calendar one")
+  }
+  let negative = apart.seconds < 0L
+  let sign = if negative { -1L } else { 1L }
+  let mut seconds = if negative { -apart.seconds } else { apart.seconds }
+  let mut nanos = apart.nanos
+  if negative && nanos != 0L {
+    seconds = seconds - 1L
+    nanos = 1_000_000_000L - nanos
+  }
+  let days = seconds / 86_400L
+  let rest = seconds % 86_400L
+  let hours = rest / 3_600L
+  let minutes = rest % 3_600L / 60L
+  let seconds_field = rest % 60L
+  if rank(largest) >= rank(Days) {
+    {
+      ..@moondate.zero,
+      days: days * sign,
+      hours: hours * sign,
+      minutes: minutes * sign,
+      seconds: seconds_field * sign,
+      nanos: nanos * sign,
+    }
+  } else if largest == Hours {
+    {
+      ..@moondate.zero,
+      hours: (days * 24L + hours) * sign,
+      minutes: minutes * sign,
+      seconds: seconds_field * sign,
+      nanos: nanos * sign,
+    }
+  } else if largest == Minutes {
+    {
+      ..@moondate.zero,
+      minutes: (days * 1_440L + hours * 60L + minutes) * sign,
+      seconds: seconds_field * sign,
+      nanos: nanos * sign,
+    }
+  } else {
+    {
+      ..@moondate.zero,
+      seconds: (days * 86_400L + rest) * sign,
+      nanos: nanos * sign,
+    }
   }
 }
 

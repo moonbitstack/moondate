@@ -187,10 +187,31 @@ fn refused(ask : () -> Unit raise Refused) -> Bool {
 }
 
 ///|
-test "rounding: a difference longer than a count of nanoseconds is refused" {
+test "rounding: a difference longer than a count of nanoseconds is answered" {
+  // Ten thousand years is eight thousand million hours: no count of nanoseconds
+  // holds it and a field of a period does. This test used to pin the refusal the
+  // count used to force, which is the limitation this round removes.
   let early = utc(-62_135_596_800L)
   let late = utc(253_402_300_800L)
-  assert_eq(refused(fn() raise Refused { ignore(late.until(early)) }), true)
+  assert_eq(late.until(early).to_string(), "-PT87649416H")
+  assert_eq(
+    late.until(early, largest_unit=@moondate.TimeUnit::Seconds).to_string(),
+    "-PT315537897600S",
+  )
+}
+
+///|
+test "rounding: a difference written in nanoseconds is refused when it is long" {
+  // The one unit that is still bounded: an answer in milliseconds or below is a
+  // count of nanoseconds, and a difference of ten thousand years is not one.
+  let early = utc(-62_135_596_800L)
+  let late = utc(253_402_300_800L)
+  assert_eq(
+    refused(fn() raise Refused {
+      ignore(late.until(early, largest_unit=@moondate.TimeUnit::Millis))
+    }),
+    true,
+  )
 }
 
 ///|
