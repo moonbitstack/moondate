@@ -74,7 +74,8 @@ jobs:
           git checkout -b "$branch"
           git add -A
           git commit -s -m "chore(moondate): the IANA database at $VERSION."
-          git push origin "$branch"
+          # Checkout keeps no credentials, so the token is named here, for this push only.
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
           cat > "$RUNNER_TEMP/body.md" <<'BODY'
           The IANA release named in the title has been published. This is what
           `scripts/gen_tzdata.py` and `scripts/tz_vectors/build.py` make of it: the
